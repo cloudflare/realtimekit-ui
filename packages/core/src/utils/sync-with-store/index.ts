@@ -51,8 +51,6 @@ export function SyncWithStore() {
           host[`_rtkStoreToCleanup-${propName}`] = event.detail.store;
           // Since peer specific store is available, remove element prop from global store
           removeElement(propName, host, legacyGlobalUIStore as RtkUiStoreExtended)
-
-          document.removeEventListener('rtkProvideStore', storeResponseListener);
         }
       };
 
@@ -86,7 +84,6 @@ export function SyncWithStore() {
         });
         
         host.dispatchEvent(retryRequestEvent);
-        document.removeEventListener('rtkPeerStoreReady', storeReadyListener);
       };
 
       // Store listener reference for cleanup
