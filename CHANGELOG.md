@@ -1,3 +1,10 @@
+## [1.0.6-staging.1](https://github.com/dyte-io/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.5...@cloudflare/realtimekit-ui-v1.0.6-staging.1) (2025-09-02)
+
+
+### Bug Fixes
+
+* **store-inconsistency:** for back to back meetings, 2nd meeting onwards, dialogs were not shown ([3376538](https://github.com/dyte-io/realtimekit-ui/commit/33765386ceb690bd5b527ff832aad99338482b27))
+
 ## [1.0.5](https://github.com/dyte-io/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.4...@cloudflare/realtimekit-ui-v1.0.5) (2025-08-14)
 
 
