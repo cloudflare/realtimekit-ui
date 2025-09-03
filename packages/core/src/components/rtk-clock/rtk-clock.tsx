@@ -2,6 +2,7 @@ import { Component, Host, h, Prop, Watch, State } from '@stencil/core';
 import { defaultIconPack, IconPack } from '../../lib/icons';
 import { SyncWithStore } from '../../utils/sync-with-store';
 import { Meeting } from '../../types/rtk-client';
+import { Size } from '../../types/props';
 
 const addZero = (n: number) => Math.trunc(n).toString().padStart(2, '0');
 
@@ -26,6 +27,9 @@ export class RtkClock {
   @SyncWithStore()
   @Prop()
   iconPack: IconPack = defaultIconPack;
+
+  /** Size */
+  @Prop({ reflect: true }) size: Size;
 
   @State() startedTime: string;
   @State() timeDiff: number;
