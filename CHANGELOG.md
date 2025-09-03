@@ -1,3 +1,10 @@
+## [1.0.6-staging.2](https://github.com/dyte-io/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.6-staging.1...@cloudflare/realtimekit-ui-v1.0.6-staging.2) (2025-09-03)
+
+
+### Bug Fixes
+
+* **component:** add size prop to the component to prevent type errors ([a4b73bf](https://github.com/dyte-io/realtimekit-ui/commit/a4b73bfe4757629b71a7e77fd2d09e93081a10d3)), closes [#48](https://github.com/dyte-io/realtimekit-ui/issues/48)
+
 ## [1.0.6-staging.1](https://github.com/dyte-io/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.5...@cloudflare/realtimekit-ui-v1.0.6-staging.1) (2025-09-02)
 
 
