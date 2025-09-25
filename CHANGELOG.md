@@ -1,3 +1,10 @@
+## [1.0.6-staging.3](https://github.com/dyte-io/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.6-staging.2...@cloudflare/realtimekit-ui-v1.0.6-staging.3) (2025-09-25)
+
+
+### Bug Fixes
+
+* **toggle-border-highlight:** remove border from polls, chats etc toggles, once sidebar is closed ([050d8ab](https://github.com/dyte-io/realtimekit-ui/commit/050d8abbeb79bbe38f556d4865d6cb20e986fc33))
+
 ## [1.0.6-staging.2](https://github.com/dyte-io/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.6-staging.1...@cloudflare/realtimekit-ui-v1.0.6-staging.2) (2025-09-03)
 
 
