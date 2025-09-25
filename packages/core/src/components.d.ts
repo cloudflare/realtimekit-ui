@@ -996,6 +996,10 @@ export namespace Components {
           * Meeting object
          */
         "meeting": Meeting;
+        /**
+          * Size
+         */
+        "size": Size;
     }
     /**
      * A confirmation modal.
@@ -7650,6 +7654,10 @@ declare namespace LocalJSX {
           * Meeting object
          */
         "meeting"?: Meeting;
+        /**
+          * Size
+         */
+        "size"?: Size;
     }
     /**
      * A confirmation modal.

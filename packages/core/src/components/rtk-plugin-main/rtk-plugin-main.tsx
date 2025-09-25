@@ -52,7 +52,7 @@ export class RtkPluginMain {
 
   @Watch('meeting')
   meetingChanged(meeting: Meeting) {
-    if (meeting == undefined) return;
+    if (!meeting) return;
     const enabled = this.canInteractWithPlugin();
     this.viewModeEnabled = !enabled;
     writeTask(() => {
