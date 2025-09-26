@@ -66,7 +66,7 @@ export class RtkDialogManager {
 
   @Watch('meeting')
   meetingChanged(meeting: Meeting) {
-    if (meeting == undefined) return;
+    if (!meeting) return;
     const { stage } = meeting;
     stage?.addListener('stageStatusUpdate', this.stageStatusUpdateListener);
   }

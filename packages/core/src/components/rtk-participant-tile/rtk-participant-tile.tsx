@@ -106,15 +106,15 @@ export class RtkParticipantTile {
 
   @Watch('meeting')
   meetingChanged(meeting: Meeting) {
-    if (meeting == undefined) return;
+    if (!meeting) return;
     this.participantsChanged(this.participant);
   }
 
   @Watch('participant')
   participantsChanged(participant: Peer) {
-    if (participant == undefined) return;
+    if (!participant) return;
 
-    if (this.meeting === undefined) {
+    if (!this.meeting) {
       if (this.isPreview) {
         this.videoEl && this.participant.registerVideoElement(this.videoEl, this.isPreview);
       }

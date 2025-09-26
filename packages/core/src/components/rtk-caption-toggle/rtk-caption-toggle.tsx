@@ -61,7 +61,7 @@ export class RtkCaptionToggle {
 
   @Watch('meeting')
   meetingChanged(meeting: Meeting) {
-    if (meeting === null) return;
+    if (!meeting) return;
     this.permissionsUpdateListener();
 
     this.meeting.self.permissions.addListener('permissionsUpdate', this.permissionsUpdateListener);
