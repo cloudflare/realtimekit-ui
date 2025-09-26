@@ -1,3 +1,11 @@
+## [1.0.6-staging.4](https://github.com/dyte-io/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.6-staging.3...@cloudflare/realtimekit-ui-v1.0.6-staging.4) (2025-09-26)
+
+
+### Bug Fixes
+
+* **participant-menu-list:** participant menu list was not visible in virtualised list ([ccd04d5](https://github.com/dyte-io/realtimekit-ui/commit/ccd04d5fa3c558f74741e91b3c6a045c2ab453fe))
+* **rtk-polls:** under rtk-ui-provider, polls were not reattaching due to internal error ([bdbf42f](https://github.com/dyte-io/realtimekit-ui/commit/bdbf42f7d6a23fc148e655a3c41f7c441bdd5b1c))
+
 ## [1.0.6-staging.3](https://github.com/dyte-io/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.6-staging.2...@cloudflare/realtimekit-ui-v1.0.6-staging.3) (2025-09-25)
 
 
