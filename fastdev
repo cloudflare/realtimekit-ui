@@ -1,53 +1,16 @@
 #!/bin/bash
 
-WEB_CORE_DIRECTORY=$1
-UI_KIT_DIRECTORY=$(pwd)
-GHR_PACKAGE_NAME="@dyte-in/client-core"
-NPM_PACKAGE_NAME="@dytesdk/web-core"
+REALTIMEKIT_DIRECTORY=$1
+REALTIMEKIT_UI_DIRECTORY=$(pwd)
 
-if [[ -z $WEB_CORE_DIRECTORY ]]
+if [[ -z $REALTIMEKIT_DIRECTORY ]]
 then
   echo "Usage: ./fastdev <path_to_web_core>"
   exit 1
 fi
 
-WEB_CORE_DIRECTORY=$(readlink -f $WEB_CORE_DIRECTORY)
+REALTIMEKIT_DIRECOTRY=$(readlink -f $REALTIMEKIT_DIRECTORY)
 
-if ! command -v jq &> /dev/null
-then
-    echo "This script needs \"jq\" to function properly."
-    echo "Please install \"jq\" and rerun this script."
-    exit 1
-fi
+npm link $REALTIMEKIT_DIRECTORY/realtimekit-wrapper --workspace packages/core
 
-function update_package_name() {
-  cat <<< $(jq ".name = \"$PACKAGE_NAME\"" $WEB_CORE_DIRECTORY/package.json) > $WEB_CORE_DIRECTORY/package.json
-}
-
-echo "Locating web-core in $WEB_CORE_DIRECTORY..."
-
-PACKAGE_NAME=$(cat $WEB_CORE_DIRECTORY/package.json | jq '.name' | tr -d "\"")
-
-WAS_PACKAGE_NAME_UPDATED=0
-if [[ $PACKAGE_NAME == *"$GHR_PACKAGE_NAME"* ]]
-then
-  echo "Updating package name temporarily to $NPM_PACKAGE_NAME."
-  PACKAGE_NAME=$NPM_PACKAGE_NAME
-
-  update_package_name
-fi
-
-cd node_modules/@dytesdk
-rm -rf web-core
-ln -s $WEB_CORE_DIRECTORY
-
-if [[ $PACKAGE_NAME == *"$NPM_PACKAGE_NAME"* ]] && [[ $WAS_PACKAGE_NAME_UPDATED -ne 0 ]]
-then
-  echo "Reverting package name to $GHR_PACKAGE_NAME."
-  PACKAGE_NAME=$GHR_PACKAGE_NAME
-  update_package_name
-fi
-
-echo "Linking complete! You can now run a \"build:watch\" script on web-core."
-echo "Changes made in $WEB_CORE_DIRECTORY that retrigger a build will be synced."
-echo "✅"
+npm run dev
