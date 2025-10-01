@@ -4,6 +4,10 @@
   @apply block w-fit;
 }
 
+.audioActivePadding {
+  @apply p-1;
+}
+
 canvas,
 rtk-icon {
   @apply h-6 w-6;
