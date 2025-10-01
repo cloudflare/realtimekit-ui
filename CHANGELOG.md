@@ -1,3 +1,11 @@
+## [1.0.6-staging.5](https://github.com/dyte-io/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.6-staging.4...@cloudflare/realtimekit-ui-v1.0.6-staging.5) (2025-10-01)
+
+
+### Bug Fixes
+
+* **audio-visualiser:** muted visualiser was shown as dot ([9cf7afe](https://github.com/dyte-io/realtimekit-ui/commit/9cf7afea81483d33afdd1a41122d86f21bbe8125))
+* **audio-visualizer:** added proper variable name to avoid confusion ([1bf84c7](https://github.com/dyte-io/realtimekit-ui/commit/1bf84c7d6eaac3bd6305e89287247ed1f1eb4124))
+
 ## [1.0.6-staging.4](https://github.com/dyte-io/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.6-staging.3...@cloudflare/realtimekit-ui-v1.0.6-staging.4) (2025-09-26)
 
 
