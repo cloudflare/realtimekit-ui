@@ -28,7 +28,6 @@ img.loaded {
 
   p {
     @apply m-0 mr-1;
-    @apply inline-block;
   }
 
   blockquote {

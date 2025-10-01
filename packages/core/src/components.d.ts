@@ -222,7 +222,7 @@ export namespace Components {
      */
     interface RtkAudioVisualizer {
         /**
-          * Hide when there is no audio / audio is muted
+          * Hide the visualizer if audio is muted
          */
         "hideMuted": boolean;
         /**
@@ -6700,7 +6700,7 @@ declare namespace LocalJSX {
      */
     interface RtkAudioVisualizer {
         /**
-          * Hide when there is no audio / audio is muted
+          * Hide the visualizer if audio is muted
          */
         "hideMuted"?: boolean;
         /**
