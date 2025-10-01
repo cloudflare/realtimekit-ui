@@ -4,10 +4,6 @@
   @apply block w-fit;
 }
 
-.hideMuted {
-  @apply p-1;
-}
-
 canvas,
 rtk-icon {
   @apply h-6 w-6;

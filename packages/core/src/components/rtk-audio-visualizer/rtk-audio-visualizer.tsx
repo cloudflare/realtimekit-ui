@@ -154,13 +154,11 @@ export class RtkAudioVisualizer {
   }
 
   render() {
+    if (this.hideMuted && !this.audioEnabled) return null;
+
     return (
       <Host>
-        <div
-          class={{
-            hideMuted: this.hideMuted,
-          }}
-        >
+        <div>
           <canvas
             width="24"
             height="24"
@@ -171,7 +169,7 @@ export class RtkAudioVisualizer {
             ref={(el) => (this.visualizer = el)}
             part="canvas"
           ></canvas>
-          {!this.isScreenShare && !this.audioEnabled && this.hideMuted !== true && (
+          {!this.isScreenShare && !this.audioEnabled && (
             <rtk-icon icon={this.iconPack.mic_off} part="mic-off-icon" />
           )}
         </div>
