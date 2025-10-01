@@ -48,7 +48,7 @@ export class RtkAudioVisualizer {
   @Prop()
   t: RtkI18n = useLanguage();
 
-  /** Hide when there is no audio / audio is muted */
+  /** Hide the visualizer if audio is muted */
   @Prop() hideMuted: boolean = false;
 
   /** Audio visualizer for screensharing, it will use screenShareTracks.audio instead of audioTrack */
@@ -154,11 +154,13 @@ export class RtkAudioVisualizer {
   }
 
   render() {
+    if (this.hideMuted && !this.audioEnabled) return null;
+
     return (
       <Host>
         <div
           class={{
-            hideMuted: this.hideMuted,
+            audioActivePadding: this.hideMuted && this.audioEnabled,
           }}
         >
           <canvas
@@ -171,7 +173,7 @@ export class RtkAudioVisualizer {
             ref={(el) => (this.visualizer = el)}
             part="canvas"
           ></canvas>
-          {!this.isScreenShare && !this.audioEnabled && this.hideMuted !== true && (
+          {!this.isScreenShare && !this.audioEnabled && (
             <rtk-icon icon={this.iconPack.mic_off} part="mic-off-icon" />
           )}
         </div>
