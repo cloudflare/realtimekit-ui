@@ -14,7 +14,9 @@ export const config: Config = {
   sourceMap: false,
   devServer: {
     openBrowser: false,
+    reloadStrategy: 'pageReload',
   },
+  watchIgnoredRegex: new RegExp(`node_modules/@cloudflare/realtimekit/.*`),
   extras: {
     experimentalImportInjection: true,
   },
