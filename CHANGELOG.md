@@ -1,3 +1,10 @@
+## [1.0.6-staging.6](https://github.com/dyte-io/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.6-staging.5...@cloudflare/realtimekit-ui-v1.0.6-staging.6) (2025-10-01)
+
+
+### Bug Fixes
+
+* **chat-notification-overflow:** fixed overflow, clamp message to 2 lines with ellipsis ([8b67c87](https://github.com/dyte-io/realtimekit-ui/commit/8b67c879d693026cc49b63ef9d384dbb8a99fb88))
+
 ## [1.0.6-staging.5](https://github.com/dyte-io/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.6-staging.4...@cloudflare/realtimekit-ui-v1.0.6-staging.5) (2025-10-01)
 
 
