@@ -24,6 +24,8 @@ export class RtkParticipantTile {
 
   private playTimeout: any;
 
+  private boundMediaConnectionUpdateListener: (...args: any[]) => void;
+
   @State() isPinned: boolean = false;
 
   @State() mediaConnectionError: boolean = false;
@@ -91,6 +93,7 @@ export class RtkParticipantTile {
     // set videoState before initial render and initialize listeners
     if (this.meeting) this.meetingChanged(this.meeting);
     else this.participantsChanged(this.participant);
+    this.boundMediaConnectionUpdateListener = this.mediaConnectionUpdateListener.bind(this);
   }
 
   disconnectedCallback() {
@@ -100,7 +103,7 @@ export class RtkParticipantTile {
     this.participant.deregisterVideoElement(this.videoEl, this.isPreview);
     (this.participant as RTKParticipant).removeListener('pinned', this.onPinned);
     (this.participant as RTKParticipant).removeListener('unpinned', this.onPinned);
-    this.meeting.meta.off('mediaConnectionUpdate', this.mediaConnectionUpdateListener);
+    this.meeting.meta.off('mediaConnectionUpdate', this.boundMediaConnectionUpdateListener);
     this.tileUnload.emit(this.participant);
   }
 
@@ -127,7 +130,8 @@ export class RtkParticipantTile {
 
     (participant as RTKParticipant).addListener('pinned', this.onPinned);
     (participant as RTKParticipant).addListener('unpinned', this.onPinned);
-    this.meeting.meta.on('mediaConnectionUpdate', this.mediaConnectionUpdateListener.bind(this));
+    this.meeting.meta.off('mediaConnectionUpdate', this.boundMediaConnectionUpdateListener);
+    this.meeting.meta.on('mediaConnectionUpdate', this.boundMediaConnectionUpdateListener);
   }
 
   private mediaConnectionUpdateListener() {
