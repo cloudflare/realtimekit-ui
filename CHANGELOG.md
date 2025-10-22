@@ -1,3 +1,11 @@
+## [1.0.6-staging.7](https://github.com/dyte-io/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.6-staging.6...@cloudflare/realtimekit-ui-v1.0.6-staging.7) (2025-10-22)
+
+
+### Bug Fixes
+
+* bind this to listener in constructor ([3944745](https://github.com/dyte-io/realtimekit-ui/commit/39447452a7c5871cc0b9b2305b0b24441b564dd1))
+* cleanup mediaConnection listener ([ce52fa4](https://github.com/dyte-io/realtimekit-ui/commit/ce52fa4353a734e2fc3849f8027dfc44332b334d))
+
 ## [1.0.6-staging.6](https://github.com/dyte-io/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.6-staging.5...@cloudflare/realtimekit-ui-v1.0.6-staging.6) (2025-10-01)
 
 
