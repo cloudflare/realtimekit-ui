@@ -93,6 +93,10 @@ export class RtkParticipantTile {
     else this.participantsChanged(this.participant);
   }
 
+  constructor() {
+    this.mediaConnectionUpdateListener = this.mediaConnectionUpdateListener.bind(this);
+  }
+
   disconnectedCallback() {
     if (this.playTimeout) clearTimeout(this.playTimeout);
     if (this.participant == null) return;
@@ -127,7 +131,8 @@ export class RtkParticipantTile {
 
     (participant as RTKParticipant).addListener('pinned', this.onPinned);
     (participant as RTKParticipant).addListener('unpinned', this.onPinned);
-    this.meeting.meta.on('mediaConnectionUpdate', this.mediaConnectionUpdateListener.bind(this));
+    this.meeting.meta.off('mediaConnectionUpdate', this.mediaConnectionUpdateListener);
+    this.meeting.meta.on('mediaConnectionUpdate', this.mediaConnectionUpdateListener);
   }
 
   private mediaConnectionUpdateListener() {
