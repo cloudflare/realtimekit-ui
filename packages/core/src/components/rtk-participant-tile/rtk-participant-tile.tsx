@@ -228,7 +228,8 @@ export class RtkParticipantTile {
         )}
 
         <slot>
-          <Render
+          {!this.isPreview && (
+            <Render
             element="rtk-participant-tile"
             defaults={defaults}
             childProps={{
@@ -237,6 +238,7 @@ export class RtkParticipantTile {
             deepProps
             onlyChildren
           />
+          )}
         </slot>
       </Host>
     );
