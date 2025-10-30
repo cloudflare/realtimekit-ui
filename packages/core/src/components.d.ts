@@ -17,7 +17,7 @@ import { AudioVisualizerVariant } from "./components/rtk-audio-visualizer/rtk-au
 import { AvatarVariant } from "./components/rtk-avatar/rtk-avatar";
 import { DraftMeeting } from "./utils/breakout-rooms-manager";
 import { ButtonKind, ButtonVariant } from "./components/rtk-button/rtk-button";
-import { FileMessage, ImageMessage, Message, BasicParticipant as RTKBasicParticipant, RTKPermissionsPreset, RTKPlugin, TextMessage } from "@cloudflare/realtimekit";
+import { FileMessage, ImageMessage, Message, RTKBasicParticipant, RTKPermissionsPreset, RTKPlugin, TextMessage } from "@cloudflare/realtimekit";
 import { ChatFilter } from "./components/rtk-chat/rtk-chat";
 import { RtkNewMessageEvent } from "./components/rtk-chat-composer-ui/rtk-chat-composer-ui";
 import { NewMessageEvent } from "./components/rtk-chat-composer-view/rtk-chat-composer-view";
@@ -57,7 +57,7 @@ export { AudioVisualizerVariant } from "./components/rtk-audio-visualizer/rtk-au
 export { AvatarVariant } from "./components/rtk-avatar/rtk-avatar";
 export { DraftMeeting } from "./utils/breakout-rooms-manager";
 export { ButtonKind, ButtonVariant } from "./components/rtk-button/rtk-button";
-export { FileMessage, ImageMessage, Message, BasicParticipant as RTKBasicParticipant, RTKPermissionsPreset, RTKPlugin, TextMessage } from "@cloudflare/realtimekit";
+export { FileMessage, ImageMessage, Message, RTKBasicParticipant, RTKPermissionsPreset, RTKPlugin, TextMessage } from "@cloudflare/realtimekit";
 export { ChatFilter } from "./components/rtk-chat/rtk-chat";
 export { RtkNewMessageEvent } from "./components/rtk-chat-composer-ui/rtk-chat-composer-ui";
 export { NewMessageEvent } from "./components/rtk-chat-composer-view/rtk-chat-composer-view";
