@@ -49,6 +49,18 @@ export class RtkSidebarUi {
 
   private onClose = () => {
     this.sidebarClose.emit();
+    /**
+     * NOTE(ravindra-cloudflare):
+     * If the sidebar was opened from a RealtimeKit component, apply a blur (remove focus/active class).
+     * This helps remove the active border from RTK toggles, such as rtk-polls-toggle, rtk-chat-toggle, etc.
+     */
+    if (
+      document.activeElement instanceof HTMLElement &&
+      document.activeElement.tagName?.includes('RTK-') &&
+      document.activeElement.blur instanceof Function
+    ) {
+      document.activeElement.blur();
+    }
   };
 
   private keydownListener: (e: KeyboardEvent) => void;

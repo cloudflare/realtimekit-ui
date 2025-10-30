@@ -50,7 +50,7 @@ export class RtkPolls {
   @State() create: boolean = false;
 
   /** Polls */
-  @State() polls: Poll[];
+  @State() polls: Poll[] = [];
 
   @State() permissions: RTKPermissionsPreset;
 
@@ -66,9 +66,9 @@ export class RtkPolls {
 
   @Watch('meeting')
   meetingChanged(meeting: Meeting) {
-    if (meeting == undefined) return;
+    if (!meeting) return;
 
-    if (meeting && !meeting.polls) return;
+    if (!meeting.polls) return;
 
     this.permissions = this.meeting.self.permissions;
     this.polls = [...meeting.polls.items];
@@ -133,7 +133,7 @@ export class RtkPolls {
               />
             )}
           </div>
-          {this.permissions.polls.canCreate && (
+          {this.permissions?.polls?.canCreate && (
             <rtk-button
               kind="wide"
               onClick={() => this.toggleCreateState()}

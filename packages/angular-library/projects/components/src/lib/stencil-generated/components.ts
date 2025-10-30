@@ -915,14 +915,14 @@ export declare interface RtkChatToggle extends Components.RtkChatToggle {
 
 
 @ProxyCmp({
-  inputs: ['iconPack', 'meeting']
+  inputs: ['iconPack', 'meeting', 'size']
 })
 @Component({
   selector: 'rtk-clock',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: '<ng-content></ng-content>',
   // eslint-disable-next-line @angular-eslint/no-inputs-metadata-property
-  inputs: ['iconPack', 'meeting'],
+  inputs: ['iconPack', 'meeting', 'size'],
 })
 export class RtkClock {
   protected el: HTMLRtkClockElement;

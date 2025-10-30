@@ -1,3 +1,55 @@
+## [1.0.6-staging.7](https://github.com/dyte-io/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.6-staging.6...@cloudflare/realtimekit-ui-v1.0.6-staging.7) (2025-10-22)
+
+
+### Bug Fixes
+
+* bind this to listener in constructor ([3944745](https://github.com/dyte-io/realtimekit-ui/commit/39447452a7c5871cc0b9b2305b0b24441b564dd1))
+* cleanup mediaConnection listener ([ce52fa4](https://github.com/dyte-io/realtimekit-ui/commit/ce52fa4353a734e2fc3849f8027dfc44332b334d))
+
+## [1.0.6-staging.6](https://github.com/dyte-io/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.6-staging.5...@cloudflare/realtimekit-ui-v1.0.6-staging.6) (2025-10-01)
+
+
+### Bug Fixes
+
+* **chat-notification-overflow:** fixed overflow, clamp message to 2 lines with ellipsis ([8b67c87](https://github.com/dyte-io/realtimekit-ui/commit/8b67c879d693026cc49b63ef9d384dbb8a99fb88))
+
+## [1.0.6-staging.5](https://github.com/dyte-io/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.6-staging.4...@cloudflare/realtimekit-ui-v1.0.6-staging.5) (2025-10-01)
+
+
+### Bug Fixes
+
+* **audio-visualiser:** muted visualiser was shown as dot ([9cf7afe](https://github.com/dyte-io/realtimekit-ui/commit/9cf7afea81483d33afdd1a41122d86f21bbe8125))
+* **audio-visualizer:** added proper variable name to avoid confusion ([1bf84c7](https://github.com/dyte-io/realtimekit-ui/commit/1bf84c7d6eaac3bd6305e89287247ed1f1eb4124))
+
+## [1.0.6-staging.4](https://github.com/dyte-io/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.6-staging.3...@cloudflare/realtimekit-ui-v1.0.6-staging.4) (2025-09-26)
+
+
+### Bug Fixes
+
+* **participant-menu-list:** participant menu list was not visible in virtualised list ([ccd04d5](https://github.com/dyte-io/realtimekit-ui/commit/ccd04d5fa3c558f74741e91b3c6a045c2ab453fe))
+* **rtk-polls:** under rtk-ui-provider, polls were not reattaching due to internal error ([bdbf42f](https://github.com/dyte-io/realtimekit-ui/commit/bdbf42f7d6a23fc148e655a3c41f7c441bdd5b1c))
+
+## [1.0.6-staging.3](https://github.com/dyte-io/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.6-staging.2...@cloudflare/realtimekit-ui-v1.0.6-staging.3) (2025-09-25)
+
+
+### Bug Fixes
+
+* **toggle-border-highlight:** remove border from polls, chats etc toggles, once sidebar is closed ([050d8ab](https://github.com/dyte-io/realtimekit-ui/commit/050d8abbeb79bbe38f556d4865d6cb20e986fc33))
+
+## [1.0.6-staging.2](https://github.com/dyte-io/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.6-staging.1...@cloudflare/realtimekit-ui-v1.0.6-staging.2) (2025-09-03)
+
+
+### Bug Fixes
+
+* **component:** add size prop to the component to prevent type errors ([a4b73bf](https://github.com/dyte-io/realtimekit-ui/commit/a4b73bfe4757629b71a7e77fd2d09e93081a10d3)), closes [#48](https://github.com/dyte-io/realtimekit-ui/issues/48)
+
+## [1.0.6-staging.1](https://github.com/dyte-io/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.5...@cloudflare/realtimekit-ui-v1.0.6-staging.1) (2025-09-02)
+
+
+### Bug Fixes
+
+* **store-inconsistency:** for back to back meetings, 2nd meeting onwards, dialogs were not shown ([3376538](https://github.com/dyte-io/realtimekit-ui/commit/33765386ceb690bd5b527ff832aad99338482b27))
+
 ## [1.0.5](https://github.com/dyte-io/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.4...@cloudflare/realtimekit-ui-v1.0.5) (2025-08-14)
 
 
