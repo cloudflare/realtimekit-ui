@@ -7,6 +7,13 @@
       content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"
     />
     <title>RealtimeKit UI</title>
+    
+    <!-- Cloudflare Favicon -->
+    <link rel="icon" type="image/svg+xml" href="https://demo.realtime.cloudflare.com/favicon.ico">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
       html,
@@ -14,6 +21,8 @@
         -webkit-overflow-scrolling: touch !important;
         overflow: auto !important;
         height: 100% !important;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
       }
 
       [x-cloak] {
@@ -23,6 +32,344 @@
       .pattern {
         fill: #ffac00;
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 56 28' width='56' height='28'%3E%3Cpath fill='%23000' fill-opacity='0.4' d='M56 26v2h-7.75c2.3-1.27 4.94-2 7.75-2zm-26 2a2 2 0 1 0-4 0h-4.09A25.98 25.98 0 0 0 0 16v-2c.67 0 1.34.02 2 .07V14a2 2 0 0 0-2-2v-2a4 4 0 0 1 3.98 3.6 28.09 28.09 0 0 1 2.8-3.86A8 8 0 0 0 0 6V4a9.99 9.99 0 0 1 8.17 4.23c.94-.95 1.96-1.83 3.03-2.63A13.98 13.98 0 0 0 0 0h7.75c2 1.1 3.73 2.63 5.1 4.45 1.12-.72 2.3-1.37 3.53-1.93A20.1 20.1 0 0 0 14.28 0h2.7c.45.56.88 1.14 1.29 1.74 1.3-.48 2.63-.87 4-1.15-.11-.2-.23-.4-.36-.59H26v.07a28.4 28.4 0 0 1 4 0V0h4.09l-.37.59c1.38.28 2.72.67 4.01 1.15.4-.6.84-1.18 1.3-1.74h2.69a20.1 20.1 0 0 0-2.1 2.52c1.23.56 2.41 1.2 3.54 1.93A16.08 16.08 0 0 1 48.25 0H56c-4.58 0-8.65 2.2-11.2 5.6 1.07.8 2.09 1.68 3.03 2.63A9.99 9.99 0 0 1 56 4v2a8 8 0 0 0-6.77 3.74c1.03 1.2 1.97 2.5 2.79 3.86A4 4 0 0 1 56 10v2a2 2 0 0 0-2 2.07 28.4 28.4 0 0 1 2-.07v2c-9.2 0-17.3 4.78-21.91 12H30zM7.75 28H0v-2c2.81 0 5.46.73 7.75 2zM56 20v2c-5.6 0-10.65 2.3-14.28 6h-2.7c4.04-4.89 10.15-8 16.98-8zm-39.03 8h-2.69C10.65 24.3 5.6 22 0 22v-2c6.83 0 12.94 3.11 16.97 8zm15.01-.4a28.09 28.09 0 0 1 2.8-3.86 8 8 0 0 0-13.55 0c1.03 1.2 1.97 2.5 2.79 3.86a4 4 0 0 1 7.96 0zm14.29-11.86c1.3-.48 2.63-.87 4-1.15a25.99 25.99 0 0 0-44.55 0c1.38.28 2.72.67 4.01 1.15a21.98 21.98 0 0 1 36.54 0zm-5.43 2.71c1.13-.72 2.3-1.37 3.54-1.93a19.98 19.98 0 0 0-32.76 0c1.23.56 2.41 1.2 3.54 1.93a15.98 15.98 0 0 1 25.68 0zm-4.67 3.78c.94-.95 1.96-1.83 3.03-2.63a13.98 13.98 0 0 0-22.4 0c1.07.8 2.09 1.68 3.03 2.63a9.99 9.99 0 0 1 16.34 0z'%3E%3C/path%3E%3C/svg%3E");
+      }
+
+      /* Replace Tailwind classes with plain CSS - Cloudflare Colors */
+      .body-styles {
+        height: 100%;
+        width: 100%;
+        background: linear-gradient(135deg, #0f1419 0%, #1a1f2e 100%); /* Cloudflare dark gradient */
+      }
+
+      .app-container {
+        height: 100%;
+        width: 100%;
+      }
+
+      .login-container {
+        display: flex;
+        min-height: 100vh;
+        width: 100%;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+      }
+
+      /* Mobile-first responsive design */
+      @media (max-width: 640px) {
+        .login-container {
+          padding: 0.5rem;
+          align-items: flex-start;
+          padding-top: 2rem;
+        }
+      }
+
+      .pattern-bg {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        opacity: 0.1;
+      }
+
+      .form-card {
+        z-index: 10;
+        width: 100%;
+        max-width: 28rem;
+        border-radius: 0.75rem;
+        border: 1px solid #2d3748; /* Cloudflare border */
+        background: rgba(26, 31, 46, 0.95); /* Semi-transparent dark */
+        backdrop-filter: blur(10px);
+        padding: 2rem;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(246, 130, 31, 0.1);
+      }
+
+      /* Responsive form card */
+      @media (max-width: 640px) {
+        .form-card {
+          max-width: none;
+          margin: 0;
+          padding: 1.5rem;
+          border-radius: 0.5rem;
+          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(246, 130, 31, 0.1);
+        }
+      }
+
+      @media (max-width: 480px) {
+        .form-card {
+          padding: 1rem;
+          border-radius: 0.25rem;
+        }
+      }
+
+      .header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .header-text {
+        font-size: 1.25rem;
+        color: #f7fafc; /* Cloudflare light text */
+        font-weight: 600;
+      }
+
+      /* Responsive typography */
+      @media (max-width: 640px) {
+        .header-text {
+          font-size: 1.125rem;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .header-text {
+          font-size: 1rem;
+        }
+      }
+
+      .form-styles {
+        margin-top: 1.5rem;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .form-group {
+        margin-top: 1rem;
+      }
+
+      .form-group:first-child {
+        margin-top: 0;
+      }
+
+      .label-styles {
+        font-size: 0.875rem;
+        color: #e2e8f0; /* Brighter text */
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        display: block;
+        letter-spacing: 0.025em;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+      }
+
+      .input-styles {
+        display: block;
+        height: 3rem;
+        width: 100%;
+        box-sizing: border-box;
+        border-radius: 0.5rem;
+        border: 1px solid #4a5568; /* Cloudflare input border */
+        background-color: rgba(45, 55, 72, 0.6); /* Semi-transparent dark */
+        padding: 0 0.75rem;
+        color: #f7fafc; /* Cloudflare light text */
+        transition: border-color 0.2s, box-shadow 0.2s;
+      }
+
+      .input-styles:focus {
+        outline: none;
+        border-color: #F6821F; /* Cloudflare orange */
+        box-shadow: 0 0 0 3px rgba(246, 130, 31, 0.1);
+      }
+
+      .select-styles {
+        display: block;
+        height: 3rem;
+        width: 100%;
+        box-sizing: border-box;
+        border-radius: 0.5rem;
+        border: 1px solid #4a5568; /* Cloudflare input border */
+        background-color: rgba(45, 55, 72, 0.6); /* Semi-transparent dark */
+        padding: 0 0.75rem;
+        color: #f7fafc; /* Cloudflare light text */
+        transition: border-color 0.2s, box-shadow 0.2s;
+      }
+
+      .select-styles:focus {
+        outline: none;
+        border-color: #F6821F; /* Cloudflare orange */
+        box-shadow: 0 0 0 3px rgba(246, 130, 31, 0.1);
+      }
+
+      .options-section {
+        margin-top: 1rem;
+        font-size: 0.875rem;
+      }
+
+      .options-container {
+        margin-top: 0.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      /* Responsive form elements */
+      @media (max-width: 640px) {
+        .form-styles {
+          margin-top: 1rem;
+        }
+        
+        .form-group {
+          margin-top: 0.75rem;
+        }
+        
+        .options-section {
+          margin-top: 0.75rem;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .input-styles,
+        .select-styles {
+          height: 2.75rem;
+          font-size: 0.875rem;
+        }
+        
+        .label-styles {
+          font-size: 0.6875rem;
+        }
+      }
+
+      .checkbox-label {
+        display: flex;
+        height: 3rem;
+        user-select: none;
+        align-items: center;
+        justify-content: space-between;
+        border-radius: 0.5rem;
+        background-color: rgba(45, 55, 72, 0.4); /* Cloudflare semi-transparent */
+        border: 1px solid #4a5568;
+        padding: 0 1rem;
+        color: #f7fafc; /* Cloudflare light text */
+        transition: background-color 0.2s, border-color 0.2s;
+      }
+
+      .checkbox-label:hover {
+        background-color: rgba(45, 55, 72, 0.6);
+        border-color: #F6821F; /* Cloudflare orange */
+      }
+
+      .checkbox-label.mt-4 {
+        margin-top: 1rem;
+      }
+
+      .checkbox-styles {
+        border-radius: 4px;
+        background-color: transparent;
+        border: 2px solid #4a5568;
+        color: #F6821F; /* Cloudflare orange */
+        accent-color: #F6821F;
+        width: 18px;
+        height: 18px;
+      }
+
+      .divider {
+        margin: 1.5rem 0;
+        border-top: 1px dashed #4a5568; /* Cloudflare border */
+        border-bottom: 1px dashed #4a5568;
+        padding: 1rem;
+        text-align: center;
+        font-size: 0.875rem;
+        color: #cbd5e0; /* Cloudflare secondary text */
+      }
+
+      .link-styles {
+        color: #F6821F; /* Cloudflare orange */
+        text-decoration: none;
+        font-weight: 500;
+      }
+
+      .link-styles:hover {
+        color: #fb923c;
+        text-decoration: underline;
+      }
+
+      .button-styles {
+        display: block;
+        border-radius: 0.5rem;
+        background: linear-gradient(135deg, #F6821F 0%, #fb923c 100%); /* Cloudflare orange gradient */
+        padding: 0.75rem 0;
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+
+      .button-styles:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 25px rgba(246, 130, 31, 0.3);
+      }
+
+      .button-styles:disabled {
+        cursor: progress;
+        background: linear-gradient(135deg, rgba(246, 130, 31, 0.3), rgba(251, 146, 60, 0.3));
+        color: rgba(247, 250, 252, 0.6);
+        transform: none;
+        box-shadow: none;
+      }
+
+      /* Responsive checkboxes and buttons */
+      @media (max-width: 640px) {
+        .checkbox-label {
+          height: 2.75rem;
+          padding: 0 0.75rem;
+        }
+        
+        .divider {
+          margin: 1rem 0;
+          padding: 0.75rem;
+          font-size: 0.8125rem;
+        }
+        
+        .button-styles {
+          padding: 0.625rem 0;
+          font-size: 0.9375rem;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .checkbox-label {
+          height: 2.5rem;
+          padding: 0 0.5rem;
+          font-size: 0.875rem;
+        }
+        
+        .checkbox-styles {
+          width: 16px;
+          height: 16px;
+        }
+        
+        .button-styles {
+          padding: 0.5rem 0;
+          font-size: 0.875rem;
+        }
+        
+        .divider {
+          margin: 0.75rem 0;
+          padding: 0.5rem;
+          font-size: 0.75rem;
+        }
+      }
+
+      /* Landscape mobile optimization */
+      @media (max-height: 600px) and (orientation: landscape) {
+        .login-container {
+          padding: 0.5rem;
+          align-items: flex-start;
+        }
+        
+        .form-card {
+          padding: 1rem;
+          margin: 0.5rem 0;
+        }
+        
+        .form-styles {
+          margin-top: 0.75rem;
+        }
+        
+        .form-group {
+          margin-top: 0.5rem;
+        }
       }
     </style>
 
@@ -34,7 +381,6 @@
     <script src="/realtimekit.js"></script>
 
     <!-- Optional libs -->
-    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
     <script src="https://unpkg.com/alpinejs@3.8.1/dist/cdn.min.js" defer></script>
 
     <script>
@@ -51,6 +397,7 @@
               audio: false,
               video: false,
             },
+            addEffectsAddon: false,
           },
           async initialize() {
             const url = new URL(window.location.href);
@@ -94,7 +441,7 @@
 
             this.status = 'Getting meeting details...';
 
-            const { roomName, defaults, authToken } = this.data;
+            const { roomName, defaults, authToken, addEffectsAddon } = this.data;
             const modules = {
               spotlight: true,
               devTools: {
@@ -118,6 +465,31 @@
                 modules,
               });
 
+              let config;
+              // Conditionally load effects addon if enabled
+              if (addEffectsAddon) {
+                const RealtimeKitVideoBackground = await import("https://cdn.jsdelivr.net/npm/@cloudflare/realtimekit-ui-addons@latest/dist/video-background.js");
+                const { registerAddons } = await import("https://cdn.jsdelivr.net/npm/@cloudflare/realtimekit-ui@latest/dist/esm/index.js");
+                
+                const videoBackground = await RealtimeKitVideoBackground.default.init({
+                  modes: ["blur", "virtual"],
+                  meeting,
+                  images: [
+                      "https://images.unsplash.com/photo-1487088678257-3a541e6e3922?q=80&w=2874&auto=format&fit=crop&ixlib=rb-4.0.3",
+                      "https://images.unsplash.com/photo-1496715976403-7e36dc43f17b?q=80&w=2848&auto=format&fit=crop&ixlib=rb-4.0.3",
+                      "https://images.unsplash.com/photo-1600431521340-491eca880813?q=80&w=2938&auto=format&fit=crop&ixlib=rb-4.0.3"
+                  ],
+                  onVideoBackgroundUpdate: ({backgroundMode, backgroundURL}) => { 
+                    console.log('videoBackgroundUpdated => ', {backgroundMode, backgroundURL});
+                  }, // Listen to background update action
+                });
+
+                config = registerAddons([videoBackground], meeting);
+                console.log('Effects addon loaded and configured');
+              } else {
+                console.log('Effects addon disabled - using default meeting config');
+              }
+
               if (!location.href.includes('http://localhost:3333/')) {
                 // set name from localStorage cache
                 const name =
@@ -129,6 +501,12 @@
 
               this.status = 'Connecting...';
               this.attachMeetingObject(meeting);
+              /**
+               *  config as undefined is accepted,
+               *  if addons are enabled, addon config will be used
+               */
+              this.$refs.meeting.config = config;
+              
               meeting.connectedMeetings.on('meetingChanged', (newMeeting) =>
                 this.attachMeetingObject(newMeeting, true)
               );
@@ -149,18 +527,18 @@
     </script>
   </head>
 
-  <body class="h-full w-full bg-zinc-900">
-    <div x-init="initialize" x-data="app()" class="h-full w-full" x-data="app()">
+  <body class="body-styles">
+    <div x-init="initialize" x-data="app()" class="app-container" x-data="app()">
       <div
         x-show="!meeting"
         x-transition
-        class="flex h-screen w-full items-center justify-center p-4"
+        class="login-container"
       >
-        <div class="pattern absolute inset-0 z-0"></div>
+        <div class="pattern pattern-bg"></div>
         <div
-          class="z-10 w-full max-w-md rounded-lg border border-zinc-800 bg-zinc-900 p-5 shadow-xl"
+          class="form-card"
         >
-          <h1 class="flex items-center gap-2">
+          <h1 class="header">
             <svg xmlns="http://www.w3.org/2000/svg" width="60" height="27" fill="none" class="">
               <g clip-path="url(#a)">
                 <path
@@ -176,24 +554,24 @@
                 <clipPath id="a"><path fill="#FFF" d="M0 0h60v27H0z" /></clipPath>
               </defs>
             </svg>
-            <span class="text-xl text-white">RealtimeKit</span>
+            <span class="header-text">Cloudflare RealtimeKit</span>
           </h1>
-          <form @submit.prevent="handleSubmit" class="mt-6 flex flex-col">
-            <div>
-              <label for="authToken" class="text-sm text-zinc-400">Participant Token</label>
+          <form @submit.prevent="handleSubmit" class="form-styles">
+            <div class="form-group">
+              <label for="authToken" class="label-styles">Participant Token</label>
               <input
                 id="authToken"
                 type="text"
                 placeholder="Participant Token"
-                class="input-colors block h-12 w-full rounded-lg border-zinc-800 bg-zinc-800 px-3 text-zinc-300"
+                class="input-styles"
                 x-model="data.authToken"
               />
             </div>
-            <div class="mt-4">
-              <label for="env" class="text-sm text-zinc-400">Environment</label>
+            <div class="form-group">
+              <label for="env" class="label-styles">Environment</label>
               <select
                 id="env"
-                class="block h-12 w-full rounded-lg border-zinc-800 bg-zinc-800 px-3 text-zinc-300"
+                class="select-styles"
                 x-model="data.env"
               >
                 <option value="devel">Devel</option>
@@ -201,57 +579,74 @@
                 <option value="prod">Production</option>
               </select>
             </div>
-            <div class="mt-4 text-sm">
-              <label class="text-zinc-400">Options</label>
-              <div class="mt-2 space-y-2">
+            <div class="options-section">
+              <label class="label-styles">Options</label>
+              <div class="options-container">
                 <label
                   for="showSetupScreen"
-                  class="flex h-12 select-none items-center justify-between rounded-lg bg-zinc-800 px-4 text-zinc-300"
+                  class="checkbox-label"
                 >
                   <span>Show Setup Screen</span>
                   <input
                     type="checkbox"
                     id="showSetupScreen"
-                    class="rounded-full bg-zinc-800 text-[#F6821E] accent-[#F6821E]"
+                    class="checkbox-styles"
                     x-model="data.showSetupScreen"
                   />
                 </label>
                 <label
                   for="video"
-                  class="flex h-12 select-none items-center justify-between rounded-lg bg-zinc-800 px-4 text-zinc-300"
+                  class="checkbox-label"
                 >
                   <span>Enable Video</span>
                   <input
                     type="checkbox"
                     id="video"
-                    class="rounded-full bg-zinc-800 text-[#F6821E] accent-[#F6821E]"
+                    class="checkbox-styles"
                     x-model="data.defaults.video"
                   />
                 </label>
                 <label
                   for="audio"
-                  class="mt-4 flex h-12 select-none items-center justify-between rounded-lg bg-zinc-800 px-4 text-zinc-300"
+                  class="checkbox-label"
                 >
                   <span>Enable Audio</span>
                   <input
                     type="checkbox"
                     id="audio"
-                    class="rounded-full bg-zinc-800 text-[#F6821E] accent-[#F6821E]"
+                    class="checkbox-styles"
                     x-model="data.defaults.audio"
                   />
                 </label>
               </div>
             </div>
+            <div class="options-section">
+              <label class="label-styles">Addons</label>
+              <div class="options-container">
+                <label
+                  for="addEffectsAddon"
+                  class="checkbox-label"
+                >
+                  <span>Effects</span>
+                  <input
+                    type="checkbox"
+                    id="addEffectsAddon"
+                    class="checkbox-styles"
+                    x-model="data.addEffectsAddon"
+                  />
+                </label>
+              </div>
+            </div>
             <div
-              class="my-6 border-t border-b border-dashed border-zinc-700 px-4 py-4 text-center text-sm text-zinc-300"
+              class="divider"
             >
               Load this page with
-              <a href="#join" class="text-orange-400" target="_blank"><code>#join</code></a>
+              <a href="#join" class="link-styles" target="_blank"><code>#join</code></a>
               for faster development!
             </div>
             <button
               type="submit"
-              class="block rounded-lg bg-gradient-to-br from-orange-400 to-orange-500 py-2 text-white disabled:cursor-progress disabled:from-orange-100/10 from:to-orange-900/10 disabled:text-orange-100/60"
+              class="button-styles"
               x-text="joining ? status : 'Join'"
               :disabled="joining"
             >
