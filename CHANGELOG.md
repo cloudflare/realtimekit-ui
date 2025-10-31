@@ -1,3 +1,15 @@
+## [1.0.7-staging.2](https://github.com/dyte-io/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.7-staging.1...@cloudflare/realtimekit-ui-v1.0.7-staging.2) (2025-10-31)
+
+
+### Bug Fixes
+
+* **toggles:** fixed alignment issues with unread counts in toggles ([2c35c81](https://github.com/dyte-io/realtimekit-ui/commit/2c35c81aa86216763ee6b65beb3d3628ec62b7c3))
+
+
+### Reverts
+
+* **colors:** reverted the colors of sample page ([9f71e6f](https://github.com/dyte-io/realtimekit-ui/commit/9f71e6fab55504a53f37f0d37b93ac127f9ad96f))
+
 ## [1.0.7-staging.1](https://github.com/dyte-io/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.6...@cloudflare/realtimekit-ui-v1.0.7-staging.1) (2025-10-31)
 
 
