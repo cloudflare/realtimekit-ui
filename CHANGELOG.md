@@ -1,3 +1,10 @@
+## [1.0.7-staging.3](https://github.com/dyte-io/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.7-staging.2...@cloudflare/realtimekit-ui-v1.0.7-staging.3) (2025-10-31)
+
+
+### Bug Fixes
+
+* **audio-settings:** aligned toggle similarly to mirror my video, compatible with old sdk versions ([179b8c6](https://github.com/dyte-io/realtimekit-ui/commit/179b8c63192d73eba1e78ad8cdd718679808c3dc))
+
 ## [1.0.7-staging.2](https://github.com/dyte-io/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.7-staging.1...@cloudflare/realtimekit-ui-v1.0.7-staging.2) (2025-10-31)
 
 
