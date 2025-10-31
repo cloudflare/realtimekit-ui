@@ -1,3 +1,10 @@
+## [1.0.7-staging.1](https://github.com/dyte-io/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.6...@cloudflare/realtimekit-ui-v1.0.7-staging.1) (2025-10-31)
+
+
+### Bug Fixes
+
+* **participant-tile:** on setup screen preview, action buttons were rendered ([ffab2d0](https://github.com/dyte-io/realtimekit-ui/commit/ffab2d005ce0871d493f5b9776c753966bc373d5))
+
 ## [1.0.6](https://github.com/dyte-io/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.5...@cloudflare/realtimekit-ui-v1.0.6) (2025-10-30)
 
 
