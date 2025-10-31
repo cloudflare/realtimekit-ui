@@ -1,3 +1,15 @@
+## [1.0.7-staging.4](https://github.com/dyte-io/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.7-staging.3...@cloudflare/realtimekit-ui-v1.0.7-staging.4) (2025-10-31)
+
+
+### Bug Fixes
+
+* **chat-composer-overflow:** in case of huge pre formatted text, composer view overflows ([13023ee](https://github.com/dyte-io/realtimekit-ui/commit/13023eef804509e106dd0387ca866567fbb1e66c))
+
+
+### Reverts
+
+* **components-d-ts:** reverting unrelated file change ([e94c4e8](https://github.com/dyte-io/realtimekit-ui/commit/e94c4e86a1750c528cd8872a7c31644de124b556))
+
 ## [1.0.7-staging.3](https://github.com/dyte-io/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.7-staging.2...@cloudflare/realtimekit-ui-v1.0.7-staging.3) (2025-10-31)
 
 
