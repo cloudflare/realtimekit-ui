@@ -6,3 +6,5 @@ export { default as RtkLeaveButton } from './components/rtk-leave-button';
 export type { RtkLeaveButtonProps } from './components/rtk-leave-button';
 export { default as RtkLeaveMeeting } from './components/rtk-leave-meeting';
 export type { RtkLeaveMeetingProps } from './components/rtk-leave-meeting';
+export { default as RtkJoinStage } from './components/rtk-join-stage';
+export type { RtkJoinStageProps } from './components/rtk-join-stage';
