@@ -2,3 +2,7 @@ export { default as RtkMicToggle } from './components/rtk-mic-toggle';
 export type { RtkMicToggleProps } from './components/rtk-mic-toggle';
 export { default as RtkCameraToggle } from './components/rtk-camera-toggle';
 export type { RtkCameraToggleProps } from './components/rtk-camera-toggle';
+export { default as RtkLeaveButton } from './components/rtk-leave-button';
+export type { RtkLeaveButtonProps } from './components/rtk-leave-button';
+export { default as RtkLeaveMeeting } from './components/rtk-leave-meeting';
+export type { RtkLeaveMeetingProps } from './components/rtk-leave-meeting';
