@@ -12,3 +12,7 @@ export { default as RtkControlbar } from './components/rtk-controlbar';
 export type { RtkControlbarProps } from './components/rtk-controlbar';
 export { default as RtkControlbarButton } from './components/rtk-controlbar-button';
 export type { RtkControlbarButtonProps } from './components/rtk-controlbar-button';
+export { default as RtkMeeting } from './components/rtk-meeting';
+export type { RtkMeetingProps, MeetingMode, MeetingState } from './components/rtk-meeting';
+export { default as RtkStage } from './components/rtk-stage';
+export type { RtkStageProps } from './components/rtk-stage';
