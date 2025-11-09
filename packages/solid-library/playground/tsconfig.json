@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "module": "ESNext",
+    "target": "ESNext",
+    "newLine": "LF",
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "paths": {
+      "@src/*": ["../src/*"]
+    },
+    "types": ["vite/client"],
+    "moduleResolution": "Bundler",
+    "noEmit": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "strictNullChecks": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "forceConsistentCasingInFileNames": true,
+    "noUncheckedIndexedAccess": true,
+    "skipLibCheck": true,
+    "jsx": "preserve",
+    "jsxImportSource": "solid-js",
+    "verbatimModuleSyntax": true
+  },
+  "exclude": ["node_modules", "dist"]
+}
