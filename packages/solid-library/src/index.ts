@@ -10,3 +10,5 @@ export { default as RtkJoinStage } from './components/rtk-join-stage';
 export type { RtkJoinStageProps } from './components/rtk-join-stage';
 export { default as RtkControlbar } from './components/rtk-controlbar';
 export type { RtkControlbarProps } from './components/rtk-controlbar';
+export { default as RtkControlbarButton } from './components/rtk-controlbar-button';
+export type { RtkControlbarButtonProps } from './components/rtk-controlbar-button';
