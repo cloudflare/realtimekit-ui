@@ -8,3 +8,5 @@ export { default as RtkLeaveMeeting } from './components/rtk-leave-meeting';
 export type { RtkLeaveMeetingProps } from './components/rtk-leave-meeting';
 export { default as RtkJoinStage } from './components/rtk-join-stage';
 export type { RtkJoinStageProps } from './components/rtk-join-stage';
+export { default as RtkControlbar } from './components/rtk-controlbar';
+export type { RtkControlbarProps } from './components/rtk-controlbar';
