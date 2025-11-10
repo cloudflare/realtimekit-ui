@@ -1,7 +1,6 @@
 import { EmojiMetaData } from '../types/props';
 
-// NOT WORKING
-const EMOJI_ASSET_URL = 'https://rtk-uploads.realtime.cloudflare.com/assets/emojis-data.json';
+const EMOJI_ASSET_URL = 'https://rtk-assets.realtime.cloudflare.com/assets/emojis-data.json';
 
 let cachedEmojis: any;
 
