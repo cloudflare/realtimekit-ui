@@ -1,3 +1,11 @@
+## [1.0.7-staging.5](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.7-staging.4...@cloudflare/realtimekit-ui-v1.0.7-staging.5) (2025-11-11)
+
+
+### Bug Fixes
+
+* **dyte-branding-urls:** removed dyte branding, replace urls with realtime ([07caca1](https://github.com/cloudflare/realtimekit-ui/commit/07caca1d24e1f015cb9b498e48ec76d04a24c352))
+* **emoji-asset:** fixed url for emoji asset ([f9e3654](https://github.com/cloudflare/realtimekit-ui/commit/f9e36541a13146c90e20eb75321e3c3c1ff8aec8))
+
 ## [1.0.7-staging.4](https://github.com/dyte-io/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.7-staging.3...@cloudflare/realtimekit-ui-v1.0.7-staging.4) (2025-10-31)
 
 
