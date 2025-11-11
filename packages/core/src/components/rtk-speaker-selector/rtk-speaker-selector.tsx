@@ -143,7 +143,7 @@ export class RtkSpeakerSelector {
       <Host>
         <audio
           preload="auto"
-          src="https://assets.dyte.io/ui-kit/speaker-test.mp3"
+          src="https://rtk-assets.realtime.cloudflare.com/ui-kit/speaker-test.mp3"
           ref={(el) => (this.testAudioEl = el)}
         />
         <div class={'group ' + this.variant} part="speaker-selection">

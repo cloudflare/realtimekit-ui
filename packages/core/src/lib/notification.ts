@@ -2,9 +2,9 @@ import { Meeting } from '../types/rtk-client';
 import { disableSettingSinkId } from '../utils/flags';
 
 const SOUNDS = {
-  joined: 'https://dyte-uploads.s3.ap-south-1.amazonaws.com/notification_join.mp3',
-  left: 'https://dyte-uploads.s3.ap-south-1.amazonaws.com/notification_join.mp3',
-  message: 'https://dyte-uploads.s3.ap-south-1.amazonaws.com/notification_message.mp3',
+  joined: 'https://rtk-uploads.realtime.cloudflare.com/notification_join.mp3',
+  left: 'https://rtk-uploads.realtime.cloudflare.com/notification_join.mp3',
+  message: 'https://rtk-uploads.realtime.cloudflare.com/notification_message.mp3',
 };
 
 export type Sound = keyof typeof SOUNDS;

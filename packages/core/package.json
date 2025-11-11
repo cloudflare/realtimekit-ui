@@ -93,10 +93,10 @@
   "license": "UNLICENSED",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dyte-io/realtimekit-ui.git"
+    "url": "git+https://github.com/cloudflare/realtimekit-ui.git"
   },
   "bugs": {
-    "url": "https://realtime.cloudflare.com/issues"
+    "url": "https://community.cloudflare.com"
   },
   "homepage": "https://realtime.cloudflare.com"
 }

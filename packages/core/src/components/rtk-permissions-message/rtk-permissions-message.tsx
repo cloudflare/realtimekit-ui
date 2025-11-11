@@ -142,7 +142,7 @@ export class RtkPermissionsMessage {
     const browser = browserName.toLowerCase() ?? 'others';
     const os = osName ?? 'others';
 
-    /* NOTE(ravindra-dyte):
+    /* NOTE(ravindra-cloudflare):
       If in case a unknown browser or os doesn't have a translation,
       use the translation for `others`, instead of showing ugly error string,
       such as `perm_denied.video.yandex browser.message`.
@@ -164,7 +164,9 @@ export class RtkPermissionsMessage {
     function replaceAll(target, search, replacement) {
       return target.split(search).join(replacement);
     }
-    const svgReq = await fetch(`https://assets.dyte.io/ui-kit/permissions/${stepURL}`);
+    const svgReq = await fetch(
+      `https://rtk-assets.realtime.cloudflare.com/ui-kit/permissions/${stepURL}`
+    );
     let svg = await svgReq.text();
     svg = replaceAll(svg, 'yoursite.com', location.host);
     svg = replaceAll(
