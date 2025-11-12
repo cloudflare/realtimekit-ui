@@ -18,7 +18,7 @@ export function SyncWithStore() {
       host[`_rtkStoreToCleanup-${propName}`] = legacyGlobalUIStore;
 
       /**
-       * NOTE(ravindra-dyte):
+       * NOTE(ravindra-cloudflare):
        * For backward compatibility, let's use global store.
        * If rtk-ui-provider in parent hierarchy is available, we will use peer specific store.
        * If provider is found, All states will be solely controlled by RtkUiProvider.
@@ -40,7 +40,7 @@ export function SyncWithStore() {
           const storeValue = event.detail.store.state[propName];
           host.componentOnReady().then(() => {
             /**
-             * NOTE(ravindra-dyte):
+             * NOTE(ravindra-cloudflare):
              * https://stenciljs.com/docs/api#componentonready
              * This psudo ready callback is to ensure that the component is ready to accept props
              * Without this, changing the prop would not trigger @Watch of prop in the initial mount phase

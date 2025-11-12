@@ -29,7 +29,7 @@ export const hasOnlyEmojis = (str: string) => {
 export const sanitizeLink = (link: string) => {
   // TODO: needs more work
   if (link?.trim().toLowerCase().startsWith('javascript:')) {
-    return 'https://dyte.io';
+    return 'https://realtime.cloudflare.com';
   }
   return link;
 };

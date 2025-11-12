@@ -393,7 +393,7 @@ export class RtkBreakoutRoomsManager {
                   onParticipantsAdd={() => this.assignParticipantsToRoom(room['id'])}
                   onRoomJoin={() => this.joinRoom(room['id'])}
                   states={this.states}
-                  room={{ ...room }} // NOTE(ravindra-dyte): this prevents cache
+                  room={{ ...room }} // NOTE(ravindra-cloudflare): this prevents cache
                   iconPack={this.iconPack}
                   t={this.t}
                   allowDelete={false}
@@ -567,7 +567,7 @@ export class RtkBreakoutRoomsManager {
                       onRoomJoin={() => this.joinRoom(room['id'])}
                       onUpdate={this.onRoomUpdate}
                       states={this.states}
-                      room={{ ...room }} // NOTE(ravindra-dyte): this prevents cache
+                      room={{ ...room }} // NOTE(ravindra-cloudflare): this prevents cache
                       iconPack={this.iconPack}
                       t={this.t}
                       allowDelete={this.stateManager.allConnectedMeetings.length > MIN_ROOMS}

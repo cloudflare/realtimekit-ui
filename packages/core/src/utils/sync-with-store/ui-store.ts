@@ -145,9 +145,9 @@ function appendElement(
   } else {
     try {
       /**
-       * NOTE(ravindra-dyte):
+       * NOTE(ravindra-cloudflare):
        * If the element+propName exists already, remove it first
-       * This could happen in https://github.com/dyte-io/react-samples/tree/main/samples/back-to-back-meetings,
+       * This could happen in https://github.com/cloudflare/realtimekit-web-examples/tree/main/react-examples/examples/back-to-back-meetings,
        * where the same component is re-rendered multiple times under different providers
        *  */
       removeElement(propName, element, targetStore);

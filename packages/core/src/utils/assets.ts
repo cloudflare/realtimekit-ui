@@ -1,6 +1,6 @@
 import { EmojiMetaData } from '../types/props';
 
-const EMOJI_ASSET_URL = 'https://cdn.dyte.in/assets/emojis-data.json';
+const EMOJI_ASSET_URL = 'https://rtk-assets.realtime.cloudflare.com/assets/emojis-data.json';
 
 let cachedEmojis: any;
 

@@ -228,15 +228,17 @@ export class RtkParticipantTile {
         )}
 
         <slot>
-          <Render
-            element="rtk-participant-tile"
-            defaults={defaults}
-            childProps={{
-              participant: this.participant,
-            }}
-            deepProps
-            onlyChildren
-          />
+          {!this.isPreview && (
+            <Render
+              element="rtk-participant-tile"
+              defaults={defaults}
+              childProps={{
+                participant: this.participant,
+              }}
+              deepProps
+              onlyChildren
+            />
+          )}
         </slot>
       </Host>
     );

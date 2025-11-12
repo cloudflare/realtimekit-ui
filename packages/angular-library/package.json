@@ -3,14 +3,14 @@
   "version": "0.0.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dyte-io/realtimekit-ui.git"
+    "url": "git+https://github.com/cloudflare/realtimekit-ui.git"
   },
   "files": [
     "*",
     "!prepublish.js"
   ],
   "bugs": {
-    "email": "support@dyte.io"
+    "url": "https://community.cloudflare.com"
   },
   "scripts": {
     "ng": "ng",

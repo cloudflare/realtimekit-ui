@@ -28,6 +28,7 @@
 
 :host([variant='horizontal']) {
   .unread-count {
-    @apply right-4 top-1/2 translate-y-[-50%];
+    @apply right-4 top-1/2;
+    transform: translateY(-50%);
   }
 }

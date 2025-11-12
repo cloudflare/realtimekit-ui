@@ -63,7 +63,7 @@ const baseConfig = {
       },
     ],
   ],
-  repositoryUrl: 'https://github.com/dyte-io/realtimekit-ui',
+  repositoryUrl: 'https://github.com/cloudflare/realtimekit-ui',
 };
 
 const config = {

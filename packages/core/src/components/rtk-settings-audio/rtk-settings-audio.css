@@ -22,6 +22,10 @@ audio {
   }
 }
 
+.row {
+  @apply flex items-center justify-between gap-3;
+}
+
 rtk-audio-visualizer {
   @apply flex-shrink-0;
 }

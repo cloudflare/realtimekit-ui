@@ -8,7 +8,7 @@ export const canViewChat = (meeting: Meeting) => {
 
   return (
     chatPublic.canSend ||
-    (chatPublic as any).canReceive || // TODO(ravindra-dyte): add web-core equivalent of chatPublic.canReceive, remove type casting
+    (chatPublic as any).canReceive || // TODO(ravindra-cloudflare): add web-core equivalent of chatPublic.canReceive, remove type casting
     chatPublic.text ||
     chatPublic.files ||
     chatPrivate.canSend ||
