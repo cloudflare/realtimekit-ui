@@ -18,7 +18,7 @@ textarea {
   @apply rounded-t-md;
   @apply font-sans outline-none;
   @apply resize-none overflow-y-auto border-none;
-  @apply text-text-md min-h-[60px];
+  @apply text-text-lg min-h-[60px];
 }
 
 .chat-buttons {
