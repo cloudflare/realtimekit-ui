@@ -1,6 +1,6 @@
 {
   "name": "@cloudflare/realtimekit-ui",
-  "version": "1.0.6",
+  "version": "1.0.7-staging.5",
   "description": "Pre-built, ready-to-use UI components and utilities for integrating with Cloudflare RealtimeKit",
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
@@ -93,10 +93,10 @@
   "license": "UNLICENSED",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dyte-io/realtimekit-ui.git"
+    "url": "git+https://github.com/cloudflare/realtimekit-ui.git"
   },
   "bugs": {
-    "url": "https://realtime.cloudflare.com/issues"
+    "url": "https://community.cloudflare.com"
   },
   "homepage": "https://realtime.cloudflare.com"
 }

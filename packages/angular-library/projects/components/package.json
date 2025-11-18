@@ -23,7 +23,7 @@
     "prepublishOnly": "node prepublish.js"
   },
   "bugs": {
-    "url": "https://realtime.cloudflare.com/issues"
+    "url": "https://community.cloudflare.com"
   },
   "homepage": "https://realtime.cloudflare.com"
 }

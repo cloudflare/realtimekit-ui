@@ -368,7 +368,7 @@ export class RtkLivestreamPlayer {
             );
             if (this.playbackUrl && this.livestreamState === 'LIVESTREAMING') {
               /*
-                NOTE(ravindra-dyte): Maybe manifest is not ready,
+                NOTE(ravindra-cloudflare): Maybe manifest is not ready,
                 maybe levels are not available yet.
                 Keep on retrying every 5 seconds till either livestream is stopped or error is resolved.
               */

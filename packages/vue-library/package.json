@@ -4,10 +4,10 @@
   "description": "Pre-built, ready-to-use Vue UI components and utilities for integrating with Cloudflare RealtimeKit",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dyte-io/realtimekit-ui.git"
+    "url": "git+https://github.com/cloudflare/realtimekit-ui.git"
   },
   "bugs": {
-    "url": "https://realtime.cloudflare.com/issues"
+    "url": "https://community.cloudflare.com"
   },
   "homepage": "https://realtime.cloudflare.com",
   "main": "dist/index.js",

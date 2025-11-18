@@ -9,7 +9,7 @@ export interface Addon {
    * Register the addon, add event listeners, etc.
    * @param config The current UIConfig
    * @param meeting The meeting object
-   * @param getBuilder A function to get the DyteUIBuilder instance for the meeting UI config
+   * @param getBuilder A function to get the RtkUiBuilder instance for the meeting UI config
    * @returns The updated UIConfig
    */
   register: (

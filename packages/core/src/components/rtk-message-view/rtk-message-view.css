@@ -1,6 +1,8 @@
 @import '../../styles/reset.css';
 @import '../../styles/scrollbar.css';
-
+:host {
+  @apply max-w-96;
+}
 .message-wrapper {
   @apply flex flex-row-reverse gap-2;
   &.incoming {

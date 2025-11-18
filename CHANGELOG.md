@@ -1,3 +1,49 @@
+## [1.0.7-staging.5](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.7-staging.4...@cloudflare/realtimekit-ui-v1.0.7-staging.5) (2025-11-11)
+
+
+### Bug Fixes
+
+* **dyte-branding-urls:** removed dyte branding, replace urls with realtime ([07caca1](https://github.com/cloudflare/realtimekit-ui/commit/07caca1d24e1f015cb9b498e48ec76d04a24c352))
+* **emoji-asset:** fixed url for emoji asset ([f9e3654](https://github.com/cloudflare/realtimekit-ui/commit/f9e36541a13146c90e20eb75321e3c3c1ff8aec8))
+
+## [1.0.7-staging.4](https://github.com/dyte-io/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.7-staging.3...@cloudflare/realtimekit-ui-v1.0.7-staging.4) (2025-10-31)
+
+
+### Bug Fixes
+
+* **chat-composer-overflow:** in case of huge pre formatted text, composer view overflows ([13023ee](https://github.com/dyte-io/realtimekit-ui/commit/13023eef804509e106dd0387ca866567fbb1e66c))
+
+
+### Reverts
+
+* **components-d-ts:** reverting unrelated file change ([e94c4e8](https://github.com/dyte-io/realtimekit-ui/commit/e94c4e86a1750c528cd8872a7c31644de124b556))
+
+## [1.0.7-staging.3](https://github.com/dyte-io/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.7-staging.2...@cloudflare/realtimekit-ui-v1.0.7-staging.3) (2025-10-31)
+
+
+### Bug Fixes
+
+* **audio-settings:** aligned toggle similarly to mirror my video, compatible with old sdk versions ([179b8c6](https://github.com/dyte-io/realtimekit-ui/commit/179b8c63192d73eba1e78ad8cdd718679808c3dc))
+
+## [1.0.7-staging.2](https://github.com/dyte-io/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.7-staging.1...@cloudflare/realtimekit-ui-v1.0.7-staging.2) (2025-10-31)
+
+
+### Bug Fixes
+
+* **toggles:** fixed alignment issues with unread counts in toggles ([2c35c81](https://github.com/dyte-io/realtimekit-ui/commit/2c35c81aa86216763ee6b65beb3d3628ec62b7c3))
+
+
+### Reverts
+
+* **colors:** reverted the colors of sample page ([9f71e6f](https://github.com/dyte-io/realtimekit-ui/commit/9f71e6fab55504a53f37f0d37b93ac127f9ad96f))
+
+## [1.0.7-staging.1](https://github.com/dyte-io/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.6...@cloudflare/realtimekit-ui-v1.0.7-staging.1) (2025-10-31)
+
+
+### Bug Fixes
+
+* **participant-tile:** on setup screen preview, action buttons were rendered ([ffab2d0](https://github.com/dyte-io/realtimekit-ui/commit/ffab2d005ce0871d493f5b9776c753966bc373d5))
+
 ## [1.0.6](https://github.com/dyte-io/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.5...@cloudflare/realtimekit-ui-v1.0.6) (2025-10-30)
 
 
