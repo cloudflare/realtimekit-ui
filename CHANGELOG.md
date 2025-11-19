@@ -1,3 +1,10 @@
+## [1.0.8-staging.1](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.7...@cloudflare/realtimekit-ui-v1.0.8-staging.1) (2025-11-19)
+
+
+### Bug Fixes
+
+* increase chat font size to 16px ([d001c87](https://github.com/cloudflare/realtimekit-ui/commit/d001c872f26c2da5486d74d15b0946741f27478a))
+
 ## [1.0.7](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.6...@cloudflare/realtimekit-ui-v1.0.7) (2025-11-18)
 
 
