@@ -264,7 +264,18 @@ export class RtkBreakoutRoomManager {
   }
 
   render() {
-    if (!this.meeting) return null;
+    if (!this.meeting || !this.room || !this.permissions) return null;
+
+    /* NOTE(ravindra-cloudflare):
+    *  Checking if user can switch to this room
+    *  Check 1: if user has full access.
+    *  Check 2: For non-parent room, user has "switch meeting" access.
+    *  Check 3: For parent room, user has "switch to parent meeting" access.
+    */
+    const canSwitchToThisRoom = this.permissions.canAlterConnectedMeetings ||
+      (this.permissions.canSwitchConnectedMeetings && !this.room.isParent) ||
+      (this.permissions.canSwitchToParentMeeting && this.room.isParent);
+
     return (
       <Host>
         <div
@@ -343,7 +354,7 @@ export class RtkBreakoutRoomManager {
                 )}
               {this.mode === 'edit' &&
                 !this.assigningParticipants &&
-                this.permissions.canSwitchConnectedMeetings && (
+                canSwitchToThisRoom && (
                   <rtk-button
                     kind="button"
                     variant="ghost"
