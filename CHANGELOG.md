@@ -1,3 +1,10 @@
+## [1.0.8-staging.3](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.8-staging.2...@cloudflare/realtimekit-ui-v1.0.8-staging.3) (2025-12-10)
+
+
+### Bug Fixes
+
+* **breakout-rooms:** in the ui-kit demo, peers could not switch connected meetings twice ([0afb65f](https://github.com/cloudflare/realtimekit-ui/commit/0afb65f2226999de57f38bf1bb8de0c278ff76a6))
+
 ## [1.0.8-staging.2](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.8-staging.1...@cloudflare/realtimekit-ui-v1.0.8-staging.2) (2025-12-09)
 
 
