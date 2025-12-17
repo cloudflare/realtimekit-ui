@@ -1,3 +1,24 @@
+## [1.0.8-staging.3](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.8-staging.2...@cloudflare/realtimekit-ui-v1.0.8-staging.3) (2025-12-10)
+
+
+### Bug Fixes
+
+* **breakout-rooms:** in the ui-kit demo, peers could not switch connected meetings twice ([0afb65f](https://github.com/cloudflare/realtimekit-ui/commit/0afb65f2226999de57f38bf1bb8de0c278ff76a6))
+
+## [1.0.8-staging.2](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.8-staging.1...@cloudflare/realtimekit-ui-v1.0.8-staging.2) (2025-12-09)
+
+
+### Bug Fixes
+
+* **breakout-rooms:** peer with switch-to-parent-meeting permission were not seeing join button ([5b62eb9](https://github.com/cloudflare/realtimekit-ui/commit/5b62eb98caa14a934f41698024135a63a09e3769))
+
+## [1.0.8-staging.1](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.7...@cloudflare/realtimekit-ui-v1.0.8-staging.1) (2025-11-19)
+
+
+### Bug Fixes
+
+* increase chat font size to 16px ([d001c87](https://github.com/cloudflare/realtimekit-ui/commit/d001c872f26c2da5486d74d15b0946741f27478a))
+
 ## [1.0.7](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.6...@cloudflare/realtimekit-ui-v1.0.7) (2025-11-18)
 
 

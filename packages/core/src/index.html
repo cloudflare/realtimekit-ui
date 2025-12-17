@@ -395,6 +395,42 @@
               this.handleSubmit();
             }
           },
+          async addAddonsInConfig(meeting) {
+            const RealtimeKitVideoBackground = await import("https://cdn.jsdelivr.net/npm/@cloudflare/realtimekit-ui-addons@latest/dist/video-background.js");
+            const { registerAddons } = await import("https://cdn.jsdelivr.net/npm/@cloudflare/realtimekit-ui@latest/dist/esm/index.js");
+            
+            const videoBackground = await RealtimeKitVideoBackground.default.init({
+              modes: ["blur", "virtual"],
+              meeting,
+              images: [
+                  "https://images.unsplash.com/photo-1487088678257-3a541e6e3922?q=80&w=2874&auto=format&fit=crop&ixlib=rb-4.0.3",
+                  "https://images.unsplash.com/photo-1496715976403-7e36dc43f17b?q=80&w=2848&auto=format&fit=crop&ixlib=rb-4.0.3",
+                  "https://images.unsplash.com/photo-1600431521340-491eca880813?q=80&w=2938&auto=format&fit=crop&ixlib=rb-4.0.3"
+              ],
+              onVideoBackgroundUpdate: ({backgroundMode, backgroundURL}) => { 
+                console.log('videoBackgroundUpdated => ', {backgroundMode, backgroundURL});
+              }, // Listen to background update action
+            });
+
+            let config = registerAddons([videoBackground], meeting);
+            /**
+             *  config as undefined is accepted,
+             *  if addons are enabled, addon config will be used
+             */
+            this.$refs.meeting.config = config;
+          },
+          async addConnectedMeetingListeners(meeting){
+            meeting.connectedMeetings.on('meetingChanged', (newMeeting) => {
+              newMeeting.__internals__.logger.info('Showing the next meeting UI for breakout', { connectedMeetings: { movement: {
+                destinationMeetingId: newMeeting.meta.meetingId,
+                sourceMeetingId: meeting.meta.meetingId,
+              } } });
+              this.addAddonsInConfig(newMeeting);
+              this.attachMeetingObject(newMeeting, true);
+              // In the new meeting, we need to re-attach the listeners
+              this.addConnectedMeetingListeners(newMeeting);
+            });
+          },
           async handleSubmit() {
             if (!this.joining) {
               this.joining = true;
@@ -433,31 +469,6 @@
                 modules,
               });
 
-              let config;
-              // Conditionally load effects addon if enabled
-              if (addEffectsAddon) {
-                const RealtimeKitVideoBackground = await import("https://cdn.jsdelivr.net/npm/@cloudflare/realtimekit-ui-addons@latest/dist/video-background.js");
-                const { registerAddons } = await import("https://cdn.jsdelivr.net/npm/@cloudflare/realtimekit-ui@latest/dist/esm/index.js");
-                
-                const videoBackground = await RealtimeKitVideoBackground.default.init({
-                  modes: ["blur", "virtual"],
-                  meeting,
-                  images: [
-                      "https://images.unsplash.com/photo-1487088678257-3a541e6e3922?q=80&w=2874&auto=format&fit=crop&ixlib=rb-4.0.3",
-                      "https://images.unsplash.com/photo-1496715976403-7e36dc43f17b?q=80&w=2848&auto=format&fit=crop&ixlib=rb-4.0.3",
-                      "https://images.unsplash.com/photo-1600431521340-491eca880813?q=80&w=2938&auto=format&fit=crop&ixlib=rb-4.0.3"
-                  ],
-                  onVideoBackgroundUpdate: ({backgroundMode, backgroundURL}) => { 
-                    console.log('videoBackgroundUpdated => ', {backgroundMode, backgroundURL});
-                  }, // Listen to background update action
-                });
-
-                config = registerAddons([videoBackground], meeting);
-                console.log('Effects addon loaded and configured');
-              } else {
-                console.log('Effects addon disabled - using default meeting config');
-              }
-
               if (!location.href.includes('http://localhost:3333/')) {
                 // set name from localStorage cache
                 const name =
@@ -468,16 +479,11 @@
               }
 
               this.status = 'Connecting...';
+              if (addEffectsAddon) {
+                await this.addAddonsInConfig(meeting);
+              }
               this.attachMeetingObject(meeting);
-              /**
-               *  config as undefined is accepted,
-               *  if addons are enabled, addon config will be used
-               */
-              this.$refs.meeting.config = config;
-              
-              meeting.connectedMeetings.on('meetingChanged', (newMeeting) =>
-                this.attachMeetingObject(newMeeting, true)
-              );
+              this.addConnectedMeetingListeners(meeting);
             } catch (err) {
               console.error(err);
               alert('An error occured, check if the environment is correct.');
