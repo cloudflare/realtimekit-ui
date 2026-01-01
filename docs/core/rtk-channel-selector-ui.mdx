@@ -1,0 +1,35 @@
+---
+title: rtk-channel-selector-ui
+description: API reference for rtk-channel-selector-ui component (Core Library)
+---
+
+# rtk-channel-selector-ui
+
+## Properties
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `channels` | `ChatChannel[]` | ✅ | - | Channels |
+| `iconPack` | `IconPack1` | ❌ | `defaultIconPack` | Icon pack |
+| `selectedChannelId` | `string` | ✅ | - | Selected channel id |
+| `showRecentMessage` | `boolean` | ✅ | - | show recent message in channel |
+| `t` | `RtkI18n1` | ❌ | `useLanguage()` | Language |
+
+## Usage Examples
+
+### Basic Usage
+
+```html
+<rtk-channel-selector-ui></rtk-channel-selector-ui>
+```
+
+### With Properties
+
+```html
+<rtk-channel-selector-ui
+  channels=[]
+  selectedChannelId="example"
+  showRecentMessage=true>
+</rtk-channel-selector-ui>
+```
+

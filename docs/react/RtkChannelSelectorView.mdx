@@ -1,0 +1,48 @@
+---
+title: RtkChannelSelectorView
+description: API reference for RtkChannelSelectorView component (React Library)
+---
+
+# RtkChannelSelectorView
+
+## Properties
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `channels` | `{
+    id: string` | ✅ | - | Channels |
+| `disableSearch` | `boolean` | ✅ | - | Disables search bar (default = false) |
+| `hideAvatar` | `boolean` | ✅ | - | Hides avatar (default = false) |
+| `iconPack` | `IconPack1` | ❌ | `defaultIconPack` | Icon Pack |
+| `selectedChannelId` | `string` | ✅ | - | Selected channel id |
+| `t` | `RtkI18n1` | ❌ | `useLanguage()` | Language |
+| `viewAs` | `'dropdown' | 'list'` | ✅ | - | Render as dropdown or list (default = list) |
+
+## Usage Examples
+
+### Basic Usage
+
+```tsx
+import { RtkChannelSelectorView } from '@cloudflare/realtimekit-ui/react';
+
+function MyComponent() {
+  return <RtkChannelSelectorView />;
+}
+```
+
+### With Properties
+
+```tsx
+import { RtkChannelSelectorView } from '@cloudflare/realtimekit-ui/react';
+
+function MyComponent() {
+  return (
+    <RtkChannelSelectorView
+      channels="example"
+      disableSearch={true}
+      hideAvatar={true}
+    />
+  );
+}
+```
+

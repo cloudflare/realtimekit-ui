@@ -1,0 +1,55 @@
+---
+title: rtk-channel-selector-view
+description: API reference for rtk-channel-selector-view component (Angular Library)
+---
+
+# rtk-channel-selector-view
+
+## Properties
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `channels` | `{
+    id: string` | ✅ | - | Channels |
+| `disableSearch` | `boolean` | ✅ | - | Disables search bar (default = false) |
+| `hideAvatar` | `boolean` | ✅ | - | Hides avatar (default = false) |
+| `iconPack` | `IconPack1` | ❌ | `defaultIconPack` | Icon Pack |
+| `selectedChannelId` | `string` | ✅ | - | Selected channel id |
+| `t` | `RtkI18n1` | ❌ | `useLanguage()` | Language |
+| `viewAs` | `'dropdown' | 'list'` | ✅ | - | Render as dropdown or list (default = list) |
+
+## Usage Examples
+
+### Setup
+
+```typescript
+// app.module.ts
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { defineCustomElements } from '@cloudflare/realtimekit-ui/loader';
+
+defineCustomElements();
+
+@NgModule({
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
+})
+export class AppModule { }
+```
+
+### Basic Usage
+
+```html
+<!-- component.html -->
+<rtk-channel-selector-view></rtk-channel-selector-view>
+```
+
+### With Properties
+
+```html
+<!-- component.html -->
+<rtk-channel-selector-view
+  [channels]="example"
+  [disableSearch]=true
+  [hideAvatar]=true>
+</rtk-channel-selector-view>
+```
+

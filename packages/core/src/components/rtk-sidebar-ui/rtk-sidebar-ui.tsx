@@ -9,6 +9,12 @@ export interface RtkSidebarTab {
 
 export type RtkSidebarView = 'sidebar' | 'full-screen';
 
+/**
+ * A sidebar UI component with tabbed navigation.
+ *
+ * Provides a container for sidebar content with tab switching functionality.
+ * Can be displayed as a sidebar or in full-screen mode.
+ */
 @Component({
   tag: 'rtk-sidebar-ui',
   styleUrl: 'rtk-sidebar-ui.css',
@@ -34,7 +40,7 @@ export class RtkSidebarUi {
   @Prop() iconPack = defaultIconPack;
 
   /** Option to focus close button when opened */
-  @Prop() focusCloseButton = true;
+  @Prop() focusCloseButton = false;
 
   /** Language */
   @SyncWithStore()

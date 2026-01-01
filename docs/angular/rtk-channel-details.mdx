@@ -1,0 +1,50 @@
+---
+title: rtk-channel-details
+description: API reference for rtk-channel-details component (Angular Library)
+---
+
+# rtk-channel-details
+
+## Properties
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `channel` | `ChatChannel` | ✅ | - | Channel object |
+| `iconPack` | `IconPack1` | ❌ | `defaultIconPack` | Icon pack |
+| `members` | `RTKBasicParticipant[]` | ✅ | - | List of channel members |
+| `t` | `RtkI18n1` | ❌ | `useLanguage()` | Language |
+
+## Usage Examples
+
+### Setup
+
+```typescript
+// app.module.ts
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { defineCustomElements } from '@cloudflare/realtimekit-ui/loader';
+
+defineCustomElements();
+
+@NgModule({
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
+})
+export class AppModule { }
+```
+
+### Basic Usage
+
+```html
+<!-- component.html -->
+<rtk-channel-details></rtk-channel-details>
+```
+
+### With Properties
+
+```html
+<!-- component.html -->
+<rtk-channel-details
+  [channel]=chatchannel
+  [members]=[]>
+</rtk-channel-details>
+```
+

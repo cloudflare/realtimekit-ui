@@ -10,6 +10,12 @@ import { RTKPermissionsPreset } from '@cloudflare/realtimekit';
 
 export type AIView = 'default' | 'sidebar' | 'full-screen';
 
+/**
+ * An AI assistant component for meeting interactions.
+ *
+ * Provides AI-powered features like transcription, summarization, and
+ * intelligent meeting assistance. Can be displayed in different view modes.
+ */
 @Component({
   tag: 'rtk-ai',
   styleUrl: 'rtk-ai.css',

@@ -1,0 +1,43 @@
+---
+title: RtkChannelDetails
+description: API reference for RtkChannelDetails component (React Library)
+---
+
+# RtkChannelDetails
+
+## Properties
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `channel` | `ChatChannel` | ✅ | - | Channel object |
+| `iconPack` | `IconPack1` | ❌ | `defaultIconPack` | Icon pack |
+| `members` | `RTKBasicParticipant[]` | ✅ | - | List of channel members |
+| `t` | `RtkI18n1` | ❌ | `useLanguage()` | Language |
+
+## Usage Examples
+
+### Basic Usage
+
+```tsx
+import { RtkChannelDetails } from '@cloudflare/realtimekit-ui/react';
+
+function MyComponent() {
+  return <RtkChannelDetails />;
+}
+```
+
+### With Properties
+
+```tsx
+import { RtkChannelDetails } from '@cloudflare/realtimekit-ui/react';
+
+function MyComponent() {
+  return (
+    <RtkChannelDetails
+      channel={chatchannel}
+      members={[]}
+    />
+  );
+}
+```
+
