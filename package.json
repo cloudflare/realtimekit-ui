@@ -14,7 +14,11 @@
     "test": "npm t --workspaces --if-present",
     "format": "prettier --write '**/src/**/*.{ts,tsx,js,css,html,json}'",
     "entropy": "lerna exec --concurrency 1 -- bash ../../entropy.sh",
-    "fastdev": "./fastdev ../web-core"
+    "fastdev": "./fastdev ../web-core",
+    "docs:generate": "bash scripts/docs.sh all",
+    "docs:core": "bash scripts/docs.sh core",
+    "docs:react": "bash scripts/docs.sh react",
+    "docs:angular": "bash scripts/docs.sh angular"
   },
   "devDependencies": {
     "@commitlint/cli": "^16.2.3",
@@ -35,6 +39,8 @@
     "prettier-plugin-tailwindcss": "^0.1.4",
     "semantic-release": "^19.0.2",
     "semantic-release-monorepo": "^7.0.5",
+    "typedoc": "^0.28.15",
+    "typedoc-plugin-markdown": "^4.9.0",
     "typescript": "^5.7.3"
   },
   "commitlint": {

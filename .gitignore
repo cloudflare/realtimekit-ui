@@ -7,3 +7,4 @@ www/
 .DS_Store
 packages/**/package-lock.json
 packages/core/coverage
+docs/*

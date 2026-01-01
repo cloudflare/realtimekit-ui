@@ -1,0 +1,79 @@
+name: Update Documentation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'packages/core/src/components.d.ts'
+
+jobs:
+  update-docs:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+
+    steps:
+      - name: Checkout realtimekit-ui
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate documentation
+        run: npm run docs:generate
+
+      - name: Checkout cloudflare-docs
+        uses: actions/checkout@v4
+        with:
+          repository: cloudflare/cloudflare-docs
+          token: ${{ secrets.DOCS_REPO_TOKEN }}
+          path: cloudflare-docs
+          ref: production
+
+      - name: Create docs branch
+        working-directory: cloudflare-docs
+        run: |
+          git config user.name "realtimekit-ui-bot"
+          git config user.email "realtimekit-ui-bot@cloudflare.com"
+
+          # Create a unique branch name with timestamp
+          BRANCH_NAME="update-realtimekit-ui-docs-$(date +%Y%m%d-%H%M%S)"
+          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
+
+          git checkout -b $BRANCH_NAME
+
+      - name: Copy generated docs
+        run: |
+          mkdir -p cloudflare-docs/src/content/docs/realtime/realtimekit/ui-kit/api-reference
+
+          cp -r docs/* cloudflare-docs/src/content/docs/realtime/realtimekit/ui-kit/api-reference/
+
+      - name: Check for changes
+        id: check-changes
+        working-directory: cloudflare-docs
+        run: |
+          git add .
+
+      - name: Commit and push changes
+        if: steps.check-changes.outputs.has-changes == 'true'
+        working-directory: cloudflare-docs
+        run: |
+          git commit -m "fix: update RealtimeKit UI component api reference"
+          git push origin $BRANCH_NAME
+
+      - name: Create pull request
+        if: steps.check-changes.outputs.has-changes == 'true'
+        working-directory: cloudflare-docs
+        env:
+          GH_TOKEN: ${{ secrets.DOCS_REPO_TOKEN }}
+        run: |
+          gh pr create \
+            --title "fix: update RealtimeKit UI component api reference" \
+            --body "## 🤖 Automated Documentation Update"
