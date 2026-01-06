@@ -4,74 +4,34 @@ This document explains how to set up the automated documentation workflow that c
 
 ## Required Setup
 
-### 1. GitHub Personal Access Token
+### 1. GitHub App for cloudflare-docs access
 
-Create a Personal Access Token (PAT) with the following permissions:
+The workflow authenticates to `cloudflare/cloudflare-docs` using a GitHub App installation token generated at runtime via `actions/create-github-app-token@v1`.
 
-**For the cloudflare-docs repository:**
+This avoids using a long-lived Personal Access Token.
 
-- `repo` (Full control of private repositories)
-- `workflow` (Update GitHub Action workflows)
-- `pull_requests:write` (Create and update pull requests)
+The GitHub App must be installed for the `cloudflare` org (or at minimum have access to the `cloudflare/cloudflare-docs` repository) with sufficient permissions to:
 
-**Steps to create the token:**
+- Create and push branches to `cloudflare/cloudflare-docs`
+- Create pull requests in `cloudflare/cloudflare-docs`
 
-1. Go to GitHub Settings → Developer settings → Personal access tokens → Tokens (classic)
-2. Click "Generate new token (classic)"
-3. Set expiration and select the required scopes above
-4. Generate and copy the token
+### 2. Repository secrets
 
-### 2. Repository Secret
+Add these secrets to the `realtimekit-ui` repository:
 
-Add the PAT as a repository secret in the realtimekit-ui repository:
-
-1. Go to realtimekit-ui repository → Settings → Secrets and variables → Actions
+1. Go to `realtimekit-ui` → Settings → Secrets and variables → Actions
 2. Click "New repository secret"
-3. Name: `DOCS_REPO_TOKEN`
-4. Value: The PAT created in step 1
-5. Click "Add secret"
+3. Add:
 
-### 3. Permissions
+- `GH_APP_ID`: GitHub App ID
+- `GH_APP_PRIVATE_KEY`: GitHub App private key (PEM)
 
-Ensure the GitHub Actions in this repository have permission to:
+### 3. Workflow permissions
 
-- Read repository contents
-- Create issues and pull requests (for commenting on PRs)
+The workflow itself requests:
 
-## How It Works
+- `contents: write`
+- `pull-requests: write`
+- `id-token: write`
 
-### Trigger Conditions
-
-The workflow runs when:
-
-- Changes are pushed to `main` branch
-- The changed files include `packages/core/src/components.d.ts`
-
-### Workflow Steps
-
-1. **Generate Documentation**: Runs `npm run docs:generate` to create MDX files
-2. **Checkout cloudflare-docs**: Clones the target repository using the PAT
-3. **Create Branch**: Creates a timestamped branch for the changes
-4. **Copy Documentation**: Copies generated docs to the correct path
-5. **Commit Changes**: Commits the documentation updates
-6. **Create PR**: Opens a pull request in cloudflare-docs
-
-### Target Location
-
-Documentation is copied to:
-
-```
-cloudflare-docs/src/content/docs/realtime/realtimekit/ui-kit/api-reference/
-├── core/
-│   ├── index.mdx
-│   ├── rtk-component-1.mdx
-│   └── ...
-├── react/
-│   ├── index.mdx
-│   ├── RtkComponent1.mdx
-│   └── ...
-└── angular/
-    ├── index.mdx
-    ├── rtk-component-1.mdx
-    └── ...
-```
+Note that the PR creation and pushes to `cloudflare-docs` are performed using the GitHub App token, not the workflow `GITHUB_TOKEN`.

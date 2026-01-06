@@ -9,10 +9,20 @@ on:
 jobs:
   update-docs:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
-
+    permissions:
+      contents: write
+      pull-requests: write
+      id-token: write
     steps:
-      - name: Checkout realtimekit-ui
+      - name: Generate GitHub App token
+        id: generate-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.GH_APP_ID }}
+          private-key: ${{ secrets.GH_APP_PRIVATE_KEY }}
+          owner: cloudflare
+
+      - name: Checkout source repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -29,21 +39,20 @@ jobs:
       - name: Generate documentation
         run: npm run docs:generate
 
-      - name: Checkout cloudflare-docs
+      - name: Checkout cloudflare-docs repository
         uses: actions/checkout@v4
         with:
           repository: cloudflare/cloudflare-docs
-          token: ${{ secrets.DOCS_REPO_TOKEN }}
+          token: ${{ steps.generate-token.outputs.token }}
           path: cloudflare-docs
           ref: production
 
-      - name: Create docs branch
+      - name: Create branch in cloudflare-docs
         working-directory: cloudflare-docs
         run: |
-          git config user.name "realtimekit-ui-bot"
-          git config user.email "realtimekit-ui-bot@cloudflare.com"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Create a unique branch name with timestamp
           BRANCH_NAME="update-realtimekit-ui-docs-$(date +%Y%m%d-%H%M%S)"
           echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
 
@@ -61,19 +70,28 @@ jobs:
         run: |
           git add .
 
+          if git diff --cached --quiet; then
+            echo "has-changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "has-changes=true" >> $GITHUB_OUTPUT
+          fi
+
       - name: Commit and push changes
-        if: steps.check-changes.outputs.has-changes == 'true'
         working-directory: cloudflare-docs
+        if: steps.check-changes.outputs.has-changes == 'true'
         run: |
           git commit -m "fix: update RealtimeKit UI component api reference"
           git push origin $BRANCH_NAME
 
       - name: Create pull request
-        if: steps.check-changes.outputs.has-changes == 'true'
         working-directory: cloudflare-docs
+        if: steps.check-changes.outputs.has-changes == 'true'
         env:
-          GH_TOKEN: ${{ secrets.DOCS_REPO_TOKEN }}
+          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
         run: |
           gh pr create \
+            --repo cloudflare/cloudflare-docs \
+            --base production \
+            --head $BRANCH_NAME \
             --title "fix: update RealtimeKit UI component api reference" \
             --body "## 🤖 Automated Documentation Update"
