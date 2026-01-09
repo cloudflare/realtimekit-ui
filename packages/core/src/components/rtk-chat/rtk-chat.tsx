@@ -332,7 +332,7 @@ export class RtkChat {
   private usePaginatedChat = () => {
     if (this.isGroupCall && this.showPinnedMessages) return false;
 
-    return this.selectedGroup === 'everyone' && usePaginatedChat(this.meeting);
+    return this.selectedGroup === 'everyone' && usePaginatedChat();
   };
 
   @Watch('chatGroups')
