@@ -1,3 +1,11 @@
+## [1.0.9-staging.2](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.9-staging.1...@cloudflare/realtimekit-ui-v1.0.9-staging.2) (2026-01-09)
+
+
+### Bug Fixes
+
+* **chat:** making paginated chat, default for public group(everyone) ([4e5d17d](https://github.com/cloudflare/realtimekit-ui/commit/4e5d17d1c3d77e52ae4fe0179d608b9adae5347a))
+* **chat:** removed use paginated chat function usage where it could be done without conflicts ([5cce9bd](https://github.com/cloudflare/realtimekit-ui/commit/5cce9bd87e4c1ae522ff059fbd76174d558e54fc))
+
 ## [1.0.9-staging.1](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.8...@cloudflare/realtimekit-ui-v1.0.9-staging.1) (2026-01-09)
 
 
