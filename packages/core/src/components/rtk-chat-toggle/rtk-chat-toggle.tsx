@@ -76,11 +76,9 @@ export class RtkChatToggle {
   @Watch('meeting')
   meetingChanged(meeting: Meeting) {
     if (!meeting) return;
-    if (usePaginatedChat()) {
-      meeting.chat?.getMessages(new Date().getTime(), 1, true).then((res) => {
-        if (res?.messages?.length) this.hasNewMessages = true;
-      });
-    }
+    meeting.chat?.getMessages(new Date().getTime(), 1, true).then((res) => {
+      if (res?.messages?.length) this.hasNewMessages = true;
+    });
 
     const meetingStartedTimeMs = meeting.meta?.meetingStartedTimestamp.getTime() ?? 0;
     const newMessages = meeting.chat?.messages.filter((m) => m.timeMs > meetingStartedTimeMs);
