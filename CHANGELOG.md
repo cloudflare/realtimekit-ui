@@ -1,3 +1,11 @@
+## [1.0.9-staging.1](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.8...@cloudflare/realtimekit-ui-v1.0.9-staging.1) (2026-01-09)
+
+
+### Bug Fixes
+
+* update workflow to use github bot for token generation ([81e377f](https://github.com/cloudflare/realtimekit-ui/commit/81e377f31c29295989c99d14f8ad1e68be1d6d11))
+* workflow does not contain permissions ([9e8ac74](https://github.com/cloudflare/realtimekit-ui/commit/9e8ac741848f61fc42848a5ab6f7f82bdfad331e))
+
 ## [1.0.8](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.7...@cloudflare/realtimekit-ui-v1.0.8) (2025-12-17)
 
 
