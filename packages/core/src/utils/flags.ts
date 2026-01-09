@@ -1,5 +1,4 @@
 import RealtimeKitClient from '@cloudflare/realtimekit';
-import { showLivestream } from './livestream';
 
 export const FlagsmithFeatureFlags = {
   PLAY_PARTICIPANT_TILE_VIDEO_ON_PAUSE: 'play_participant_tile_video_on_pause',
@@ -16,10 +15,7 @@ export const FlagsmithFeatureFlags = {
 export const isBreakoutRoomsEnabled = (meeting: RealtimeKitClient) =>
   meeting.connectedMeetings.supportsConnectedMeetings;
 
-export const usePaginatedChat = (meeting: RealtimeKitClient) =>
-  meeting?.meta.viewType === 'CHAT' ||
-  showLivestream(meeting) ||
-  meeting?.__internals__?.features.hasFeature('feat_paginated_chat');
+export const usePaginatedChat = () => true;
 
 export const disableSettingSinkId = (meeting: RealtimeKitClient) =>
   meeting?.__internals__?.browserSpecs.isFirefox() &&

@@ -267,12 +267,13 @@ export class RtkBreakoutRoomManager {
     if (!this.meeting || !this.room || !this.permissions) return null;
 
     /* NOTE(ravindra-cloudflare):
-    *  Checking if user can switch to this room
-    *  Check 1: if user has full access.
-    *  Check 2: For non-parent room, user has "switch meeting" access.
-    *  Check 3: For parent room, user has "switch to parent meeting" access.
-    */
-    const canSwitchToThisRoom = this.permissions.canAlterConnectedMeetings ||
+     *  Checking if user can switch to this room
+     *  Check 1: if user has full access.
+     *  Check 2: For non-parent room, user has "switch meeting" access.
+     *  Check 3: For parent room, user has "switch to parent meeting" access.
+     */
+    const canSwitchToThisRoom =
+      this.permissions.canAlterConnectedMeetings ||
       (this.permissions.canSwitchConnectedMeetings && !this.room.isParent) ||
       (this.permissions.canSwitchToParentMeeting && this.room.isParent);
 
@@ -352,22 +353,18 @@ export class RtkBreakoutRoomManager {
                     {this.t('breakout_rooms.assign')}
                   </rtk-button>
                 )}
-              {this.mode === 'edit' &&
-                !this.assigningParticipants &&
-                canSwitchToThisRoom && (
-                  <rtk-button
-                    kind="button"
-                    variant="ghost"
-                    class="assign-button"
-                    size="md"
-                    disabled={this.room.id === this.meeting.meta.meetingId}
-                    onClick={() => this.onJoin()}
-                  >
-                    {this.room.id === this.meeting.meta.meetingId
-                      ? this.t('joined')
-                      : this.t('join')}
-                  </rtk-button>
-                )}
+              {this.mode === 'edit' && !this.assigningParticipants && canSwitchToThisRoom && (
+                <rtk-button
+                  kind="button"
+                  variant="ghost"
+                  class="assign-button"
+                  size="md"
+                  disabled={this.room.id === this.meeting.meta.meetingId}
+                  onClick={() => this.onJoin()}
+                >
+                  {this.room.id === this.meeting.meta.meetingId ? this.t('joined') : this.t('join')}
+                </rtk-button>
+              )}
               {!this.room.isParent && (
                 <rtk-icon
                   icon={
