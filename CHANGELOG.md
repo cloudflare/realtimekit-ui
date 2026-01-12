@@ -1,3 +1,14 @@
+## [1.0.9-staging.3](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.9-staging.2...@cloudflare/realtimekit-ui-v1.0.9-staging.3) (2026-01-12)
+
+
+### Bug Fixes
+
+* deprecate chat-messages-ui component ([c0a602e](https://github.com/cloudflare/realtimekit-ui/commit/c0a602e761b3c722852d6d7bcb620b083eb78f51))
+* position for renderActions ([06ca23d](https://github.com/cloudflare/realtimekit-ui/commit/06ca23df87db5d7519cc500fde0c0f3e7728495c))
+* remove chat sdk usage from rtk-chat ([02dbce5](https://github.com/cloudflare/realtimekit-ui/commit/02dbce5d77d9ff3f7fb63607e14260d4457bbea8))
+* remove unused declarations ([79d54ee](https://github.com/cloudflare/realtimekit-ui/commit/79d54eed37eb0733088a043381957716f7a5b152))
+* ui for chat messages ([0f396ed](https://github.com/cloudflare/realtimekit-ui/commit/0f396ed02f75e8af7e924e2fda893fd7421c4ec0))
+
 ## [1.0.9-staging.2](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.9-staging.1...@cloudflare/realtimekit-ui-v1.0.9-staging.2) (2026-01-09)
 
 
