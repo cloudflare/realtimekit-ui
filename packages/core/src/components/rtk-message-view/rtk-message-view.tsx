@@ -91,12 +91,12 @@ export class RtkMessageView {
             )}
             <div class={{ body: true, bubble: this.variant === 'bubble' }}>
               <slot></slot>
-              {this.actions.length !== 0 && this.renderActions()}
               {!this.hideMetadata && !!this.time && (
                 <div class="metadata" title={formatDateTime(this.time)}>
                   {elapsedDuration(this.time, new Date(Date.now()))}
                 </div>
               )}
+              {this.actions.length !== 0 && this.renderActions()}
             </div>
           </div>
         </div>
