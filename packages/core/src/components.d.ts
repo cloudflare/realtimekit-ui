@@ -2052,6 +2052,10 @@ export namespace Components {
          */
         "iconPack": IconPack;
         /**
+          * Variant
+         */
+        "menuVariant": 'primary' | 'secondary';
+        /**
           * Size
          */
         "size": Size;
@@ -2068,6 +2072,10 @@ export namespace Components {
           * Icon pack
          */
         "iconPack": IconPack;
+        /**
+          * Variant
+         */
+        "menuVariant": 'primary' | 'secondary';
         /**
           * Language
          */
@@ -8868,6 +8876,10 @@ declare namespace LocalJSX {
          */
         "iconPack"?: IconPack;
         /**
+          * Variant
+         */
+        "menuVariant"?: 'primary' | 'secondary';
+        /**
           * Size
          */
         "size"?: Size;
@@ -8884,6 +8896,10 @@ declare namespace LocalJSX {
           * Icon pack
          */
         "iconPack"?: IconPack;
+        /**
+          * Variant
+         */
+        "menuVariant"?: 'primary' | 'secondary';
         /**
           * Language
          */

@@ -16,7 +16,11 @@
 }
 
 :host(:hover) {
-  @apply bg-background-600;
+  @apply bg-background-900;
+}
+
+:host(.primary:hover) {
+  @apply bg-brand-300;
 }
 
 :host(.red) {

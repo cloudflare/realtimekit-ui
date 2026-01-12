@@ -55,13 +55,16 @@ export class RtkMessageView {
 
   private renderActions() {
     return (
-      <rtk-menu placement="top-end" offset={1}>
+      <rtk-menu placement={this.isSelf ? 'bottom-start' : 'bottom-end'} offset={1}>
         <button slot="trigger" class="actions">
           <rtk-icon icon={this.iconPack.chevron_down} />
         </button>
-        <rtk-menu-list>
+        <rtk-menu-list menuVariant={this.isSelf ? 'primary' : 'secondary'}>
           {this.actions.map((action) => (
-            <rtk-menu-item onClick={() => this.onAction.emit(action.id)}>
+            <rtk-menu-item
+              menuVariant={this.isSelf ? 'primary' : 'secondary'}
+              onClick={() => this.onAction.emit(action.id)}
+            >
               {action.icon && <rtk-icon icon={action.icon} slot="start" />}
               {action.label}
             </rtk-menu-item>

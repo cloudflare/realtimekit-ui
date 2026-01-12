@@ -62,41 +62,29 @@
 }
 
 rtk-menu {
-  @apply absolute right-0 top-0 rounded-lg;
+  @apply absolute right-1 top-1 rounded-lg;
 
   rtk-icon {
     @apply h-4 w-4;
     @apply cursor-pointer;
   }
 }
+
 .actions {
-  @apply flex items-center justify-center pl-2 pb-2 pt-1 pr-1;
+  @apply bg-brand-300 border-brand-600 flex items-center justify-center border-[1px] border-solid p-1;
   @apply rounded-md border-none;
-  background: radial-gradient(
-    at top right,
-    theme(colors.brand.300) 60%,
-    rgba(255, 255, 255, 0) 80%
-  );
   rtk-icon {
     @apply h-4 w-4;
     @apply text-text-on-brand;
   }
 }
+
 .incoming {
-  .actions {
-    background: radial-gradient(
-      at top right,
-      theme(colors.background.800) 60%,
-      rgba(255, 255, 255, 0) 80%
-    );
-
-    rtk-icon {
-      @apply text-text-900;
-    }
-  }
-
   rtk-avatar {
     @apply bg-background-600 text-text-900;
+  }
+  .actions {
+    @apply bg-background-1000 border-background-700;
   }
 }
 

@@ -1,8 +1,14 @@
 @import '../../styles/reset.css';
 
 :host {
-  @apply flex w-max flex-col py-2;
-  @apply bg-background-800 text-text-1000;
+  @apply flex w-max flex-col p-0;
+  @apply text-text-1000;
+  @apply bg-background-1000 border-background-700 border-[1px] border-solid;
   @apply overflow-hidden rounded-sm;
   @apply shadow-lg;
+  backdrop-filter: blur(60px);
+}
+
+:host(.primary) {
+  @apply bg-brand-300/30 border-brand-600;
 }

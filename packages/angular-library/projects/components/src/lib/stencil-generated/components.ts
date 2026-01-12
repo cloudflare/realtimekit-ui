@@ -2006,14 +2006,14 @@ export declare interface RtkMenu extends Components.RtkMenu {}
 
 
 @ProxyCmp({
-  inputs: ['iconPack', 'size', 't']
+  inputs: ['iconPack', 'menuVariant', 'size', 't']
 })
 @Component({
   selector: 'rtk-menu-item',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: '<ng-content></ng-content>',
   // eslint-disable-next-line @angular-eslint/no-inputs-metadata-property
-  inputs: ['iconPack', 'size', 't'],
+  inputs: ['iconPack', 'menuVariant', 'size', 't'],
 })
 export class RtkMenuItem {
   protected el: HTMLRtkMenuItemElement;
@@ -2028,14 +2028,14 @@ export declare interface RtkMenuItem extends Components.RtkMenuItem {}
 
 
 @ProxyCmp({
-  inputs: ['iconPack', 't']
+  inputs: ['iconPack', 'menuVariant', 't']
 })
 @Component({
   selector: 'rtk-menu-list',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: '<ng-content></ng-content>',
   // eslint-disable-next-line @angular-eslint/no-inputs-metadata-property
-  inputs: ['iconPack', 't'],
+  inputs: ['iconPack', 'menuVariant', 't'],
 })
 export class RtkMenuList {
   protected el: HTMLRtkMenuListElement;
