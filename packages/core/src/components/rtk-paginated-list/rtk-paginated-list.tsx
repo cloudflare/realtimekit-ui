@@ -59,6 +59,12 @@ export class RtkPaginatedList {
 
   @State() isLoading: boolean = false;
 
+  @State() isLoadingTop: boolean = false;
+
+  @State() isLoadingBottom: boolean = false;
+
+  @State() hasMoreDataAtTop: boolean = false;
+
   @State() rerenderBoolean: boolean = false;
 
   /**
@@ -206,7 +212,8 @@ export class RtkPaginatedList {
 
     // TODO: scrollIntoView
     const onPageRendered = () => {}; // oldestVNode.$elm$?.scrollIntoView();
-    this.loadPage(oldestTimestamp - 1, this.pageSize, true, onPageRendered);
+    this.isLoadingTop = true;
+    this.loadPage(oldestTimestamp - 1, this.pageSize, true, onPageRendered, 'top');
   }
 
   private loadBottom() {
@@ -228,7 +235,8 @@ export class RtkPaginatedList {
 
     // TODO: scrollIntoView
     const onPageRendered = () => smoothScrollToBottom(this.$paginatedList);
-    this.loadPage(newestTimestamp + 1, this.pageSize, false, onPageRendered);
+    this.isLoadingBottom = true;
+    this.loadPage(newestTimestamp + 1, this.pageSize, false, onPageRendered, 'bottom');
   }
 
   private addNodeToRender(node: DataNode, addToStart: boolean) {
@@ -272,16 +280,27 @@ export class RtkPaginatedList {
    * @param end
    * @param reversed Defines whether to add the page at the beginning or the end
    * @param onPageLoaded Callback for when all new nodes are rendered
+   * @param direction Indicates if loading from 'top' or 'bottom'
    */
   private async loadPage(
     timestamp: number,
     size: number,
     reversed: boolean,
-    onPageRendered: (data: DataNode[]) => void = () => {}
+    onPageRendered: (data: DataNode[]) => void = () => {},
+    direction?: 'top' | 'bottom'
   ) {
     this.isLoading = true;
     const data = (await this.fetchData(timestamp, size, reversed)) as DataNode[];
     this.isLoading = false;
+
+    if (direction === 'top') {
+      this.isLoadingTop = false;
+      this.hasMoreDataAtTop = data?.length > 0;
+    }
+    if (direction === 'bottom') {
+      this.isLoadingBottom = false;
+    }
+
     if (!data?.length) {
       /**
        * While scrolling down if there were no new items found
@@ -333,6 +352,10 @@ export class RtkPaginatedList {
     this.loadBottom();
   }
 
+  private onLoadMoreOnTopClicked() {
+    this.loadTop();
+  }
+
   render() {
     /**
      * div.container is flex=column-reverse
@@ -358,6 +381,7 @@ export class RtkPaginatedList {
             id="bottom-scroll"
             ref={(el) => (this.$bottomRef = el)}
           ></div>
+          {this.isLoadingBottom && <rtk-spinner size="sm" />}
           {this.isLoading && this.pagesToRender.flat().length === 0 && <rtk-spinner size="lg" />}
           {this.pagesToRender.flat().length === 0 && this.showEmptyListLabel ? (
             <div class="empty-list">{this.emptyListLabel ?? this.t('list.empty')}</div>
@@ -366,6 +390,20 @@ export class RtkPaginatedList {
               {this.pagesToRender.map((page) => this.createNodes(page))}
             </div>
           )}
+          {this.hasMoreDataAtTop && !this.isLoadingTop && (
+            <div class="load-more-on-top-container">
+              <rtk-button
+                class="load-more-icon"
+                kind="icon"
+                variant="secondary"
+                part="load-more-icon"
+                onClick={() => this.onLoadMoreOnTopClicked()}
+              >
+                <rtk-icon icon={this.iconPack.chevron_up} />
+              </rtk-button>
+            </div>
+          )}
+          {this.isLoadingTop && <rtk-spinner size="sm" />}
           <div class="smallest-dom-element" id="top-scroll" ref={(el) => (this.$topRef = el)}></div>
         </div>
       </Host>
