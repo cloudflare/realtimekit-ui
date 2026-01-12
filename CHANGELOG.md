@@ -1,3 +1,10 @@
+## [1.0.9-staging.4](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.9-staging.3...@cloudflare/realtimekit-ui-v1.0.9-staging.4) (2026-01-12)
+
+
+### Bug Fixes
+
+* **paginated-list-loaders:** added loaders in paginated list ([d124d6e](https://github.com/cloudflare/realtimekit-ui/commit/d124d6e7dca7cbc0e86abf5ba0e8dee4762a6786))
+
 ## [1.0.9-staging.3](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.9-staging.2...@cloudflare/realtimekit-ui-v1.0.9-staging.3) (2026-01-12)
 
 
