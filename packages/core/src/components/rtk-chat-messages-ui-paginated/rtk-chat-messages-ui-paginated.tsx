@@ -167,11 +167,7 @@ export class RtkChatMessagesUiPaginated {
     //     : chatMessagePermissions.canEdit === 'ALL' ||
     //       (chatMessagePermissions.canEdit === 'SELF' && isSelf);
 
-    // const canDelete =
-    //   chatMessagePermissions === undefined
-    //     ? isSelf
-    //     : chatMessagePermissions.canDelete === 'ALL' ||
-    //       (chatMessagePermissions.canDelete === 'SELF' && isSelf);
+    const canDelete = message.userId === this.meeting.self.userId;
 
     if (this.meeting.self.permissions.pinParticipant) {
       actions.push({
@@ -181,13 +177,13 @@ export class RtkChatMessagesUiPaginated {
       });
     }
 
-    // if (canDelete) {
-    //   actions.push({
-    //     id: 'delete_message',
-    //     label: this.t('chat.delete_msg'),
-    //     icon: this.iconPack.delete,
-    //   });
-    // }
+    if (canDelete) {
+      actions.push({
+        id: 'delete_message',
+        label: this.t('chat.delete_msg'),
+        icon: this.iconPack.delete,
+      });
+    }
 
     return actions;
   };
