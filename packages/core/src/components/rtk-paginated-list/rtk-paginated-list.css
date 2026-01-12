@@ -199,3 +199,18 @@ rtk-spinner,
     @apply py-1;
   }
 }
+
+.load-more-on-top-container {
+  @apply pointer-events-none absolute top-2 right-4;
+  @apply z-10;
+}
+
+.load-more-icon {
+  @apply pointer-events-auto;
+  @apply rounded-full;
+
+  &:hover {
+    @apply ring-background-600 ring-2;
+    @apply bg-background-600;
+  }
+}
