@@ -5,6 +5,9 @@ import type { Message } from '@cloudflare/realtimekit';
 import { SyncWithStore } from '../../utils/sync-with-store';
 import { TextMessageView } from '../rtk-text-message/components/TextMessage';
 
+/**
+ * @deprecated `rtk-channel-selector-ui` is deprecated and will be removed soon.
+ */
 @Component({
   tag: 'rtk-channel-selector-ui',
   styleUrl: 'rtk-channel-selector-ui.css',

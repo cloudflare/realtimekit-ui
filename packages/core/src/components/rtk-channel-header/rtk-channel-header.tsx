@@ -5,6 +5,7 @@ import { RtkI18n, IconPack, defaultIconPack, useLanguage } from '../../exports';
 import { SyncWithStore } from '../../utils/sync-with-store';
 import { RTKBasicParticipant } from '@cloudflare/realtimekit';
 
+/** @deprecated `rtk-channel-header` is deprecated and will be removed soon. Use `rtk-channel-selector-view` instead. */
 @Component({
   tag: 'rtk-channel-header',
   styleUrl: 'rtk-channel-header.css',

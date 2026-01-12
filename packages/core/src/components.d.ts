@@ -526,6 +526,9 @@ export namespace Components {
          */
         "variant": ControlBarVariant;
     }
+    /**
+     * @deprecated `rtk-channel-creator` is deprecated and will be removed soon.
+     */
     interface RtkChannelCreator {
         /**
           * Icon pack
@@ -540,6 +543,9 @@ export namespace Components {
          */
         "t": RtkI18n1;
     }
+    /**
+     * @deprecated `rtk-channel-details` is deprecated and will be removed soon.
+     */
     interface RtkChannelDetails {
         /**
           * Channel object
@@ -558,6 +564,9 @@ export namespace Components {
          */
         "t": RtkI18n1;
     }
+    /**
+     * @deprecated `rtk-channel-header` is deprecated and will be removed soon. Use `rtk-channel-selector-view` instead.
+     */
     interface RtkChannelHeader {
         /**
           * Channel object
@@ -580,6 +589,9 @@ export namespace Components {
          */
         "t": RtkI18n1;
     }
+    /**
+     * @deprecated `rtk-channel-selector-ui` is deprecated and will be removed soon.
+     */
     interface RtkChannelSelectorUi {
         /**
           * Channels
@@ -772,6 +784,9 @@ export namespace Components {
          */
         "t": RtkI18n1;
     }
+    /**
+     * @deprecated `rtk-chat-message` is deprecated and will be removed soon. Use `rtk-message-view` instead.
+     */
     interface RtkChatMessage {
         /**
           * aligns message to right
@@ -905,6 +920,9 @@ export namespace Components {
          */
         "t": RtkI18n;
     }
+    /**
+     * @deprecated `rtk-chat-search-results` is deprecated and will be removed soon. Use `rtk-chat-messages-ui-paginated` instead. -
+     */
     interface RtkChatSearchResults {
         /**
           * Channel id
@@ -1438,6 +1456,7 @@ export namespace Components {
         "t": RtkI18n1;
     }
     /**
+     * @deprecated `rtk-file-message` is deprecated and will be removed soon. Use `rtk-file-message-view` instead.
      * A component which renders a file message from chat.
      */
     interface RtkFileMessage {
@@ -1695,6 +1714,7 @@ export namespace Components {
         "t": RtkI18n;
     }
     /**
+     * @deprecated `rtk-image-message` is deprecated and will be removed soon. Use `rtk-image-message-view` instead.
      * A component which renders an image message from chat.
      */
     interface RtkImageMessage {
@@ -3757,6 +3777,7 @@ export namespace Components {
         "value": string;
     }
     /**
+     * @deprecated `rtk-text-message` is deprecated and will be removed soon. Use `rtk-text-message-view` instead.
      * A component which renders a text message from chat.
      */
     interface RtkTextMessage {
@@ -4520,6 +4541,9 @@ declare global {
         "rtkStateUpdate": States1;
         "switchChannel": string;
     }
+    /**
+     * @deprecated `rtk-channel-creator` is deprecated and will be removed soon.
+     */
     interface HTMLRtkChannelCreatorElement extends Components.RtkChannelCreator, HTMLStencilElement {
         addEventListener<K extends keyof HTMLRtkChannelCreatorElementEventMap>(type: K, listener: (this: HTMLRtkChannelCreatorElement, ev: RtkChannelCreatorCustomEvent<HTMLRtkChannelCreatorElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
         addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
@@ -4534,6 +4558,9 @@ declare global {
         prototype: HTMLRtkChannelCreatorElement;
         new (): HTMLRtkChannelCreatorElement;
     };
+    /**
+     * @deprecated `rtk-channel-details` is deprecated and will be removed soon.
+     */
     interface HTMLRtkChannelDetailsElement extends Components.RtkChannelDetails, HTMLStencilElement {
     }
     var HTMLRtkChannelDetailsElement: {
@@ -4545,6 +4572,9 @@ declare global {
         "searchDismissed": any;
         "back": void;
     }
+    /**
+     * @deprecated `rtk-channel-header` is deprecated and will be removed soon. Use `rtk-channel-selector-view` instead.
+     */
     interface HTMLRtkChannelHeaderElement extends Components.RtkChannelHeader, HTMLStencilElement {
         addEventListener<K extends keyof HTMLRtkChannelHeaderElementEventMap>(type: K, listener: (this: HTMLRtkChannelHeaderElement, ev: RtkChannelHeaderCustomEvent<HTMLRtkChannelHeaderElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
         addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
@@ -4562,6 +4592,9 @@ declare global {
     interface HTMLRtkChannelSelectorUiElementEventMap {
         "channelChanged": string;
     }
+    /**
+     * @deprecated `rtk-channel-selector-ui` is deprecated and will be removed soon.
+     */
     interface HTMLRtkChannelSelectorUiElement extends Components.RtkChannelSelectorUi, HTMLStencilElement {
         addEventListener<K extends keyof HTMLRtkChannelSelectorUiElementEventMap>(type: K, listener: (this: HTMLRtkChannelSelectorUiElement, ev: RtkChannelSelectorUiCustomEvent<HTMLRtkChannelSelectorUiElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
         addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
@@ -4673,6 +4706,9 @@ declare global {
         "pin": Message;
         "delete": Message;
     }
+    /**
+     * @deprecated `rtk-chat-message` is deprecated and will be removed soon. Use `rtk-message-view` instead.
+     */
     interface HTMLRtkChatMessageElement extends Components.RtkChatMessage, HTMLStencilElement {
         addEventListener<K extends keyof HTMLRtkChatMessageElementEventMap>(type: K, listener: (this: HTMLRtkChatMessageElement, ev: RtkChatMessageCustomEvent<HTMLRtkChatMessageElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
         addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
@@ -4731,6 +4767,9 @@ declare global {
         prototype: HTMLRtkChatMessagesUiPaginatedElement;
         new (): HTMLRtkChatMessagesUiPaginatedElement;
     };
+    /**
+     * @deprecated `rtk-chat-search-results` is deprecated and will be removed soon. Use `rtk-chat-messages-ui-paginated` instead. -
+     */
     interface HTMLRtkChatSearchResultsElement extends Components.RtkChatSearchResults, HTMLStencilElement {
     }
     var HTMLRtkChatSearchResultsElement: {
@@ -5027,6 +5066,7 @@ declare global {
         new (): HTMLRtkFileDropzoneElement;
     };
     /**
+     * @deprecated `rtk-file-message` is deprecated and will be removed soon. Use `rtk-file-message-view` instead.
      * A component which renders a file message from chat.
      */
     interface HTMLRtkFileMessageElement extends Components.RtkFileMessage, HTMLStencilElement {
@@ -5144,6 +5184,7 @@ declare global {
         "rtkStateUpdate": States;
     }
     /**
+     * @deprecated `rtk-image-message` is deprecated and will be removed soon. Use `rtk-image-message-view` instead.
      * A component which renders an image message from chat.
      */
     interface HTMLRtkImageMessageElement extends Components.RtkImageMessage, HTMLStencilElement {
@@ -6313,6 +6354,7 @@ declare global {
         new (): HTMLRtkTextComposerViewElement;
     };
     /**
+     * @deprecated `rtk-text-message` is deprecated and will be removed soon. Use `rtk-text-message-view` instead.
      * A component which renders a text message from chat.
      */
     interface HTMLRtkTextMessageElement extends Components.RtkTextMessage, HTMLStencilElement {
@@ -7071,6 +7113,9 @@ declare namespace LocalJSX {
          */
         "variant"?: ControlBarVariant;
     }
+    /**
+     * @deprecated `rtk-channel-creator` is deprecated and will be removed soon.
+     */
     interface RtkChannelCreator {
         /**
           * Icon pack
@@ -7093,6 +7138,9 @@ declare namespace LocalJSX {
          */
         "t"?: RtkI18n1;
     }
+    /**
+     * @deprecated `rtk-channel-details` is deprecated and will be removed soon.
+     */
     interface RtkChannelDetails {
         /**
           * Channel object
@@ -7111,6 +7159,9 @@ declare namespace LocalJSX {
          */
         "t"?: RtkI18n1;
     }
+    /**
+     * @deprecated `rtk-channel-header` is deprecated and will be removed soon. Use `rtk-channel-selector-view` instead.
+     */
     interface RtkChannelHeader {
         /**
           * Channel object
@@ -7145,6 +7196,9 @@ declare namespace LocalJSX {
          */
         "t"?: RtkI18n1;
     }
+    /**
+     * @deprecated `rtk-channel-selector-ui` is deprecated and will be removed soon.
+     */
     interface RtkChannelSelectorUi {
         /**
           * Channels
@@ -7389,6 +7443,9 @@ declare namespace LocalJSX {
          */
         "t"?: RtkI18n1;
     }
+    /**
+     * @deprecated `rtk-chat-message` is deprecated and will be removed soon. Use `rtk-message-view` instead.
+     */
     interface RtkChatMessage {
         /**
           * aligns message to right
@@ -7565,6 +7622,9 @@ declare namespace LocalJSX {
          */
         "t"?: RtkI18n;
     }
+    /**
+     * @deprecated `rtk-chat-search-results` is deprecated and will be removed soon. Use `rtk-chat-messages-ui-paginated` instead. -
+     */
     interface RtkChatSearchResults {
         /**
           * Channel id
@@ -8146,6 +8206,7 @@ declare namespace LocalJSX {
         "t"?: RtkI18n1;
     }
     /**
+     * @deprecated `rtk-file-message` is deprecated and will be removed soon. Use `rtk-file-message-view` instead.
      * A component which renders a file message from chat.
      */
     interface RtkFileMessage {
@@ -8415,6 +8476,7 @@ declare namespace LocalJSX {
         "t"?: RtkI18n;
     }
     /**
+     * @deprecated `rtk-image-message` is deprecated and will be removed soon. Use `rtk-image-message-view` instead.
      * A component which renders an image message from chat.
      */
     interface RtkImageMessage {
@@ -10682,6 +10744,7 @@ declare namespace LocalJSX {
         "value"?: string;
     }
     /**
+     * @deprecated `rtk-text-message` is deprecated and will be removed soon. Use `rtk-text-message-view` instead.
      * A component which renders a text message from chat.
      */
     interface RtkTextMessage {
@@ -11093,9 +11156,21 @@ declare module "@stencil/core" {
              */
             "rtk-camera-toggle": LocalJSX.RtkCameraToggle & JSXBase.HTMLAttributes<HTMLRtkCameraToggleElement>;
             "rtk-caption-toggle": LocalJSX.RtkCaptionToggle & JSXBase.HTMLAttributes<HTMLRtkCaptionToggleElement>;
+            /**
+             * @deprecated `rtk-channel-creator` is deprecated and will be removed soon.
+             */
             "rtk-channel-creator": LocalJSX.RtkChannelCreator & JSXBase.HTMLAttributes<HTMLRtkChannelCreatorElement>;
+            /**
+             * @deprecated `rtk-channel-details` is deprecated and will be removed soon.
+             */
             "rtk-channel-details": LocalJSX.RtkChannelDetails & JSXBase.HTMLAttributes<HTMLRtkChannelDetailsElement>;
+            /**
+             * @deprecated `rtk-channel-header` is deprecated and will be removed soon. Use `rtk-channel-selector-view` instead.
+             */
             "rtk-channel-header": LocalJSX.RtkChannelHeader & JSXBase.HTMLAttributes<HTMLRtkChannelHeaderElement>;
+            /**
+             * @deprecated `rtk-channel-selector-ui` is deprecated and will be removed soon.
+             */
             "rtk-channel-selector-ui": LocalJSX.RtkChannelSelectorUi & JSXBase.HTMLAttributes<HTMLRtkChannelSelectorUiElement>;
             "rtk-channel-selector-view": LocalJSX.RtkChannelSelectorView & JSXBase.HTMLAttributes<HTMLRtkChannelSelectorViewElement>;
             /**
@@ -11107,12 +11182,18 @@ declare module "@stencil/core" {
              * A component which renders a chat composer
              */
             "rtk-chat-composer-view": LocalJSX.RtkChatComposerView & JSXBase.HTMLAttributes<HTMLRtkChatComposerViewElement>;
+            /**
+             * @deprecated `rtk-chat-message` is deprecated and will be removed soon. Use `rtk-message-view` instead.
+             */
             "rtk-chat-message": LocalJSX.RtkChatMessage & JSXBase.HTMLAttributes<HTMLRtkChatMessageElement>;
             /**
              * @deprecated Use `rtk-chat-messages-ui-paginated` instead.
              */
             "rtk-chat-messages-ui": LocalJSX.RtkChatMessagesUi & JSXBase.HTMLAttributes<HTMLRtkChatMessagesUiElement>;
             "rtk-chat-messages-ui-paginated": LocalJSX.RtkChatMessagesUiPaginated & JSXBase.HTMLAttributes<HTMLRtkChatMessagesUiPaginatedElement>;
+            /**
+             * @deprecated `rtk-chat-search-results` is deprecated and will be removed soon. Use `rtk-chat-messages-ui-paginated` instead. -
+             */
             "rtk-chat-search-results": LocalJSX.RtkChatSearchResults & JSXBase.HTMLAttributes<HTMLRtkChatSearchResultsElement>;
             "rtk-chat-selector-ui": LocalJSX.RtkChatSelectorUi & JSXBase.HTMLAttributes<HTMLRtkChatSelectorUiElement>;
             /**
@@ -11182,6 +11263,7 @@ declare module "@stencil/core" {
             "rtk-ended-screen": LocalJSX.RtkEndedScreen & JSXBase.HTMLAttributes<HTMLRtkEndedScreenElement>;
             "rtk-file-dropzone": LocalJSX.RtkFileDropzone & JSXBase.HTMLAttributes<HTMLRtkFileDropzoneElement>;
             /**
+             * @deprecated `rtk-file-message` is deprecated and will be removed soon. Use `rtk-file-message-view` instead.
              * A component which renders a file message from chat.
              */
             "rtk-file-message": LocalJSX.RtkFileMessage & JSXBase.HTMLAttributes<HTMLRtkFileMessageElement>;
@@ -11218,6 +11300,7 @@ declare module "@stencil/core" {
              */
             "rtk-idle-screen": LocalJSX.RtkIdleScreen & JSXBase.HTMLAttributes<HTMLRtkIdleScreenElement>;
             /**
+             * @deprecated `rtk-image-message` is deprecated and will be removed soon. Use `rtk-image-message-view` instead.
              * A component which renders an image message from chat.
              */
             "rtk-image-message": LocalJSX.RtkImageMessage & JSXBase.HTMLAttributes<HTMLRtkImageMessageElement>;
@@ -11529,6 +11612,7 @@ declare module "@stencil/core" {
              */
             "rtk-text-composer-view": LocalJSX.RtkTextComposerView & JSXBase.HTMLAttributes<HTMLRtkTextComposerViewElement>;
             /**
+             * @deprecated `rtk-text-message` is deprecated and will be removed soon. Use `rtk-text-message-view` instead.
              * A component which renders a text message from chat.
              */
             "rtk-text-message": LocalJSX.RtkTextMessage & JSXBase.HTMLAttributes<HTMLRtkTextMessageElement>;
