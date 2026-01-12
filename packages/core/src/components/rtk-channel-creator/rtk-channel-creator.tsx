@@ -15,6 +15,9 @@ import { Meeting } from '../../types/rtk-client';
 import { SyncWithStore } from '../../utils/sync-with-store';
 import { RTKBasicParticipant } from '@cloudflare/realtimekit';
 
+/**
+ * @deprecated `rtk-channel-creator` is deprecated and will be removed soon.
+ */
 @Component({
   tag: 'rtk-channel-creator',
   styleUrl: 'rtk-channel-creator.css',

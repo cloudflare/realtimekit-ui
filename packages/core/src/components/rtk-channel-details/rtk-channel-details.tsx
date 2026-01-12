@@ -4,6 +4,7 @@ import { ChatChannel } from '../../types/props';
 import { SyncWithStore } from '../../utils/sync-with-store';
 import { RTKBasicParticipant } from '@cloudflare/realtimekit';
 
+/** @deprecated `rtk-channel-details` is deprecated and will be removed soon. */
 @Component({
   tag: 'rtk-channel-details',
   styleUrl: 'rtk-channel-details.css',

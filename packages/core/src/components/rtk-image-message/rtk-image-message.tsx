@@ -9,6 +9,7 @@ import { States } from '../../types/props';
 import { SyncWithStore } from '../../utils/sync-with-store';
 
 /**
+ * @deprecated `rtk-image-message` is deprecated and will be removed soon. Use `rtk-image-message-view` instead.
  * A component which renders an image message from chat.
  */
 @Component({
