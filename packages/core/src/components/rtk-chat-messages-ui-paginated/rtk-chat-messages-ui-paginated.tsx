@@ -159,19 +159,19 @@ export class RtkChatMessagesUiPaginated {
   private getMessageActions = (message: Message) => {
     const actions = [];
 
-    const isSelf = this.meeting.self.userId === message.userId;
-    const chatMessagePermissions = this.meeting.self.permissions?.chatMessage;
-    const canEdit =
-      chatMessagePermissions === undefined
-        ? isSelf
-        : chatMessagePermissions.canEdit === 'ALL' ||
-          (chatMessagePermissions.canEdit === 'SELF' && isSelf);
+    // const isSelf = this.meeting.self.userId === message.userId;
+    // const chatMessagePermissions = this.meeting.self.permissions?.chatMessage;
+    // const canEdit =
+    //   chatMessagePermissions === undefined
+    //     ? isSelf
+    //     : chatMessagePermissions.canEdit === 'ALL' ||
+    //       (chatMessagePermissions.canEdit === 'SELF' && isSelf);
 
-    const canDelete =
-      chatMessagePermissions === undefined
-        ? isSelf
-        : chatMessagePermissions.canDelete === 'ALL' ||
-          (chatMessagePermissions.canDelete === 'SELF' && isSelf);
+    // const canDelete =
+    //   chatMessagePermissions === undefined
+    //     ? isSelf
+    //     : chatMessagePermissions.canDelete === 'ALL' ||
+    //       (chatMessagePermissions.canDelete === 'SELF' && isSelf);
 
     if (this.meeting.self.permissions.pinParticipant) {
       actions.push({
@@ -181,21 +181,13 @@ export class RtkChatMessagesUiPaginated {
       });
     }
 
-    if (canDelete) {
-      actions.push({
-        id: 'delete_message',
-        label: this.t('chat.delete_msg'),
-        icon: this.iconPack.delete,
-      });
-    }
-
-    if (canEdit) {
-      actions.push({
-        id: 'edit_message',
-        label: this.t('chat.edit_msg'),
-        icon: this.iconPack.edit,
-      });
-    }
+    // if (canDelete) {
+    //   actions.push({
+    //     id: 'delete_message',
+    //     label: this.t('chat.delete_msg'),
+    //     icon: this.iconPack.delete,
+    //   });
+    // }
 
     return actions;
   };
