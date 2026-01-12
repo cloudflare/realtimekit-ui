@@ -2,25 +2,25 @@
 
 :host {
   @apply flex flex-col;
-  @apply bg-background-900 w-full;
+  @apply bg-background-1000 w-full;
   @apply relative;
   @apply z-10 h-12;
   min-height: 48px;
 }
 
 .dropdown-trigger {
-  @apply h-full w-full border-none p-4;
+  @apply h-full w-full border-none p-4 px-3;
   @apply flex items-center justify-between;
   @apply bg-background-700 text-text-1000 text-text-md;
   @apply cursor-pointer;
   @apply absolute z-20;
 
   span {
-    @apply flex flex-1 items-center justify-between;
+    @apply flex flex-1 items-center justify-start gap-2;
   }
 
   rtk-icon {
-    @apply ml-1 h-5 w-5 shrink-0;
+    @apply ml-1 h-4 w-4 shrink-0;
   }
 }
 
@@ -37,24 +37,17 @@
   input {
     @apply !h-8 !rounded-none;
   }
-  .channel {
-    @apply !h-8 !rounded-sm;
-  }
   .avatar-icon {
     @apply !h-3 !w-3 !p-1;
-  }
-
-  rtk-avatar {
-    @apply !h-5 !w-5;
   }
 }
 
 .dropdown {
   @apply absolute;
-  @apply bg-background-900 w-full;
+  @apply bg-background-1000 w-full;
+  @apply border-b-sm border-r-none border-l-none border-t-none border-background-600 border-solid;
   @apply top-12 z-10;
   animation: 0.3s slide-down ease;
-
   .channels-container {
     @apply max-h-80;
   }
@@ -94,17 +87,22 @@ input {
 }
 
 .channels-container {
-  @apply flex flex-col gap-1 p-2;
+  @apply flex flex-col;
   @apply flex-auto overflow-y-auto;
 }
 
+rtk-avatar {
+  @apply !h-4 !w-4 overflow-clip rounded-full p-2;
+  @apply text-text-sm;
+}
+
 .channel {
-  @apply flex flex-shrink-0;
+  @apply flex flex-shrink-0 py-2;
   @apply box-border border-none bg-transparent outline-none;
-  @apply cursor-pointer rounded-md;
+  @apply cursor-pointer;
 
   @apply flex items-center justify-between gap-2;
-  @apply h-16 w-full pl-2 pr-3;
+  @apply w-full pl-2 pr-3;
 
   @apply text-text transition-colors;
 
@@ -130,12 +128,8 @@ input {
     @apply italic;
   }
 
-  rtk-avatar {
-    @apply h-12 w-12 overflow-clip rounded-full;
-    @apply text-text-md;
-  }
   .avatar-icon {
-    @apply text-text-on-brand h-6 w-6 p-3;
+    @apply text-text-on-brand h-4 w-4 p-2;
     @apply bg-brand overflow-clip rounded-full;
   }
 

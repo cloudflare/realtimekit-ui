@@ -21,6 +21,9 @@ export class RtkMessageView {
   /** Appearance */
   @Prop() variant: 'plain' | 'bubble' = 'bubble';
 
+  /** Is message pinned */
+  @Prop() pinned: boolean = false;
+
   /** Render */
   @Prop() viewType: 'incoming' | 'outgoing' = 'outgoing';
 
@@ -96,6 +99,7 @@ export class RtkMessageView {
               <slot></slot>
               {!this.hideMetadata && !!this.time && (
                 <div class="metadata" title={formatDateTime(this.time)}>
+                  {this.pinned && <rtk-icon icon={this.iconPack.pin} size="sm" />}
                   {elapsedDuration(this.time, new Date(Date.now()))}
                 </div>
               )}

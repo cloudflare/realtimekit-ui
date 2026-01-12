@@ -2144,6 +2144,10 @@ export namespace Components {
          */
         "isSelf": boolean;
         /**
+          * Is message pinned
+         */
+        "pinned": boolean;
+        /**
           * Time when message was sent
          */
         "time": Date;
@@ -8971,6 +8975,10 @@ declare namespace LocalJSX {
           * action event
          */
         "onAction"?: (event: RtkMessageViewCustomEvent<string>) => void;
+        /**
+          * Is message pinned
+         */
+        "pinned"?: boolean;
         /**
           * Time when message was sent
          */

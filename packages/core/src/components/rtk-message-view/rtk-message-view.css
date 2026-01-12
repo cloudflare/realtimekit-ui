@@ -52,9 +52,9 @@
 }
 
 .metadata {
-  @apply mt-2;
+  @apply mt-2 flex flex-row items-center gap-2;
   @apply self-end;
-  @apply text-text-xs text-text-800;
+  @apply text-text-800 text-[11px];
 }
 
 .avatar {

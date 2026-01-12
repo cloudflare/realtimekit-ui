@@ -105,22 +105,36 @@ rtk-chat-composer-view {
   }
 }
 
+.pinned-messages {
+  @apply relative flex flex-col;
+}
+
 .pinned-messages-header {
-  @apply flex items-center gap-2 p-2;
-  @apply bg-background-600 text-text-sm;
+  @apply flex items-center justify-between gap-2 p-4;
+  @apply bg-background-700 text-text-md;
   @apply cursor-pointer;
+
+  div {
+    @apply flex flex-row items-center gap-2;
+  }
 
   rtk-icon {
     @apply h-3 w-3;
   }
-
-  &:hover {
-    @apply bg-brand-500;
-  }
 }
 
-.pinned-messages-header.active {
-  @apply bg-brand-500;
+.pinned-messages-content {
+  @apply bg-background-1000 border-background-600;
+  @apply absolute left-0 top-full z-50 w-full;
+}
+
+.pinned-message {
+  @apply border-background-600 flex cursor-pointer flex-row items-center gap-2 p-4;
+  @apply border-b-sm border-r-none border-l-none border-t-none border-solid;
+}
+
+.pinned-message-avatar {
+  @apply !h-6 !w-6;
 }
 
 @keyframes swipe-in {
