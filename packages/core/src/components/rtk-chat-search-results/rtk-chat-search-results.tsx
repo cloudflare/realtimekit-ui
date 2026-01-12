@@ -35,11 +35,12 @@ export class RtkChatSearchResults {
   private pageSize = 50;
 
   private searchMessages = async (timestamp: number, size: number, reversed: boolean) => {
-    return this.meeting.chat.searchMessages(this.query, {
-      channelId: this.channelId,
+    return this.meeting.chat.fetchMessages({
       timestamp,
-      size,
-      reversed,
+      offset: 0,
+      limit: size,
+      direction: reversed ? 'before' : 'after',
+      searchQuery: this.query,
     });
   };
 
