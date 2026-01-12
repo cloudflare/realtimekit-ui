@@ -154,8 +154,6 @@ export class RtkChat {
 
   private isChatViewType: boolean;
 
-  private isGroupCall: boolean;
-
   private resizeObserver: ResizeObserver;
 
   private onDragOver = (e) => {
@@ -256,7 +254,6 @@ export class RtkChat {
         meeting?.__internals__?.features.hasFeature(FlagsmithFeatureFlags.PINNED_MESSAGES) &&
         meeting.self.permissions.pinParticipant;
 
-      this.isGroupCall = meeting.meta.viewType === 'GROUP_CALL';
       this.isChatViewType = meeting.meta.viewType === 'CHAT';
       if (this.isChatViewType) {
         this.onChannelCreateOrUpdate();
@@ -816,10 +813,6 @@ export class RtkChat {
     if (!this.meeting) {
       return null;
     }
-
-    const uiProps = { iconPack: this.iconPack, t: this.t, size: this.size };
-
-    const selfUserId = this.meeting?.self.userId;
 
     let chatMessages = this.chatGroups[this.selectedGroup] || [];
 
