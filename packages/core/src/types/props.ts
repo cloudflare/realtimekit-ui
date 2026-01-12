@@ -78,6 +78,7 @@ export interface States {
     destinationMeetingId?: string;
   };
   activeJoinStage?: boolean;
+  /** @deprecated `activeChannelCreator` is deprecated and will be removed soon. */
   activeChannelCreator?: boolean;
   image?: ImageMessage;
   prefs?: UserPreferences;

@@ -42,7 +42,7 @@ export class RtkPaginatedList {
   @Prop() selectedItemId?: string;
 
   /** auto scroll list to bottom */
-  @Prop() autoScroll = true;
+  @Prop() autoScroll: boolean;
 
   /** Icon pack */
   @SyncWithStore()
@@ -141,6 +141,7 @@ export class RtkPaginatedList {
 
   connectedCallback() {
     this.rerender = debounce(this.rerender.bind(this), 50, { maxWait: 200 });
+    this.autoScroll = true;
     this.intersectionObserver = new IntersectionObserver((entries) => {
       writeTask(() => {
         for (const entry of entries) {
@@ -294,21 +295,6 @@ export class RtkPaginatedList {
       onPageRendered([]);
       return;
     }
-    // const page = this.createNodes(data);
-
-    // const lastNodeToBeRendered = page[page.length - 1];
-    // let lastNodeToBeRenderedProxy = new Proxy(lastNodeToBeRendered, {
-    //   set(obj, prop, value) {
-    //     /**
-    //      * Whenever the last node has the 'elm' property added to it
-    //      * we can assume it has been rendered
-    //      */
-    //     if (prop === '$elm$' && value && !obj.$elm$) onPageRendered();
-    //     obj[prop] = value;
-    //     return true;
-    //   },
-    // });
-    // page[page.length - 1] = lastNodeToBeRenderedProxy;
 
     data.forEach((node) => this.addNodeToRender(node, reversed));
     this.rerender();

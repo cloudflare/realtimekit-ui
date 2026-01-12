@@ -28,7 +28,7 @@ export function alphabeticalSorter(a: string, b: string) {
 }
 
 /**
- * Generate a unique chat group key used in `<rtk-chat-messages-ui />`
+ * Generate a unique chat group key used in `<rtk-chat /> and <rtk-chat-selector-ui />`
  * @param ids An array of user ids
  * @returns A unique key from the user ids
  */

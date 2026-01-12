@@ -2072,14 +2072,14 @@ export declare interface RtkMessageListView extends Components.RtkMessageListVie
 
 
 @ProxyCmp({
-  inputs: ['actions', 'authorName', 'avatarUrl', 'hideAuthorName', 'hideAvatar', 'hideMetadata', 'iconPack', 'time', 'variant', 'viewType']
+  inputs: ['actions', 'authorName', 'avatarUrl', 'hideAuthorName', 'hideAvatar', 'hideMetadata', 'iconPack', 'isSelf', 'time', 'variant', 'viewType']
 })
 @Component({
   selector: 'rtk-message-view',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: '<ng-content></ng-content>',
   // eslint-disable-next-line @angular-eslint/no-inputs-metadata-property
-  inputs: ['actions', 'authorName', 'avatarUrl', 'hideAuthorName', 'hideAvatar', 'hideMetadata', 'iconPack', 'time', 'variant', 'viewType'],
+  inputs: ['actions', 'authorName', 'avatarUrl', 'hideAuthorName', 'hideAvatar', 'hideMetadata', 'iconPack', 'isSelf', 'time', 'variant', 'viewType'],
 })
 export class RtkMessageView {
   protected el: HTMLRtkMessageViewElement;

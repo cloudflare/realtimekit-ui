@@ -227,6 +227,8 @@ export class RtkChatMessagesUiPaginated {
       }
     }
 
+    const isSelf = message.userId === this.meeting.self.userId;
+    const viewType = isSelf ? 'outgoing' : 'incoming';
     return (
       <div class={{ pinned: message.pinned }}>
         <div class="message-wrapper">
@@ -234,9 +236,10 @@ export class RtkChatMessagesUiPaginated {
             time={message.time}
             actions={this.getMessageActions(message)}
             authorName={message.displayName}
+            isSelf={isSelf}
             avatarUrl={displayPicture}
             hideAuthorName={isContinued}
-            viewType={'incoming'}
+            viewType={viewType}
             variant="bubble"
             onAction={(event: CustomEvent<string>) =>
               this.onMessageActionHandler(event.detail, message)

@@ -7,7 +7,6 @@ import {
   Watch,
   Element,
   Listen,
-  Fragment,
   Event,
   EventEmitter,
 } from '@stencil/core';
@@ -24,11 +23,9 @@ import {
   handleFilesDataTransfer,
   isDirectMessageChannel,
   parseMessageForTarget,
-  stripOutReplyBlock,
 } from '../../utils/chat';
 import { chatUnreadTimestamps } from '../../utils/user-prefs';
 import { FlagsmithFeatureFlags } from '../../utils/flags';
-import { RtkChannelHeaderCustomEvent } from '../../components';
 import { States, UIConfig, createDefaultConfig } from '../../exports';
 import { ChannelItem } from '../rtk-channel-selector-view/rtk-channel-selector-view';
 import { SyncWithStore } from '../../utils/sync-with-store';
@@ -152,10 +149,6 @@ export class RtkChat {
 
   private channelMap: Map<string, ChatChannel> = new Map();
 
-  private isChatViewType: boolean;
-
-  private isGroupCall: boolean;
-
   private resizeObserver: ResizeObserver;
 
   private onDragOver = (e) => {
@@ -256,36 +249,6 @@ export class RtkChat {
         meeting?.__internals__?.features.hasFeature(FlagsmithFeatureFlags.PINNED_MESSAGES) &&
         meeting.self.permissions.pinParticipant;
 
-      this.isGroupCall = meeting.meta.viewType === 'GROUP_CALL';
-      this.isChatViewType = meeting.meta.viewType === 'CHAT';
-      if (this.isChatViewType) {
-        this.onChannelCreateOrUpdate();
-        const validChannels = this.channels.filter(
-          (channel) => !channel.id.includes(TEMPORARY_CHANNEL_PREFIX)
-        );
-        if (validChannels.length) {
-          this.selectedChannelId = this.channels[0].id;
-        }
-
-        if (this.resizeObserver) {
-          this.resizeObserver.disconnect();
-        }
-
-        this.resizeObserver = new ResizeObserver((entries) => {
-          for (const entry of entries) {
-            if (entry.contentBoxSize[0].inlineSize < 758) {
-              this.selectorState = 'hide';
-            } else {
-              this.selectorState = 'desktop';
-            }
-          }
-        });
-
-        if (this.isChatViewType) {
-          this.resizeObserver.observe(this.host);
-        }
-      }
-
       this.initializeChatGroups();
       // shallow copy to trigger render
       this.chatGroups = { ...this.chatGroups };
@@ -299,12 +262,6 @@ export class RtkChat {
       if (this.isPrivateChatSupported()) {
         meeting.participants.joined.addListener('participantJoined', this.onParticipantUpdate);
         meeting.participants.joined.addListener('participantLeft', this.onParticipantUpdate);
-      }
-      if (this.isChatViewType) {
-        meeting.chat.addListener('channelCreate', this.onChannelCreateOrUpdate);
-        meeting.chat.addListener('channelUpdate', this.onChannelCreateOrUpdate);
-        meeting.chat.addListener('channelMessageUpdate', this.onChannelCreateOrUpdate);
-        meeting.participants.all.addListener('participantsUpdate', this.onChannelCreateOrUpdate);
       }
     }
   }
@@ -327,12 +284,6 @@ export class RtkChat {
       this.selectedParticipant = null;
       this.chatRecipientId = this.selectedGroup = 'everyone';
     }
-  };
-
-  private usePaginatedChat = () => {
-    if (this.isGroupCall && this.showPinnedMessages) return false;
-
-    return this.selectedGroup === 'everyone';
   };
 
   @Watch('chatGroups')
@@ -572,20 +523,7 @@ export class RtkChat {
 
   private onNewMessageHandler = async (e: CustomEvent<NewMessageEvent>) => {
     const message = e.detail;
-    if (this.isChatViewType) {
-      await this.meeting.chat.sendMessageToChannel(
-        message,
-        this.selectedChannelId,
-        this.replyMessage
-          ? {
-              replyTo: this.replyMessage,
-            }
-          : {}
-      );
-      this.replyMessage = null;
-    } else {
-      this.meeting.chat.sendMessage(message, this.getRecipientPeerIds());
-    }
+    this.meeting.chat.sendMessage(message, this.getRecipientPeerIds());
   };
 
   private onEditMessageHandler = async (e: CustomEvent<string>) => {
@@ -599,18 +537,6 @@ export class RtkChat {
 
   private onEditCancel = () => {
     this.editingMessage = null;
-  };
-
-  private onSearchHandler = async (e: RtkChannelHeaderCustomEvent<string>) => {
-    this.searchQuery = e.detail;
-  };
-
-  private onSearchDismissed = () => {
-    this.searchQuery = '';
-  };
-
-  private onChannelCreateClicked = () => {
-    this.stateUpdate.emit({ activeChannelCreator: true });
   };
 
   private onPinMessage = (event: CustomEvent<Message>) => {
@@ -627,20 +553,7 @@ export class RtkChat {
     this.meeting.chat.deleteMessage(message.id);
   };
 
-  private renderHeadlessComponents() {
-    return (
-      <Fragment>
-        <rtk-dialog-manager meeting={this.meeting} />
-        <rtk-notifications meeting={this.meeting} />
-      </Fragment>
-    );
-  }
-
   private renderComposerUI() {
-    if (this.isChatViewType && this.channels.length === 0) return null;
-    if (this.isChatViewType && this.searchQuery !== '') return null;
-    if (this.isChatViewType && !this.selectedChannelId) return null;
-
     if (this.chatRecipientId === 'everyone') {
       if (!this.canSendTextMessage && !this.canSendFiles) return null;
     } else {
@@ -677,106 +590,6 @@ export class RtkChat {
       </rtk-chat-composer-view>
     );
   }
-
-  private renderFullChat() {
-    if (this.creatingChannel) {
-      return (
-        <div class="banner">
-          <rtk-spinner size="lg" />
-        </div>
-      );
-    }
-
-    if (this.channels.length === 0 || !this.selectedChannelId) {
-      return (
-        <div class="banner">
-          <rtk-icon
-            icon={this.iconPack.create_channel_illustration}
-            slot="start"
-            class={'create-channel-illustration'}
-          />
-          <rtk-button
-            kind="wide"
-            variant="primary"
-            size="md"
-            onClick={this.onChannelCreateClicked}
-            class="welcome-new-channel"
-          >
-            <rtk-icon icon={this.iconPack.add} slot="start" />
-            <span>{this.t('chat.new_channel')}</span>
-          </rtk-button>
-
-          {(this.selectorState === 'mobile' || this.selectorState === 'hide') && (
-            <rtk-button
-              kind="button"
-              variant="secondary"
-              size="md"
-              class="view-chats-btn"
-              onClick={() => {
-                this.selectorState = 'mobile';
-              }}
-            >
-              <rtk-icon icon={this.iconPack.chat} slot="start"></rtk-icon>
-              <span>{this.t('chat.view_chats')}</span>
-            </rtk-button>
-          )}
-        </div>
-      );
-    }
-
-    const selectedChannel = this.channels.find((channel) => channel.id === this.selectedChannelId);
-
-    return (
-      <div class="chat">
-        <rtk-channel-header
-          slot="header"
-          meeting={this.meeting}
-          channel={selectedChannel}
-          onSearch={this.onSearchHandler}
-          onSearchDismissed={this.onSearchDismissed}
-          showBackButton={this.selectorState === 'mobile' || this.selectorState === 'hide'}
-          onBack={() => {
-            this.selectorState = 'mobile';
-          }}
-        />
-        {this.searchQuery !== '' && (
-          <rtk-chat-search-results
-            meeting={this.meeting}
-            query={this.searchQuery}
-            channelId={this.selectedChannelId}
-          ></rtk-chat-search-results>
-        )}
-        {this.searchQuery === '' && (
-          <rtk-chat-messages-ui-paginated
-            meeting={this.meeting}
-            size={this.size}
-            iconPack={this.iconPack}
-            t={this.t}
-            selectedChannelId={this.selectedChannelId}
-            selectedChannel={selectedChannel}
-          ></rtk-chat-messages-ui-paginated>
-        )}
-      </div>
-    );
-  }
-
-  private getChannelItems = () => {
-    return this.channels.map((channel) => {
-      const result: ChannelItem = {
-        id: channel.id,
-        name: channel.displayName,
-        avatarUrl: channel.displayPictureUrl,
-      };
-      if (channel.latestMessage) {
-        result.latestMessage =
-          channel.latestMessage.type === 'text'
-            ? stripOutReplyBlock(channel.latestMessage.message)
-            : '';
-        result.latestMessageTime = channel.latestMessage.time;
-      }
-      return result;
-    });
-  };
 
   private getPrivateChatRecipients = () => {
     const participants = this.getFilteredParticipants().map((participant) => {
@@ -824,10 +637,6 @@ export class RtkChat {
       return null;
     }
 
-    const uiProps = { iconPack: this.iconPack, t: this.t, size: this.size };
-
-    const selfUserId = this.meeting?.self.userId;
-
     let chatMessages = this.chatGroups[this.selectedGroup] || [];
 
     if (this.showPinnedMessages && this.meeting.chat.pinned.length !== 0) {
@@ -836,41 +645,7 @@ export class RtkChat {
 
     return (
       <Host>
-        {this.isChatViewType && this.renderHeadlessComponents()}
         <div class="chat-container">
-          {this.isChatViewType && (
-            <div class={{ 'selector-container': true, [this.selectorState]: true }}>
-              <rtk-channel-selector-view
-                channels={this.getChannelItems()}
-                selectedChannelId={this.selectedChannelId}
-                onChannelChange={this.onChannelChanged}
-                t={this.t}
-              >
-                <div class="channel-selector-header" slot="header">
-                  <rtk-logo meeting={this.meeting} config={this.config} t={this.t} />
-                  <rtk-tooltip label={this.t('chat.new_channel')}>
-                    <rtk-button
-                      kind="button"
-                      variant="ghost"
-                      size="md"
-                      onClick={this.onChannelCreateClicked}
-                      class="channel-create-btn"
-                    >
-                      <rtk-icon icon={this.iconPack.add} />
-                    </rtk-button>
-                  </rtk-tooltip>
-                </div>
-              </rtk-channel-selector-view>
-              <rtk-button
-                kind="icon"
-                variant="ghost"
-                class="mobile-close-btn"
-                onClick={() => (this.selectorState = 'hide')}
-              >
-                <rtk-icon icon={this.iconPack.dismiss} />
-              </rtk-button>
-            </div>
-          )}
           <div class="chat">
             {this.isFileMessagingAllowed() && (
               <div id="dropzone" class={{ active: this.dropzoneActivated }} part="dropzone">
@@ -888,27 +663,14 @@ export class RtkChat {
                 viewAs="dropdown"
               />
             )}
-            {this.isChatViewType ? (
-              this.renderFullChat()
-            ) : this.usePaginatedChat() ? (
-              <rtk-chat-messages-ui-paginated
-                meeting={this.meeting}
-                onPinMessage={this.onPinMessage}
-                onDeleteMessage={this.onDeleteMessage}
-                size={this.size}
-                iconPack={this.iconPack}
-                t={this.t}
-              ></rtk-chat-messages-ui-paginated>
-            ) : (
-              <rtk-chat-messages-ui
-                messages={chatMessages}
-                selfUserId={selfUserId}
-                selectedGroup={this.selectedGroup}
-                onPinMessage={this.onPinMessage}
-                canPinMessages={this.canPinMessages}
-                {...uiProps}
-              />
-            )}
+            <rtk-chat-messages-ui-paginated
+              meeting={this.meeting}
+              onPinMessage={this.onPinMessage}
+              onDeleteMessage={this.onDeleteMessage}
+              size={this.size}
+              iconPack={this.iconPack}
+              t={this.t}
+            ></rtk-chat-messages-ui-paginated>
 
             {this.renderComposerUI()}
           </div>

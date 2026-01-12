@@ -4,6 +4,7 @@ import { Meeting } from '../../types/rtk-client';
 import { SyncWithStore } from '../../utils/sync-with-store';
 import type { Message } from '@cloudflare/realtimekit';
 
+/** @deprecated `rtk-chat-search-results` is deprecated and will be removed soon. Use `rtk-chat-messages-ui-paginated` instead. -*/
 @Component({
   tag: 'rtk-chat-search-results',
   styleUrl: 'rtk-chat-search-results.css',
