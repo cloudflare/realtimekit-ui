@@ -5,6 +5,7 @@ import { Size } from '../../types/props';
 import { SyncWithStore } from '../../utils/sync-with-store';
 import type { Message } from '@cloudflare/realtimekit';
 
+/** @deprecated `rtk-chat-message` is deprecated and will be removed soon. Use `rtk-message-view` instead. */
 @Component({
   tag: 'rtk-chat-message',
   styleUrl: 'rtk-chat-message.css',

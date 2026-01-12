@@ -6,10 +6,9 @@
 }
 
 .container {
-  @apply box-border flex flex-col-reverse py-4;
+  @apply box-border flex flex-col-reverse py-4 px-2;
   flex: 1 0 0px;
   overflow-y: scroll;
-  /* overflow-anchor: none; */
 }
 .file-picker {
   @apply hidden;

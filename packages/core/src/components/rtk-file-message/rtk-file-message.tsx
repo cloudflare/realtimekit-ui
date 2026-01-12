@@ -8,6 +8,7 @@ import { SyncWithStore } from '../../utils/sync-with-store';
 import { useLanguage, RtkI18n } from '../../lib/lang';
 
 /**
+ * @deprecated `rtk-file-message` is deprecated and will be removed soon. Use `rtk-file-message-view` instead.
  * A component which renders a file message from chat.
  */
 @Component({
