@@ -842,6 +842,9 @@ export namespace Components {
          */
         "t": RtkI18n1;
     }
+    /**
+     * @deprecated Use `rtk-chat-messages-ui-paginated` instead.
+     */
     interface RtkChatMessagesUi {
         /**
           * Can current user pin/unpin messages
@@ -4684,6 +4687,9 @@ declare global {
         "pinMessage": Message;
         "rtkStateUpdate": States;
     }
+    /**
+     * @deprecated Use `rtk-chat-messages-ui-paginated` instead.
+     */
     interface HTMLRtkChatMessagesUiElement extends Components.RtkChatMessagesUi, HTMLStencilElement {
         addEventListener<K extends keyof HTMLRtkChatMessagesUiElementEventMap>(type: K, listener: (this: HTMLRtkChatMessagesUiElement, ev: RtkChatMessagesUiCustomEvent<HTMLRtkChatMessagesUiElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
         addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
@@ -7465,6 +7471,9 @@ declare namespace LocalJSX {
          */
         "t"?: RtkI18n1;
     }
+    /**
+     * @deprecated Use `rtk-chat-messages-ui-paginated` instead.
+     */
     interface RtkChatMessagesUi {
         /**
           * Can current user pin/unpin messages
@@ -11091,6 +11100,9 @@ declare module "@stencil/core" {
              */
             "rtk-chat-composer-view": LocalJSX.RtkChatComposerView & JSXBase.HTMLAttributes<HTMLRtkChatComposerViewElement>;
             "rtk-chat-message": LocalJSX.RtkChatMessage & JSXBase.HTMLAttributes<HTMLRtkChatMessageElement>;
+            /**
+             * @deprecated Use `rtk-chat-messages-ui-paginated` instead.
+             */
             "rtk-chat-messages-ui": LocalJSX.RtkChatMessagesUi & JSXBase.HTMLAttributes<HTMLRtkChatMessagesUiElement>;
             "rtk-chat-messages-ui-paginated": LocalJSX.RtkChatMessagesUiPaginated & JSXBase.HTMLAttributes<HTMLRtkChatMessagesUiPaginatedElement>;
             "rtk-chat-search-results": LocalJSX.RtkChatSearchResults & JSXBase.HTMLAttributes<HTMLRtkChatSearchResultsElement>;

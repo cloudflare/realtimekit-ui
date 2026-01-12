@@ -329,12 +329,6 @@ export class RtkChat {
     }
   };
 
-  private usePaginatedChat = () => {
-    if (this.isGroupCall && this.showPinnedMessages) return false;
-
-    return this.selectedGroup === 'everyone';
-  };
-
   @Watch('chatGroups')
   chatGroupsChanged(chatGroups: Record<string, Chat[]>) {
     if (!this.isPrivateChatSupported()) {
@@ -739,14 +733,13 @@ export class RtkChat {
             this.selectorState = 'mobile';
           }}
         />
-        {this.searchQuery !== '' && (
+        {this.searchQuery !== '' ? (
           <rtk-chat-search-results
             meeting={this.meeting}
             query={this.searchQuery}
             channelId={this.selectedChannelId}
           ></rtk-chat-search-results>
-        )}
-        {this.searchQuery === '' && (
+        ) : (
           <rtk-chat-messages-ui-paginated
             meeting={this.meeting}
             size={this.size}
@@ -890,7 +883,7 @@ export class RtkChat {
             )}
             {this.isChatViewType ? (
               this.renderFullChat()
-            ) : this.usePaginatedChat() ? (
+            ) : (
               <rtk-chat-messages-ui-paginated
                 meeting={this.meeting}
                 onPinMessage={this.onPinMessage}
@@ -899,15 +892,6 @@ export class RtkChat {
                 iconPack={this.iconPack}
                 t={this.t}
               ></rtk-chat-messages-ui-paginated>
-            ) : (
-              <rtk-chat-messages-ui
-                messages={chatMessages}
-                selfUserId={selfUserId}
-                selectedGroup={this.selectedGroup}
-                onPinMessage={this.onPinMessage}
-                canPinMessages={this.canPinMessages}
-                {...uiProps}
-              />
             )}
 
             {this.renderComposerUI()}
