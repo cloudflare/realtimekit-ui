@@ -1,3 +1,10 @@
+# [1.1.0-staging.1](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.9-staging.4...@cloudflare/realtimekit-ui-v1.1.0-staging.1) (2026-01-12)
+
+
+### Features
+
+* **chat:** added support to delete chat message ([df015f6](https://github.com/cloudflare/realtimekit-ui/commit/df015f60f3657d757d2d277dcb04cae4ee82df14))
+
 ## [1.0.9-staging.4](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.9-staging.3...@cloudflare/realtimekit-ui-v1.0.9-staging.4) (2026-01-12)
 
 
