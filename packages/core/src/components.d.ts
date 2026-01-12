@@ -2059,6 +2059,10 @@ export namespace Components {
           * Language
          */
         "t": RtkI18n;
+        /**
+          * View type
+         */
+        "viewType": 'incoming' | 'outgoing';
     }
     /**
      * A menu list component.
@@ -2072,6 +2076,10 @@ export namespace Components {
           * Language
          */
         "t": RtkI18n;
+        /**
+          * View type
+         */
+        "viewType": 'incoming' | 'outgoing';
     }
     /**
      * A component which renders list of messages.
@@ -8875,6 +8883,10 @@ declare namespace LocalJSX {
           * Language
          */
         "t"?: RtkI18n;
+        /**
+          * View type
+         */
+        "viewType"?: 'incoming' | 'outgoing';
     }
     /**
      * A menu list component.
@@ -8888,6 +8900,10 @@ declare namespace LocalJSX {
           * Language
          */
         "t"?: RtkI18n;
+        /**
+          * View type
+         */
+        "viewType"?: 'incoming' | 'outgoing';
     }
     /**
      * A component which renders list of messages.

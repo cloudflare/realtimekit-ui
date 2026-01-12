@@ -20,6 +20,9 @@ export class RtkMenuItem {
   /** Size */
   @Prop({ reflect: true }) size: Size;
 
+  /** View type */
+  @Prop() viewType: 'incoming' | 'outgoing' = 'incoming';
+
   /** Icon pack */
   @SyncWithStore()
   @Prop()
@@ -32,7 +35,7 @@ export class RtkMenuItem {
 
   render() {
     return (
-      <Host>
+      <Host class={{ [this.viewType]: true }}>
         <slot name="start" />
         <slot></slot>
         <slot name="end" />

@@ -53,15 +53,18 @@ export class RtkMessageView {
   /** action event */
   @Event({ eventName: 'action' }) onAction: EventEmitter<string>;
 
-  private renderActions() {
+  private renderActions(isSelf: boolean) {
     return (
-      <rtk-menu placement="top-end" offset={1}>
+      <rtk-menu placement={isSelf ? 'bottom-start' : 'bottom-end'} offset={1}>
         <button slot="trigger" class="actions">
           <rtk-icon icon={this.iconPack.chevron_down} />
         </button>
-        <rtk-menu-list>
+        <rtk-menu-list viewType={isSelf ? 'outgoing' : 'incoming'}>
           {this.actions.map((action) => (
-            <rtk-menu-item onClick={() => this.onAction.emit(action.id)}>
+            <rtk-menu-item
+              viewType={isSelf ? 'outgoing' : 'incoming'}
+              onClick={() => this.onAction.emit(action.id)}
+            >
               {action.icon && <rtk-icon icon={action.icon} slot="start" />}
               {action.label}
             </rtk-menu-item>
@@ -96,7 +99,7 @@ export class RtkMessageView {
                   {elapsedDuration(this.time, new Date(Date.now()))}
                 </div>
               )}
-              {this.actions.length !== 0 && this.renderActions()}
+              {this.actions.length !== 0 && this.renderActions(this.isSelf)}
             </div>
           </div>
         </div>
