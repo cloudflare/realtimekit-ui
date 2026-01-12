@@ -1,3 +1,12 @@
+# [1.1.0-staging.2](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.1.0-staging.1...@cloudflare/realtimekit-ui-v1.1.0-staging.2) (2026-01-12)
+
+
+### Bug Fixes
+
+* commented delete and edit actions ([c43e4f7](https://github.com/cloudflare/realtimekit-ui/commit/c43e4f7141173d5af378c49bf613c04ca7ee4452))
+* styles for rtk-menu ([5daaf4d](https://github.com/cloudflare/realtimekit-ui/commit/5daaf4d815949e04da5756c722479fa0feec2868))
+* update prop name ([ce0aafe](https://github.com/cloudflare/realtimekit-ui/commit/ce0aafecdb000ef062fde68c31716ee0b5697f00))
+
 # [1.1.0-staging.1](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.9-staging.4...@cloudflare/realtimekit-ui-v1.1.0-staging.1) (2026-01-12)
 
 
