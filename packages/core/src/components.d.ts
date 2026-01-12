@@ -2112,6 +2112,10 @@ export namespace Components {
          */
         "iconPack": IconPack1;
         /**
+          * Is the message sent by the current user
+         */
+        "isSelf": boolean;
+        /**
           * Time when message was sent
          */
         "time": Date;
@@ -8881,6 +8885,10 @@ declare namespace LocalJSX {
           * Icon pack
          */
         "iconPack"?: IconPack1;
+        /**
+          * Is the message sent by the current user
+         */
+        "isSelf"?: boolean;
         /**
           * action event
          */

@@ -33,6 +33,9 @@ export class RtkMessageView {
   /** Author display label */
   @Prop() authorName: string;
 
+  /** Is the message sent by the current user */
+  @Prop() isSelf: boolean = false;
+
   /** Hides author display label */
   @Prop() hideAuthorName: boolean = false;
 
@@ -81,15 +84,19 @@ export class RtkMessageView {
             </aside>
           )}
           <div class="message" part="message">
-            {!this.hideAuthorName && <div class="header">{this.authorName}</div>}
+            {!this.hideAuthorName && (
+              <div class="header">
+                {this.authorName} {this.isSelf ? ' (You)' : ''}
+              </div>
+            )}
             <div class={{ body: true, bubble: this.variant === 'bubble' }}>
               <slot></slot>
+              {this.actions.length !== 0 && this.renderActions()}
               {!this.hideMetadata && !!this.time && (
                 <div class="metadata" title={formatDateTime(this.time)}>
                   {elapsedDuration(this.time, new Date(Date.now()))}
                 </div>
               )}
-              {this.actions.length !== 0 && this.renderActions()}
             </div>
           </div>
         </div>
