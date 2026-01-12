@@ -59,10 +59,10 @@ export class RtkMessageView {
         <button slot="trigger" class="actions">
           <rtk-icon icon={this.iconPack.chevron_down} />
         </button>
-        <rtk-menu-list viewType={isSelf ? 'outgoing' : 'incoming'}>
+        <rtk-menu-list menuVariant={isSelf ? 'primary' : 'secondary'}>
           {this.actions.map((action) => (
             <rtk-menu-item
-              viewType={isSelf ? 'outgoing' : 'incoming'}
+              menuVariant={isSelf ? 'primary' : 'secondary'}
               onClick={() => this.onAction.emit(action.id)}
             >
               {action.icon && <rtk-icon icon={action.icon} slot="start" />}

@@ -19,8 +19,8 @@ export class RtkMenuList {
   @Prop()
   iconPack: IconPack = defaultIconPack;
 
-  /** View type */
-  @Prop() viewType: 'incoming' | 'outgoing' = 'incoming';
+  /** Variant */
+  @Prop() menuVariant: 'primary' | 'secondary' = 'secondary';
 
   /** Language */
   @SyncWithStore()
@@ -29,7 +29,7 @@ export class RtkMenuList {
 
   render() {
     return (
-      <Host class={{ [this.viewType]: true }}>
+      <Host class={{ [this.menuVariant]: true }}>
         <slot></slot>
       </Host>
     );

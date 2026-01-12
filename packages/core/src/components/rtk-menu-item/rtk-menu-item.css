@@ -19,7 +19,7 @@
   @apply bg-background-900;
 }
 
-:host(.outgoing:hover) {
+:host(.primary:hover) {
   @apply bg-brand-300;
 }
 

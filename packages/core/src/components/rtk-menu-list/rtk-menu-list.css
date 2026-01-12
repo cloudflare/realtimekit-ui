@@ -9,6 +9,6 @@
   backdrop-filter: blur(60px);
 }
 
-:host(.outgoing) {
+:host(.primary) {
   @apply bg-brand-300/30 border-brand-600;
 }

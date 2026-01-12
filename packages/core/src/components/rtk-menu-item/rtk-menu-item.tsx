@@ -20,8 +20,8 @@ export class RtkMenuItem {
   /** Size */
   @Prop({ reflect: true }) size: Size;
 
-  /** View type */
-  @Prop() viewType: 'incoming' | 'outgoing' = 'incoming';
+  /** Variant */
+  @Prop() menuVariant: 'primary' | 'secondary' = 'secondary';
 
   /** Icon pack */
   @SyncWithStore()
@@ -35,7 +35,7 @@ export class RtkMenuItem {
 
   render() {
     return (
-      <Host class={{ [this.viewType]: true }}>
+      <Host class={{ [this.menuVariant]: true }}>
         <slot name="start" />
         <slot></slot>
         <slot name="end" />
