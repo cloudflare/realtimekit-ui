@@ -1,9 +1,10 @@
-import { Component, Host, h, VNode, State, Prop, writeTask, Method, Watch } from '@stencil/core';
-import { debounce } from 'lodash-es';
+import { Component, Host, h, VNode, Prop, writeTask, State, Watch } from '@stencil/core';
 import { defaultIconPack, IconPack } from '../../lib/icons';
 import { RtkI18n, useLanguage } from '../../lib/lang';
 import { SyncWithStore } from '../../utils/sync-with-store';
-import { smoothScrollToBottom } from '../../utils/scroll';
+import { debounce } from 'lodash-es';
+import { Meeting } from '../../components';
+import { ChatUpdateParams } from '@cloudflare/realtimekit';
 
 export interface DataNode {
   id: string;
@@ -18,8 +19,6 @@ export interface DataNode {
 export class RtkPaginatedList {
   private intersectionObserver: IntersectionObserver;
 
-  private $paginatedList: HTMLDivElement;
-
   private $topRef: HTMLDivElement;
 
   private $bottomRef: HTMLDivElement;
@@ -27,10 +26,21 @@ export class RtkPaginatedList {
   /** Page Size */
   @Prop() pageSize: number;
 
+  /** Meeting object */
+  @SyncWithStore()
+  @Prop()
+  meeting: Meeting;
+
+  // the length of pages will always be pageSize + 2
+  private pages: any[][] = [];
+
   /**
    * Number of pages allowed to be shown
    */
   @Prop() pagesAllowed: number;
+
+  /** label to show when empty */
+  @Prop() emptyListLabel: string = null;
 
   /** Fetch the data */
   @Prop() fetchData: (timestamp: number, size: number, reversed: boolean) => Promise<unknown[]>;
@@ -44,6 +54,10 @@ export class RtkPaginatedList {
   /** auto scroll list to bottom */
   @Prop() autoScroll: boolean;
 
+  @State() rerenderBoolean: boolean = false;
+
+  @State() showEmptyListLabel = false;
+
   /** Icon pack */
   @SyncWithStore()
   @Prop()
@@ -54,103 +68,26 @@ export class RtkPaginatedList {
   @Prop()
   t: RtkI18n = useLanguage();
 
-  /** label to show when empty */
-  @Prop() emptyListLabel: string = null;
-
   @State() isLoading: boolean = false;
 
-  @State() rerenderBoolean: boolean = false;
-
-  /**
-   * This gets disabled when the user scrolls up and the bottom node
-   * is not visible anymore.
-   */
-  @State() shouldRenderNewNodes: boolean = true;
-
-  /**
-   * This gets disabled when the user scrolls up and the bottom node
-   * is not visible anymore.
-   */
-  @State() hasNewNodesToRender: boolean = false;
-
-  @State() showEmptyListLabel = false;
-
-  /**
-   * This is a private variable not a state
-   * since we want to debounce rerenders
-   *
-   * A list of pages where each page contains a number of Nodes
-   * [
-   *  [Node 1, Node 2, Node 3.... Node N],
-   *  [Node 1, Node 2, Node 3.... Node N],
-   * ]
-   */
-  private pagesToRender: DataNode[][] = [[]];
-
-  /**
-   * On a new node created
-   */
-  @Method()
-  async onNewNode(node: DataNode) {
-    if (!this.shouldRenderNewNodes) {
-      this.hasNewNodesToRender = true;
-      return;
-    }
-    this.addNodeToRender(node, false);
-    this.rerender();
+  private rerender() {
+    this.rerenderBoolean = !this.rerenderBoolean;
   }
 
-  /**
-   * On node deleted
-   */
-  @Method()
-  async onNodeDelete(key: string) {
-    const oldLength = this.pagesToRender.flat().length;
-    this.pagesToRender = this.pagesToRender.map((page) => page.filter((item) => item.id !== key));
-    if (oldLength !== this.pagesToRender.flat().length) {
-      this.rerender();
-    }
-  }
-
-  /**
-   * On node updated
-   */
-  @Method()
-  async onNodeUpdate(key: string, newItem: DataNode) {
-    let shouldRerender = false;
-
-    this.pagesToRender = this.pagesToRender.map((page) =>
-      page.map((item) => {
-        if (item.id === key) {
-          shouldRerender = true;
-          return newItem;
-        }
-        return item;
-      })
-    );
-    if (shouldRerender) this.rerender();
-  }
-
-  @Watch('selectedItemId')
-  onItemChanged(newItemId: string, oldItemId: string) {
-    if (newItemId !== oldItemId) {
-      this.pagesToRender = [[]];
-      this.loadFirstPage().then(() => this.rerender());
-    }
-  }
+  private oldestTimestamp;
+  private newestTimestamp;
 
   connectedCallback() {
+    this.meetingChanged(this.meeting);
     this.rerender = debounce(this.rerender.bind(this), 50, { maxWait: 200 });
-    this.autoScroll = true;
     this.intersectionObserver = new IntersectionObserver((entries) => {
       writeTask(() => {
         for (const entry of entries) {
-          if (entry.target.id === 'bottom-scroll') {
-            if (entry.isIntersecting) this.loadBottom();
-            else this.shouldRenderNewNodes = false;
+          if (entry.target.id === 'bottom-scroll' && entry.isIntersecting) {
+            this.load(false);
           }
           if (entry.target.id === 'top-scroll' && entry.isIntersecting) {
-            this.loadTop();
+            this.load(true);
           }
         }
       });
@@ -158,165 +95,94 @@ export class RtkPaginatedList {
   }
 
   disconnectedCallback() {
-    this.intersectionObserver.disconnect();
+    this.disconnectMeeting(this.meeting);
   }
+
+  @Watch('meeting')
+  meetingChanged(meeting: Meeting, oldMeeting?: Meeting) {
+    if (oldMeeting) this.disconnectMeeting(oldMeeting);
+    if (!meeting || !meeting.chat) return;
+    meeting.chat?.addListener('chatUpdate', this.chatUpdateListener);
+  }
+
+  private disconnectMeeting = (meeting) => {
+    meeting?.chat?.removeListener('chatUpdate', this.chatUpdateListener);
+  };
+
+  private chatUpdateListener = ({ action, message }: ChatUpdateParams) => {
+    if (action === 'add') {
+      console.log('here: new message added', message);
+    }
+  };
 
   componentDidLoad() {
     /**
      * Adding observes here so that on the first render we scroll down
      * and shouldRenderNewNodes remains true
      */
-    this.loadFirstPage();
     this.observe(this.$topRef);
     this.observe(this.$bottomRef);
   }
 
   componentDidRender() {
-    if (this.shouldRenderNewNodes && this.autoScroll) smoothScrollToBottom(this.$paginatedList);
+    // TODO: auto scroll to bottom
   }
-
-  private currentTime = () => {
-    return new Date().getTime();
-  };
 
   private observe = (el: HTMLElement) => {
     if (!el) return;
     this.intersectionObserver.observe(el);
   };
 
-  private loadFirstPage() {
-    return this.loadPage(this.currentTime(), this.pageSize, true, (data) => {
-      if (data.length === 0) {
-        this.showEmptyListLabel = true;
-      }
-    });
-  }
-
-  private loadTop() {
-    /**
-     * If there is only one unfilled page or no page, no need to check
-     * for top since it will be empty
-     */
-    if (this.pagesToRender.length === 0) return;
-    if (this.pagesToRender.length === 1 && this.pagesToRender[0].length < this.pageSize) return;
-    /**
-     * TODO: Make this more flexible currently this only works with chat
-     */
-    const oldestVNode = this.pagesToRender[0][0];
-    const oldestTimestamp = oldestVNode.timeMs;
-
-    // TODO: scrollIntoView
-    const onPageRendered = () => {}; // oldestVNode.$elm$?.scrollIntoView();
-    this.loadPage(oldestTimestamp - 1, this.pageSize, true, onPageRendered);
-  }
-
-  private loadBottom() {
-    /**
-     * If there is only one unfilled page or no page, no need to check
-     * for top since it will be empty
-     */
-    if (this.pagesToRender.length === 0) {
-      this.shouldRenderNewNodes = true;
-      return;
-    }
-    if (this.pagesToRender.length === 1 && this.pagesToRender[0].length < this.pageSize) {
-      this.shouldRenderNewNodes = true;
-      return;
-    }
-
-    const newestVNode = this.pagesToRender.at(-1).at(-1);
-    const newestTimestamp = newestVNode.timeMs;
-
-    // TODO: scrollIntoView
-    const onPageRendered = () => smoothScrollToBottom(this.$paginatedList);
-    this.loadPage(newestTimestamp + 1, this.pageSize, false, onPageRendered);
-  }
-
-  private addNodeToRender(node: DataNode, addToStart: boolean) {
-    if (addToStart) {
-      const firstPage = this.pagesToRender[0];
-      if (firstPage && firstPage?.length < this.pageSize) {
-        /**
-         * If first page is not full then just add to that page
-         */
-        firstPage.unshift(node);
-      } else {
-        /**
-         * If first page is full then add a new page to the start
-         */
-        const newPage = [node];
-        this.pagesToRender.unshift(newPage);
-        this.removeLastPageIfNeeded(false);
-      }
-    } else {
-      const [lastPage] = this.pagesToRender.slice(-1);
-      if (lastPage && lastPage?.length < this.pageSize) {
-        /**
-         * If last page is not full then just add it
-         */
-        lastPage.push(node);
-      } else {
-        /**
-         * If last page is full add a new page with just
-         * this node
-         */
-        const newPage = [node];
-        this.pagesToRender.push(newPage);
-
-        this.removeLastPageIfNeeded(true);
-      }
-    }
-  }
-
-  /**
-   * @param start
-   * @param end
-   * @param reversed Defines whether to add the page at the beginning or the end
-   * @param onPageLoaded Callback for when all new nodes are rendered
-   */
-  private async loadPage(
-    timestamp: number,
-    size: number,
-    reversed: boolean,
-    onPageRendered: (data: DataNode[]) => void = () => {}
-  ) {
-    this.isLoading = true;
-    const data = (await this.fetchData(timestamp, size, reversed)) as DataNode[];
-    this.isLoading = false;
-    if (!data?.length) {
+  private async load(older: boolean = true) {
+    if (older) {
       /**
-       * While scrolling down if there were no new items found
-       * then start rendering new nodes;
+       * NOTE(ikabra): this case also runs on initial load
+       * if scrolling up ->
+       * fetch older messages and push to the end of the array
+       * remove 1st element from the array if length exceeds pagesAllowed
        */
-      if (!reversed) {
-        this.hasNewNodesToRender = false;
-        this.shouldRenderNewNodes = true;
-      }
-      onPageRendered([]);
-      return;
-    }
 
-    data.forEach((node) => this.addNodeToRender(node, reversed));
+      // if no oldestTimestamp, it means we are at initial state
+      if (!this.oldestTimestamp) this.oldestTimestamp = new Date().getTime();
+
+      // load data
+      this.isLoading = true;
+      const data = await this.fetchData(this.oldestTimestamp - 1, this.pageSize, older);
+      this.isLoading = false;
+
+      // no more old messages to show, we are at the top of the page
+      if (!data.length) return;
+
+      // add old data to the end of the array
+      this.pages.push(data);
+
+      // update the oldest timestamp, if data exists
+      const lastPage = this.pages[this.pages.length - 1];
+      this.oldestTimestamp = (lastPage[lastPage.length - 1] as any).timeMs;
+
+      // set the newest timestamp, if it does not exist
+      if (!this.newestTimestamp) this.newestTimestamp = (this.pages[0][0] as any).timeMs;
+    } else {
+      // if initial state, do nothing
+      if (!this.pages.length) return;
+
+      // fetch data after the newest timestamp
+      this.isLoading = true;
+      const data = await this.fetchData(this.newestTimestamp + 1, this.pageSize, older);
+      this.isLoading = false;
+
+      // no more new messages, we are at the end of the page
+      if (!data.length) return;
+
+      // add data to the start of the array
+      this.pages.unshift(data.reverse());
+
+      // update the newest timestamp to the 1st message of the 1st page
+      if (this.pages[0]?.[0])
+        this.newestTimestamp = this.newestTimestamp = (this.pages[0][0] as any).timeMs;
+    }
+    console.log('here: pages', this.pages);
     this.rerender();
-    onPageRendered(data);
-  }
-
-  private rerender() {
-    this.rerenderBoolean = !this.rerenderBoolean;
-  }
-
-  private removeLastPageIfNeeded(removeFromStart: boolean) {
-    if (this.pagesToRender.length > this.pagesAllowed) {
-      if (removeFromStart) this.pagesToRender.shift();
-      else this.pagesToRender.pop();
-    }
-  }
-
-  private onDownArrowClicked() {
-    /**
-     * Load the freshest pages
-     */
-    this.loadBottom();
   }
 
   render() {
@@ -327,14 +193,13 @@ export class RtkPaginatedList {
      */
     return (
       <Host>
-        <div class="scrollbar container" part="container" ref={(el) => (this.$paginatedList = el)}>
-          <div class={{ 'show-new-messages-ctr': true, active: !this.shouldRenderNewNodes }}>
+        <div class="scrollbar container" part="container">
+          <div class={'show-new-messages'}>
             <rtk-button
               class="show-new-messages"
               kind="icon"
               variant="secondary"
               part="show-new-messages"
-              onClick={() => this.onDownArrowClicked()}
             >
               <rtk-icon icon={this.iconPack.chevron_down} />
             </rtk-button>
@@ -344,12 +209,16 @@ export class RtkPaginatedList {
             id="bottom-scroll"
             ref={(el) => (this.$bottomRef = el)}
           ></div>
-          {this.isLoading && this.pagesToRender.flat().length === 0 && <rtk-spinner size="lg" />}
-          {this.pagesToRender.flat().length === 0 && this.showEmptyListLabel ? (
-            <div class="empty-list">{this.emptyListLabel ?? this.t('list.empty')}</div>
+          {this.isLoading && <rtk-spinner size="lg" />}
+          {!this.isLoading && this.pages.flat().length === 0 ? (
+            <div class="empty-list">{this.t('list.empty')}</div>
           ) : (
             <div class="page-wrapper">
-              {this.pagesToRender.map((page) => this.createNodes(page))}
+              {this.pages.map((page, pageIndex) => (
+                <div class="page" data-page-index={pageIndex}>
+                  {this.createNodes([...page].reverse())}
+                </div>
+              ))}
             </div>
           )}
           <div class="smallest-dom-element" id="top-scroll" ref={(el) => (this.$topRef = el)}></div>

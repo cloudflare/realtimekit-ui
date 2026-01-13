@@ -32,8 +32,8 @@ import { GridLayout as GridLayout1, GridSize as GridSize1 } from "./components/r
 import { Placement } from "./types/floating-ui";
 import { MessageAction } from "./components/rtk-message-view/rtk-message-view";
 import { RtkNameTagVariant } from "./components/rtk-name-tag/rtk-name-tag";
+import { Meeting as Meeting1 } from "./components";
 import { VNode } from "@stencil/core";
-import { DataNode } from "./components/rtk-paginated-list/rtk-paginated-list";
 import { ParticipantViewMode } from "./components/rtk-participant/rtk-participant";
 import { ParticipantsTabId } from "./components/rtk-participants/rtk-participants";
 import { ParticipantsViewMode } from "./components/rtk-participants/rtk-participants";
@@ -72,8 +72,8 @@ export { GridLayout as GridLayout1, GridSize as GridSize1 } from "./components/r
 export { Placement } from "./types/floating-ui";
 export { MessageAction } from "./components/rtk-message-view/rtk-message-view";
 export { RtkNameTagVariant } from "./components/rtk-name-tag/rtk-name-tag";
+export { Meeting as Meeting1 } from "./components";
 export { VNode } from "@stencil/core";
-export { DataNode } from "./components/rtk-paginated-list/rtk-paginated-list";
 export { ParticipantViewMode } from "./components/rtk-participant/rtk-participant";
 export { ParticipantsTabId } from "./components/rtk-participants/rtk-participants";
 export { ParticipantsViewMode } from "./components/rtk-participants/rtk-participants";
@@ -2496,17 +2496,9 @@ export namespace Components {
          */
         "iconPack": IconPack;
         /**
-          * On a new node created
+          * Meeting object
          */
-        "onNewNode": (node: DataNode) => Promise<void>;
-        /**
-          * On node deleted
-         */
-        "onNodeDelete": (key: string) => Promise<void>;
-        /**
-          * On node updated
-         */
-        "onNodeUpdate": (key: string, newItem: DataNode) => Promise<void>;
+        "meeting": Meeting1;
         /**
           * Page Size
          */
@@ -9347,6 +9339,10 @@ declare namespace LocalJSX {
           * Icon pack
          */
         "iconPack"?: IconPack;
+        /**
+          * Meeting object
+         */
+        "meeting"?: Meeting1;
         /**
           * Page Size
          */

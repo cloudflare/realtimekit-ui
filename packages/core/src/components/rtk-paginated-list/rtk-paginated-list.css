@@ -143,6 +143,7 @@ rtk-text-message[is-continued] {
 #top-scroll {
   transform: translateY(20vh);
 }
+
 #bottom-scroll {
   transform: translateY(-20vh);
 }
@@ -151,14 +152,10 @@ a {
   @apply text-brand-300 no-underline hover:underline;
 }
 
-.show-new-messages-ctr {
-  @apply pointer-events-none absolute bottom-2 right-4;
+.show-new-messages {
+  @apply absolute bottom-2 right-2;
   @apply z-10 -mt-14;
-  @apply translate-y-28 opacity-0 transition;
-}
-
-.show-new-messages-ctr.active {
-  @apply translate-y-0 opacity-100;
+  @apply translate-y-28 transition;
 }
 
 .show-new-messages {
@@ -178,6 +175,8 @@ rtk-spinner,
 
 .page-wrapper {
   @apply mx-1;
+  display: flex;
+  flex-direction: column-reverse;
 }
 
 .message-wrapper {
