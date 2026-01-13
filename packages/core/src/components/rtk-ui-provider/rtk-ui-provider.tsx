@@ -10,6 +10,8 @@ import {
   useLanguage,
   defaultIconPack,
   provideRtkDesignSystem,
+  Overrides,
+  defaultOverrides,
 } from '../../exports';
 import {
   uiStore as legacyGlobalUIStore,
@@ -56,6 +58,10 @@ export class RtkUiProvider {
   /** Whether to show setup screen or not */
   @Prop() showSetupScreen: boolean = false;
 
+  /** UI Kit Overrides */
+  @Prop()
+  overrides: Overrides = defaultOverrides;
+
   /**
    * Emits `rtkStatesUpdate` so that developers can listen to onRtkStatesUpdate and update their own stores
    * Do not confuse this with `rtkStateUpdate` that other components emit
@@ -81,6 +87,7 @@ export class RtkUiProvider {
     this.iconPackChanged(this.iconPack);
     this.tChanged(this.t);
     this.configChanged(this.config);
+    this.overridesChanged(this.overrides);
   }
 
   disconnectedCallback() {
@@ -169,6 +176,7 @@ export class RtkUiProvider {
         iconPack: this.iconPack,
         t: this.t,
         providerId: this.providerId,
+        overrides: this.overrides,
       }) as RtkUiStoreExtended;
 
       // Notify components that peer specific store is now available
@@ -240,6 +248,13 @@ export class RtkUiProvider {
       (this.peerStore || legacyGlobalUIStore).state.states.activeDebugger !== true
     ) {
       provideRtkDesignSystem(document.documentElement, config.designTokens);
+    }
+  }
+
+  @Watch('overrides')
+  overridesChanged(overrides: Overrides) {
+    if (this.peerStore) {
+      this.peerStore.state.overrides = deepMerge(defaultOverrides, overrides) as Overrides;
     }
   }
 

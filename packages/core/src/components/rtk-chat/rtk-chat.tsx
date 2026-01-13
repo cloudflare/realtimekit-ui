@@ -30,6 +30,7 @@ import { States, UIConfig, createDefaultConfig } from '../../exports';
 import { ChannelItem } from '../rtk-channel-selector-view/rtk-channel-selector-view';
 import { SyncWithStore } from '../../utils/sync-with-store';
 import { NewMessageEvent } from '../rtk-chat-composer-view/rtk-chat-composer-view';
+import { Overrides, defaultOverrides } from '../../lib/overrides';
 
 export type ChatFilter = (message: Message) => boolean;
 
@@ -81,6 +82,11 @@ export class RtkChat {
   @SyncWithStore()
   @Prop()
   t: RtkI18n = useLanguage();
+
+  /** UI Overrides */
+  @SyncWithStore()
+  @Prop()
+  overrides: Overrides = defaultOverrides;
 
   /** disables private chat */
   @Prop() disablePrivateChat: boolean = false;
@@ -563,6 +569,10 @@ export class RtkChat {
     const uiProps = { iconPack: this.iconPack, t: this.t, size: this.size };
     const message = this.editingMessage ? this.editingMessage.message : '';
     const quotedMessage = this.replyMessage ? this.replyMessage.message : '';
+    const shouldDisableEmojiPicker =
+      !!this.meeting?.__internals__?.features.hasFeature(
+        FlagsmithFeatureFlags.DISABLE_EMOJI_PICKER
+      ) || this.overrides.disableEmojiPicker;
 
     return (
       <rtk-chat-composer-view
@@ -572,11 +582,7 @@ export class RtkChat {
         isEditing={!!this.editingMessage}
         canSendTextMessage={this.isTextMessagingAllowed()}
         canSendFiles={this.isFileMessagingAllowed()}
-        disableEmojiPicker={
-          !!this.meeting?.__internals__?.features.hasFeature(
-            FlagsmithFeatureFlags.DISABLE_EMOJI_PICKER
-          )
-        }
+        disableEmojiPicker={shouldDisableEmojiPicker}
         maxLength={this.meeting.chat.maxTextLimit}
         rateLimits={this.meeting.chat.rateLimits}
         inputTextPlaceholder={this.t('chat.message_placeholder')}

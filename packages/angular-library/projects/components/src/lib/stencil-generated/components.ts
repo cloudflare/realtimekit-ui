@@ -602,14 +602,14 @@ export declare interface RtkChannelSelectorView extends Components.RtkChannelSel
 
 
 @ProxyCmp({
-  inputs: ['config', 'disablePrivateChat', 'displayFilter', 'iconPack', 'meeting', 'privatePresetFilter', 'size', 't']
+  inputs: ['config', 'disablePrivateChat', 'displayFilter', 'iconPack', 'meeting', 'overrides', 'privatePresetFilter', 'size', 't']
 })
 @Component({
   selector: 'rtk-chat',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: '<ng-content></ng-content>',
   // eslint-disable-next-line @angular-eslint/no-inputs-metadata-property
-  inputs: ['config', 'disablePrivateChat', 'displayFilter', 'iconPack', 'meeting', 'privatePresetFilter', 'size', 't'],
+  inputs: ['config', 'disablePrivateChat', 'displayFilter', 'iconPack', 'meeting', 'overrides', 'privatePresetFilter', 'size', 't'],
 })
 export class RtkChat {
   protected el: HTMLRtkChatElement;
@@ -1931,14 +1931,14 @@ export declare interface RtkMarkdownView extends Components.RtkMarkdownView {}
 
 
 @ProxyCmp({
-  inputs: ['applyDesignSystem', 'config', 'gridLayout', 'iconPack', 'leaveOnUnmount', 'loadConfigFromPreset', 'meeting', 'mode', 'showSetupScreen', 'size', 't']
+  inputs: ['applyDesignSystem', 'config', 'gridLayout', 'iconPack', 'leaveOnUnmount', 'loadConfigFromPreset', 'meeting', 'mode', 'overrides', 'showSetupScreen', 'size', 't']
 })
 @Component({
   selector: 'rtk-meeting',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: '<ng-content></ng-content>',
   // eslint-disable-next-line @angular-eslint/no-inputs-metadata-property
-  inputs: ['applyDesignSystem', 'config', 'gridLayout', 'iconPack', 'leaveOnUnmount', 'loadConfigFromPreset', 'meeting', 'mode', 'showSetupScreen', 'size', 't'],
+  inputs: ['applyDesignSystem', 'config', 'gridLayout', 'iconPack', 'leaveOnUnmount', 'loadConfigFromPreset', 'meeting', 'mode', 'overrides', 'showSetupScreen', 'size', 't'],
 })
 export class RtkMeeting {
   protected el: HTMLRtkMeetingElement;
@@ -3655,14 +3655,14 @@ export declare interface RtkTranscripts extends Components.RtkTranscripts {}
 
 
 @ProxyCmp({
-  inputs: ['config', 'iconPack', 'meeting', 'mode', 'showSetupScreen', 't']
+  inputs: ['config', 'iconPack', 'meeting', 'mode', 'overrides', 'showSetupScreen', 't']
 })
 @Component({
   selector: 'rtk-ui-provider',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: '<ng-content></ng-content>',
   // eslint-disable-next-line @angular-eslint/no-inputs-metadata-property
-  inputs: ['config', 'iconPack', 'meeting', 'mode', 'showSetupScreen', 't'],
+  inputs: ['config', 'iconPack', 'meeting', 'mode', 'overrides', 'showSetupScreen', 't'],
 })
 export class RtkUiProvider {
   protected el: HTMLRtkUiProviderElement;

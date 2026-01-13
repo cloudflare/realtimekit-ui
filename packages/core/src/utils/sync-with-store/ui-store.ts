@@ -5,6 +5,7 @@ import { defaultIconPack, type IconPack } from '../../lib/icons';
 import { type States } from '../../types/props';
 import { getUserPreferences } from '../user-prefs';
 import { createDefaultConfig, UIConfig } from '../../exports';
+import { type Overrides, defaultOverrides } from '../../lib/overrides';
 
 export const getInitialStates = (peerId?: string): States => ({
   meeting: 'idle',
@@ -21,6 +22,7 @@ export interface RtkUiStore {
   peerId: string | null;
   storeType: 'global' | 'peer';
   storeId: string;
+  overrides: Overrides;
 }
 
 // Extended type for stores that have elementsMap attached
@@ -37,6 +39,7 @@ const uiStore = createStore<RtkUiStore>({
   peerId: 'global',
   storeType: 'global',
   storeId: 'store-global',
+  overrides: defaultOverrides,
 }) as RtkUiStoreExtended;
 
 const elementsMap = new Map<string, any[]>();
@@ -74,13 +77,15 @@ export function createPeerStore({
   config,
   providerId,
   iconPack,
-  t
+  t,
+  overrides,
 }: {
   meeting: RealtimeKitClient;
   config?: UIConfig;
   providerId: string;
   iconPack: IconPack;
   t: RtkI18n;
+  overrides?: Overrides;
 }): RtkUiStoreExtended {
   const store = createStore<RtkUiStore>({
     meeting: meeting,
@@ -92,6 +97,7 @@ export function createPeerStore({
     storeType: 'peer',
     // Use provider id's numeric portion as store id for easier debugging
     storeId: 'store-' + providerId.replace('provider-', ''),
+    overrides: overrides || defaultOverrides,
   });
 
   const peerElementsMap = new Map<string, any[]>();
