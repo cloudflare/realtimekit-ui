@@ -5,7 +5,12 @@ export { provideRtkDesignSystem } from './utils/provide-design-system';
 export { extendConfig, generateConfig } from './utils/config';
 export { sendNotification } from './utils/notification';
 export { RtkUiBuilder } from './lib/builder';
-export { uiStore, uiState, getInitialStates, createPeerStore } from './utils/sync-with-store/ui-store';
+export {
+  uiStore,
+  uiState,
+  getInitialStates,
+  createPeerStore,
+} from './utils/sync-with-store/ui-store';
 
 // addons
 export { registerAddons, Addon } from './lib/addons';
@@ -25,6 +30,7 @@ export { Peer } from './types/rtk-client';
 // UIConfig, Icon Pack, i18n and Notification Sounds
 export { defaultConfig, createDefaultConfig } from './lib/default-ui-config';
 export { IconPack, defaultIconPack } from './lib/icons';
+export { type Overrides, defaultOverrides } from './lib/overrides';
 export { LangDict, defaultLanguage, RtkI18n, useLanguage } from './lib/lang';
 export { Sound, default as RtkNotificationsAudio } from './lib/notification';
 

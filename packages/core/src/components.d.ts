@@ -12,12 +12,13 @@ import { IconPack } from "./lib/icons";
 import { RtkI18n } from "./lib/lang";
 import { AIView } from "./components/rtk-ai/rtk-ai";
 import { ControlBarVariant } from "./components/rtk-controlbar-button/rtk-controlbar-button";
-import { IconPack as IconPack1, RtkI18n as RtkI18n1, Size as Size1, States as States1, UIConfig as UIConfig1 } from "./exports";
+import { IconPack as IconPack1, Overrides as Overrides1, RtkI18n as RtkI18n1, Size as Size1, States as States1, UIConfig as UIConfig1 } from "./exports";
 import { AudioVisualizerVariant } from "./components/rtk-audio-visualizer/rtk-audio-visualizer";
 import { AvatarVariant } from "./components/rtk-avatar/rtk-avatar";
 import { DraftMeeting } from "./utils/breakout-rooms-manager";
 import { ButtonKind, ButtonVariant } from "./components/rtk-button/rtk-button";
 import { FileMessage, ImageMessage, Message, RTKBasicParticipant, RTKPermissionsPreset, RTKPlugin, TextMessage } from "@cloudflare/realtimekit";
+import { Overrides } from "./lib/overrides";
 import { ChatFilter } from "./components/rtk-chat/rtk-chat";
 import { RtkNewMessageEvent } from "./components/rtk-chat-composer-ui/rtk-chat-composer-ui";
 import { NewMessageEvent } from "./components/rtk-chat-composer-view/rtk-chat-composer-view";
@@ -52,12 +53,13 @@ export { IconPack } from "./lib/icons";
 export { RtkI18n } from "./lib/lang";
 export { AIView } from "./components/rtk-ai/rtk-ai";
 export { ControlBarVariant } from "./components/rtk-controlbar-button/rtk-controlbar-button";
-export { IconPack as IconPack1, RtkI18n as RtkI18n1, Size as Size1, States as States1, UIConfig as UIConfig1 } from "./exports";
+export { IconPack as IconPack1, Overrides as Overrides1, RtkI18n as RtkI18n1, Size as Size1, States as States1, UIConfig as UIConfig1 } from "./exports";
 export { AudioVisualizerVariant } from "./components/rtk-audio-visualizer/rtk-audio-visualizer";
 export { AvatarVariant } from "./components/rtk-avatar/rtk-avatar";
 export { DraftMeeting } from "./utils/breakout-rooms-manager";
 export { ButtonKind, ButtonVariant } from "./components/rtk-button/rtk-button";
 export { FileMessage, ImageMessage, Message, RTKBasicParticipant, RTKPermissionsPreset, RTKPlugin, TextMessage } from "@cloudflare/realtimekit";
+export { Overrides } from "./lib/overrides";
 export { ChatFilter } from "./components/rtk-chat/rtk-chat";
 export { RtkNewMessageEvent } from "./components/rtk-chat-composer-ui/rtk-chat-composer-ui";
 export { NewMessageEvent } from "./components/rtk-chat-composer-view/rtk-chat-composer-view";
@@ -676,6 +678,10 @@ export namespace Components {
           * Meeting object
          */
         "meeting": Meeting;
+        /**
+          * UI Overrides
+         */
+        "overrides": Overrides;
         /**
           * @deprecated Beta API, will change in future List of target presets allowed as private chat recipient
          */
@@ -1988,6 +1994,10 @@ export namespace Components {
           * Fill type
          */
         "mode": MeetingMode;
+        /**
+          * UI Kit Overrides
+         */
+        "overrides": Overrides;
         /**
           * Whether to show setup screen or not
          */
@@ -3919,6 +3929,10 @@ export namespace Components {
           * Fill type
          */
         "mode": MeetingMode1;
+        /**
+          * UI Kit Overrides
+         */
+        "overrides": Overrides1;
         /**
           * Whether to show setup screen or not
          */
@@ -7312,6 +7326,10 @@ declare namespace LocalJSX {
          */
         "onRtkStateUpdate"?: (event: RtkChatCustomEvent<States1>) => void;
         /**
+          * UI Overrides
+         */
+        "overrides"?: Overrides;
+        /**
           * @deprecated Beta API, will change in future List of target presets allowed as private chat recipient
          */
         "privatePresetFilter"?: String[];
@@ -8812,6 +8830,10 @@ declare namespace LocalJSX {
           * Emits `rtkStatesUpdate` so that developers can listen to onRtkStatesUpdate and update their own stores Do not confuse this with `rtkStateUpdate` that other components emit
          */
         "onRtkStatesUpdate"?: (event: RtkMeetingCustomEvent<States>) => void;
+        /**
+          * UI Kit Overrides
+         */
+        "overrides"?: Overrides;
         /**
           * Whether to show setup screen or not
          */
@@ -10909,6 +10931,10 @@ declare namespace LocalJSX {
           * Emits `rtkStatesUpdate` so that developers can listen to onRtkStatesUpdate and update their own stores Do not confuse this with `rtkStateUpdate` that other components emit
          */
         "onRtkStatesUpdate"?: (event: RtkUiProviderCustomEvent<States1>) => void;
+        /**
+          * UI Kit Overrides
+         */
+        "overrides"?: Overrides1;
         /**
           * Whether to show setup screen or not
          */
