@@ -5,6 +5,35 @@ import { SyncWithStore } from '../../utils/sync-with-store';
 import { debounce } from 'lodash-es';
 import { Meeting } from '../../components';
 
+/**
+ * HOW INFINITE SCROLL WORKS:
+ *
+ * We use intersectionObserver to scroll up.
+ * We use scrollEnd listener to scroll down.
+ *
+ * Why?
+ * intersectionObserver doesn't work reliably for 2 way scrolling but has great ux,
+ * so we use it to smoothly scroll up.
+ *
+ * We have empty divs at the top and bottom ($topRef, $bottomRef)
+ * which act as triggers to tell that we have reached the top or end of our messages and need to fetch new messages,
+ *
+ * When scrolling up, we can't remove pages as intersectionObserver relies on
+ * the index of dom elements to work properly.
+ * So instead, we fetch older messages and push them to the end of the 2d array
+ * if length exceeds pagesAllowed, we free up the pages and keep the first empty index in memory (firstEmptyIndex).
+ *
+ * For scrolling down, when scroll ends we see if the bottomRef is in view.
+ * If yes, we fetch the new page and insert it at the firstEmptyIndex.
+ * We update timestamps and firstEmptyIndex, and rerender.
+ *
+ * If we have exceeded our page allowance we delete old pages.
+ *
+ * In this case deleting pages is okay as we are not relying on the index of dom elements to detect page end.
+ *
+ * This also works out for us because when a user scrolls up we do not need to manage a lastEmptyIndex.
+ */
+
 export interface DataNode {
   id: string;
   [key: string]: any;
@@ -24,6 +53,11 @@ export class RtkPaginatedList {
 
   private $bottomRef: HTMLDivElement;
 
+  /**
+   * when scrolling up, we can't remove pages as intersectionObserver relies on
+   * the index of dom elements to stay stable.
+   * So, instead we free up the pages and keep the last empty index in memory.
+   */
   private firstEmptyIndex: number = -1;
 
   private oldTS;
@@ -115,7 +149,7 @@ export class RtkPaginatedList {
      * NOTE(ikabra): this case also runs on initial load
      * if scrolling up ->
      * fetch older messages and push to the end of the array
-     * remove 1st element from the array if length exceeds pagesAllowed
+     * cleanup 1st non empty page from the array if length exceeds pagesAllowed
      */
 
     // if no old timestamp, it means we are at initial state
@@ -174,6 +208,8 @@ export class RtkPaginatedList {
     // update the old timestamp
     const lastPage = this.pages[this.pages.length - 1];
     this.oldTS = (lastPage[lastPage.length - 1] as any).timeMs;
+    // when scrolling too fast scroll a bit to the top to be able to load new messages when you scroll down
+    if (this.$containerRef.scrollTop === 0) this.$containerRef.scrollTop = -60;
 
     this.firstEmptyIndex--;
 
