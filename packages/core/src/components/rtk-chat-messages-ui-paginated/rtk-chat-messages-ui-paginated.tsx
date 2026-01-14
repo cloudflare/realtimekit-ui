@@ -1,4 +1,4 @@
-import type { Message, TextMessage } from '@cloudflare/realtimekit';
+import type { Message, ChatUpdateParams, TextMessage } from '@cloudflare/realtimekit';
 import {
   Component,
   Event,
@@ -22,6 +22,8 @@ import { SyncWithStore } from '../../utils/sync-with-store';
   shadow: true,
 })
 export class RtkChatMessagesUiPaginated {
+  private $paginatedListRef: HTMLRtkPaginatedListElement;
+
   @Element() host: HTMLRtkChatMessagesUiPaginatedElement;
 
   /** Meeting object */
@@ -97,6 +99,7 @@ export class RtkChatMessagesUiPaginated {
     if (oldMeeting != undefined) this.disconnectMeeting(oldMeeting);
     if (meeting && !meeting.chat) return;
     if (meeting != null) {
+      meeting.chat?.addListener('chatUpdate', this.chatUpdateListener);
       meeting.self.permissions.addListener('permissionsUpdate', this.permissionsUpdateListener);
     }
     this.permissionsUpdateListener();
@@ -282,10 +285,25 @@ export class RtkChatMessagesUiPaginated {
     );
   };
 
+  private chatUpdateListener = (data: ChatUpdateParams) => {
+    if (this.selectedChannelId && data.message.channelId !== this.selectedChannelId) return;
+
+    if (data.action === 'add') {
+      this.$paginatedListRef.onNewNode(data.message);
+      this.lastReadMessageIndex = -1;
+      this.maybeMarkChannelAsRead([data.message as Message]);
+    } else if (data.action === 'delete') {
+      this.$paginatedListRef.onNodeDelete(data.message.id);
+    } else if (data.action === 'edit') {
+      this.$paginatedListRef.onNodeUpdate(data.message.id, data.message);
+    }
+  };
+
   render() {
     return (
       <Host>
         <rtk-paginated-list
+          ref={(el) => (this.$paginatedListRef = el)}
           pageSize={this.pageSize}
           pagesAllowed={3}
           fetchData={this.getChatMessages}

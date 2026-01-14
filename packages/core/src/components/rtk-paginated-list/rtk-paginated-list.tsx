@@ -1,4 +1,4 @@
-import { Component, Host, h, VNode, Prop, writeTask, State } from '@stencil/core';
+import { Component, Host, h, VNode, Prop, writeTask, State, Method } from '@stencil/core';
 import { defaultIconPack, IconPack } from '../../lib/icons';
 import { RtkI18n, useLanguage } from '../../lib/lang';
 import { SyncWithStore } from '../../utils/sync-with-store';
@@ -67,11 +67,6 @@ export class RtkPaginatedList {
   /** Page Size */
   @Prop() pageSize: number;
 
-  /** Meeting object */
-  @SyncWithStore()
-  @Prop()
-  meeting: Meeting;
-
   // the length of pages will always be pageSize + 2
   private pages: any[][] = [];
 
@@ -110,6 +105,18 @@ export class RtkPaginatedList {
   t: RtkI18n = useLanguage();
 
   @State() isLoading: boolean = false;
+
+  // WIP: Callback for adding a new node
+  @Method()
+  async onNewNode(node: DataNode) {}
+
+  // WIP: Callback for deleting a node
+  @Method()
+  async onNodeDelete(id: string) {}
+
+  // WIP: Callback for updating a node
+  @Method()
+  async onNodeUpdate(id: string, node: DataNode) {}
 
   private rerender() {
     this.rerenderBoolean = !this.rerenderBoolean;

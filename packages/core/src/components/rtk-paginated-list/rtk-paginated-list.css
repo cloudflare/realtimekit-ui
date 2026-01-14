@@ -152,10 +152,14 @@ a {
   @apply text-brand-300 no-underline hover:underline;
 }
 
-.show-new-messages {
-  @apply absolute bottom-2 right-2;
+.show-new-messages-ctr {
+  @apply pointer-events-noneabsolute bottom-2 right-2;
   @apply z-10 -mt-14;
-  @apply translate-y-28 transition;
+  @apply translate-y-28 opacity-0 transition;
+}
+
+.show-new-messages-ctr.active {
+  @apply translate-y-0 opacity-100;
 }
 
 .show-new-messages {
