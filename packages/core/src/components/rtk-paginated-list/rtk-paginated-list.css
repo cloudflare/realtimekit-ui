@@ -144,10 +144,6 @@ rtk-text-message[is-continued] {
   transform: translateY(20vh);
 }
 
-#bottom-scroll {
-  transform: translateY(-20vh);
-}
-
 a {
   @apply text-brand-300 no-underline hover:underline;
 }

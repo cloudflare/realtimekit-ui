@@ -1,10 +1,9 @@
-import { Component, Host, h, VNode, Prop, writeTask, State, Watch } from '@stencil/core';
+import { Component, Host, h, VNode, Prop, writeTask, State } from '@stencil/core';
 import { defaultIconPack, IconPack } from '../../lib/icons';
 import { RtkI18n, useLanguage } from '../../lib/lang';
 import { SyncWithStore } from '../../utils/sync-with-store';
 import { debounce } from 'lodash-es';
 import { Meeting } from '../../components';
-import { ChatUpdateParams } from '@cloudflare/realtimekit';
 
 export interface DataNode {
   id: string;
@@ -19,9 +18,15 @@ export interface DataNode {
 export class RtkPaginatedList {
   private intersectionObserver: IntersectionObserver;
 
+  private $containerRef: HTMLDivElement;
+
   private $topRef: HTMLDivElement;
 
   private $bottomRef: HTMLDivElement;
+
+  private firstEmptyIndex: number = -1;
+
+  private oldTS;
 
   /** Page Size */
   @Prop() pageSize: number;
@@ -74,58 +79,28 @@ export class RtkPaginatedList {
     this.rerenderBoolean = !this.rerenderBoolean;
   }
 
-  private oldestTimestamp;
-  private newestTimestamp;
-
   connectedCallback() {
-    this.meetingChanged(this.meeting);
     this.rerender = debounce(this.rerender.bind(this), 50, { maxWait: 200 });
     this.intersectionObserver = new IntersectionObserver((entries) => {
       writeTask(() => {
         for (const entry of entries) {
-          if (entry.target.id === 'bottom-scroll' && entry.isIntersecting) {
-            this.load(false);
-          }
           if (entry.target.id === 'top-scroll' && entry.isIntersecting) {
-            this.load(true);
+            this.loadOld();
           }
         }
       });
     });
   }
 
-  disconnectedCallback() {
-    this.disconnectMeeting(this.meeting);
-  }
-
-  @Watch('meeting')
-  meetingChanged(meeting: Meeting, oldMeeting?: Meeting) {
-    if (oldMeeting) this.disconnectMeeting(oldMeeting);
-    if (!meeting || !meeting.chat) return;
-    meeting.chat?.addListener('chatUpdate', this.chatUpdateListener);
-  }
-
-  private disconnectMeeting = (meeting) => {
-    meeting?.chat?.removeListener('chatUpdate', this.chatUpdateListener);
-  };
-
-  private chatUpdateListener = ({ action, message }: ChatUpdateParams) => {
-    if (action === 'add') {
-      console.log('here: new message added', message);
-    }
-  };
-
   componentDidLoad() {
-    /**
-     * Adding observes here so that on the first render we scroll down
-     * and shouldRenderNewNodes remains true
-     */
     this.observe(this.$topRef);
-    this.observe(this.$bottomRef);
-  }
-
-  componentDidRender() {
-    // TODO: auto scroll to bottom
+    if (this.$containerRef) {
+      this.$containerRef.onscrollend = () => {
+        if (this.isAtBottom() && this.firstEmptyIndex > -1) {
+          console.log('need to load new page');
+        }
+      };
+    }
   }
 
   private observe = (el: HTMLElement) => {
@@ -133,57 +108,46 @@ export class RtkPaginatedList {
     this.intersectionObserver.observe(el);
   };
 
-  private async load(older: boolean = true) {
-    if (older) {
-      /**
-       * NOTE(ikabra): this case also runs on initial load
-       * if scrolling up ->
-       * fetch older messages and push to the end of the array
-       * remove 1st element from the array if length exceeds pagesAllowed
-       */
+  private async loadOld() {
+    /**
+     * NOTE(ikabra): this case also runs on initial load
+     * if scrolling up ->
+     * fetch older messages and push to the end of the array
+     * remove 1st element from the array if length exceeds pagesAllowed
+     */
 
-      // if no oldestTimestamp, it means we are at initial state
-      if (!this.oldestTimestamp) this.oldestTimestamp = new Date().getTime();
+    // if no old timestamp, it means we are at initial state
+    if (!this.oldTS) this.oldTS = new Date().getTime();
 
-      // load data
-      this.isLoading = true;
-      const data = await this.fetchData(this.oldestTimestamp - 1, this.pageSize, older);
-      this.isLoading = false;
+    // load data
+    this.isLoading = true;
+    const data = await this.fetchData(this.oldTS - 1, this.pageSize, true);
+    this.isLoading = false;
 
-      // no more old messages to show, we are at the top of the page
-      if (!data.length) return;
+    // no more old messages to show, we are at the top of the page
+    if (!data.length) return;
 
-      // add old data to the end of the array
-      this.pages.push(data);
+    // add old data to the end of the array
+    this.pages.push(data);
 
-      // update the oldest timestamp, if data exists
-      const lastPage = this.pages[this.pages.length - 1];
-      this.oldestTimestamp = (lastPage[lastPage.length - 1] as any).timeMs;
-
-      // set the newest timestamp, if it does not exist
-      if (!this.newestTimestamp) this.newestTimestamp = (this.pages[0][0] as any).timeMs;
-    } else {
-      // if initial state, do nothing
-      if (!this.pages.length) return;
-
-      // fetch data after the newest timestamp
-      this.isLoading = true;
-      const data = await this.fetchData(this.newestTimestamp + 1, this.pageSize, older);
-      this.isLoading = false;
-
-      // no more new messages, we are at the end of the page
-      if (!data.length) return;
-
-      // add data to the start of the array
-      this.pages.unshift(data.reverse());
-
-      // update the newest timestamp to the 1st message of the 1st page
-      if (this.pages[0]?.[0])
-        this.newestTimestamp = this.newestTimestamp = (this.pages[0][0] as any).timeMs;
+    // clear old pages when we reach the limit
+    if (this.pages.length > this.pagesAllowed) {
+      this.pages[this.pages.length - this.pagesAllowed - 1] = [];
+      this.firstEmptyIndex = this.pages.length - this.pagesAllowed - 1;
     }
+
+    // update the oldest timestamp
+    const lastPage = this.pages[this.pages.length - 1];
+    this.oldTS = (lastPage[lastPage.length - 1] as any).timeMs;
+
     console.log('here: pages', this.pages);
     this.rerender();
   }
+
+  private isAtBottom = () => {
+    const rect = this.$bottomRef.getBoundingClientRect();
+    return rect.top >= 0 && rect.bottom <= window.innerHeight;
+  };
 
   render() {
     /**
@@ -193,7 +157,7 @@ export class RtkPaginatedList {
      */
     return (
       <Host>
-        <div class="scrollbar container" part="container">
+        <div class="scrollbar container" part="container" ref={(el) => (this.$containerRef = el)}>
           <div class={'show-new-messages'}>
             <rtk-button
               class="show-new-messages"
