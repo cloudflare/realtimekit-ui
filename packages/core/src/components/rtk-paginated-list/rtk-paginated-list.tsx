@@ -28,6 +28,8 @@ export class RtkPaginatedList {
 
   private oldTS;
 
+  private newTS;
+
   /** Page Size */
   @Prop() pageSize: number;
 
@@ -97,7 +99,7 @@ export class RtkPaginatedList {
     if (this.$containerRef) {
       this.$containerRef.onscrollend = () => {
         if (this.isAtBottom() && this.firstEmptyIndex > -1) {
-          console.log('need to load new page');
+          this.loadNew();
         }
       };
     }
@@ -136,11 +138,45 @@ export class RtkPaginatedList {
       this.firstEmptyIndex = this.pages.length - this.pagesAllowed - 1;
     }
 
-    // update the oldest timestamp
+    // update the old timestamp
     const lastPage = this.pages[this.pages.length - 1];
     this.oldTS = (lastPage[lastPage.length - 1] as any).timeMs;
 
-    console.log('here: pages', this.pages);
+    // update the new timestamp
+    this.newTS = this.pages[this.firstEmptyIndex + 1][0].timeMs;
+
+    this.rerender();
+  }
+
+  private async loadNew() {
+    // new timestamp needs to be assigned by loadOld method
+    if (!this.newTS) return;
+
+    // load data
+    this.isLoading = true;
+    const data = await this.fetchData(this.newTS + 1, this.pageSize, false);
+    this.isLoading = false;
+
+    // no more new messages to load
+    if (!data.length) return;
+
+    // index 0: oldest
+    // index last: newest
+
+    this.pages[this.firstEmptyIndex] = data.reverse();
+
+    if (this.pages.length > this.pagesAllowed) {
+      this.pages.pop();
+    }
+
+    this.newTS = this.pages[this.firstEmptyIndex][0].timeMs;
+
+    // update the old timestamp
+    const lastPage = this.pages[this.pages.length - 1];
+    this.oldTS = (lastPage[lastPage.length - 1] as any).timeMs;
+
+    this.firstEmptyIndex--;
+
     this.rerender();
   }
 
