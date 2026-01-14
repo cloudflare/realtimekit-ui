@@ -1,3 +1,10 @@
+# [1.1.0-staging.3](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.1.0-staging.2...@cloudflare/realtimekit-ui-v1.1.0-staging.3) (2026-01-14)
+
+
+### Features
+
+* introduce UI Kit overrides in rtk-ui-provider and rtk-meeting ([9d24fd8](https://github.com/cloudflare/realtimekit-ui/commit/9d24fd8a508e4fb93c94060806fed3827e1a2d09))
+
 # [1.1.0-staging.2](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.1.0-staging.1...@cloudflare/realtimekit-ui-v1.1.0-staging.2) (2026-01-12)
 
 
