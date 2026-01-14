@@ -2388,14 +2388,15 @@ export declare interface RtkOverlayModal extends Components.RtkOverlayModal {
 
 
 @ProxyCmp({
-  inputs: ['autoScroll', 'createNodes', 'emptyListLabel', 'fetchData', 'iconPack', 'meeting', 'pageSize', 'pagesAllowed', 'selectedItemId', 't']
+  inputs: ['autoScroll', 'createNodes', 'emptyListLabel', 'fetchData', 'iconPack', 'pageSize', 'pagesAllowed', 'selectedItemId', 't'],
+  methods: ['onNewNode', 'onNodeDelete', 'onNodeUpdate']
 })
 @Component({
   selector: 'rtk-paginated-list',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: '<ng-content></ng-content>',
   // eslint-disable-next-line @angular-eslint/no-inputs-metadata-property
-  inputs: ['autoScroll', 'createNodes', 'emptyListLabel', 'fetchData', 'iconPack', 'meeting', 'pageSize', 'pagesAllowed', 'selectedItemId', 't'],
+  inputs: ['autoScroll', 'createNodes', 'emptyListLabel', 'fetchData', 'iconPack', 'pageSize', 'pagesAllowed', 'selectedItemId', 't'],
 })
 export class RtkPaginatedList {
   protected el: HTMLRtkPaginatedListElement;

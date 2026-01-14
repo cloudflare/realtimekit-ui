@@ -153,7 +153,7 @@ a {
 }
 
 .show-new-messages-ctr {
-  @apply pointer-events-noneabsolute bottom-2 right-2;
+  @apply pointer-events-none absolute bottom-2 right-2;
   @apply z-10 -mt-14;
   @apply translate-y-28 opacity-0 transition;
 }

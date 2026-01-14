@@ -3,7 +3,6 @@ import { defaultIconPack, IconPack } from '../../lib/icons';
 import { RtkI18n, useLanguage } from '../../lib/lang';
 import { SyncWithStore } from '../../utils/sync-with-store';
 import { debounce } from 'lodash-es';
-import { Meeting } from '../../components';
 
 /**
  * HOW INFINITE SCROLL WORKS:
