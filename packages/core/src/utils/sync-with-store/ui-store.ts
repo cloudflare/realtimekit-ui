@@ -97,7 +97,7 @@ export function createPeerStore({
     storeType: 'peer',
     // Use provider id's numeric portion as store id for easier debugging
     storeId: 'store-' + providerId.replace('provider-', ''),
-    overrides: overrides || defaultOverrides,
+    overrides: overrides,
   });
 
   const peerElementsMap = new Map<string, any[]>();

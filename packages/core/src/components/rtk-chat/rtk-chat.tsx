@@ -569,10 +569,6 @@ export class RtkChat {
     const uiProps = { iconPack: this.iconPack, t: this.t, size: this.size };
     const message = this.editingMessage ? this.editingMessage.message : '';
     const quotedMessage = this.replyMessage ? this.replyMessage.message : '';
-    const shouldDisableEmojiPicker =
-      !!this.meeting?.__internals__?.features.hasFeature(
-        FlagsmithFeatureFlags.DISABLE_EMOJI_PICKER
-      ) || this.overrides.disableEmojiPicker;
 
     return (
       <rtk-chat-composer-view
@@ -582,7 +578,7 @@ export class RtkChat {
         isEditing={!!this.editingMessage}
         canSendTextMessage={this.isTextMessagingAllowed()}
         canSendFiles={this.isFileMessagingAllowed()}
-        disableEmojiPicker={shouldDisableEmojiPicker}
+        disableEmojiPicker={this.overrides.disableEmojiPicker}
         maxLength={this.meeting.chat.maxTextLimit}
         rateLimits={this.meeting.chat.rateLimits}
         inputTextPlaceholder={this.t('chat.message_placeholder')}

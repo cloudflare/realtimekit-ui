@@ -176,7 +176,7 @@ export class RtkUiProvider {
         iconPack: this.iconPack,
         t: this.t,
         providerId: this.providerId,
-        overrides: this.overrides,
+        overrides: deepMerge({ ...defaultOverrides }, this.overrides) as Overrides,
       }) as RtkUiStoreExtended;
 
       // Notify components that peer specific store is now available
@@ -254,7 +254,7 @@ export class RtkUiProvider {
   @Watch('overrides')
   overridesChanged(overrides: Overrides) {
     if (this.peerStore) {
-      this.peerStore.state.overrides = deepMerge(defaultOverrides, overrides) as Overrides;
+      this.peerStore.state.overrides = deepMerge({ ...defaultOverrides }, overrides) as Overrides;
     }
   }
 

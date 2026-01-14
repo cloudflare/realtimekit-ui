@@ -2,7 +2,6 @@ import RealtimeKitClient from '@cloudflare/realtimekit';
 
 export const FlagsmithFeatureFlags = {
   PLAY_PARTICIPANT_TILE_VIDEO_ON_PAUSE: 'play_participant_tile_video_on_pause',
-  DISABLE_EMOJI_PICKER: 'disable_emoji_picker',
   FEAT_PAGINATED_CHAT: 'feat_paginated_chat',
   LOG_PLAYING_FAILURES: 'log_playing_failures',
   FEAT_CHANNEL_CHAT: 'feat_channel_chat',
