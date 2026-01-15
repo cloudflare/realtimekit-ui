@@ -611,24 +611,6 @@ export class RtkChat {
     return [everyone, ...participants];
   };
 
-  private getDisplayPictureForChatMessage = (message: Message) => {
-    if (this.meeting.meta.viewType === 'CHAT') {
-      return this.meeting.participants.all.toArray().find((p) => p.userId === message.userId)
-        ?.picture;
-    }
-
-    if (this.meeting.self.userId === message.userId) {
-      return this.meeting.self.picture;
-    }
-
-    return (
-      this.meeting.participants.joined.toArray().find((member) => member.userId === message.userId)
-        ?.picture ??
-      this.meeting.participants.waitlisted.toArray().find((p) => p.userId === message.userId)
-        ?.picture
-    );
-  };
-
   private getPinnedMessageLabel = (message: Message) => {
     if (message.type === 'text') return message.message;
     if (message.type === 'image') return 'Image';
@@ -639,6 +621,9 @@ export class RtkChat {
   private renderPinnedMessagesHeader = () => {
     if (this.meeting.chat.pinned.length === 0) return null;
 
+    /**
+     * We do not display a picture against the avatar because the chatMessage API does not provide it.
+     */
     return (
       <div class="pinned-messages">
         <div
@@ -658,13 +643,12 @@ export class RtkChat {
         {this.showPinnedMessages && (
           <div class="pinned-messages-content">
             {this.meeting.chat.pinned.map((message) => {
-              const displayPicture = this.getDisplayPictureForChatMessage(message as Message);
               const label = this.getPinnedMessageLabel(message as Message);
               return (
                 <div class="pinned-message">
                   <rtk-avatar
                     class="pinned-message-avatar"
-                    participant={{ name: message.displayName, picture: displayPicture }}
+                    participant={{ name: message.displayName, picture: '' }}
                     size="sm"
                   />
                   <span>{label.length > 20 ? `${label.substring(0, 20)}...` : label}</span>
