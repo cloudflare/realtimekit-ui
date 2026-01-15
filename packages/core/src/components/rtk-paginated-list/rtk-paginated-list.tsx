@@ -104,6 +104,10 @@ export class RtkPaginatedList {
 
   @State() isLoading: boolean = false;
 
+  @State() isLoadingTop: boolean = false;
+
+  @State() isLoadingBottom: boolean = false;
+
   /**
    * Adds a new node to the beginning of the paginated list
    * @param {DataNode} node - The data node to add to the beginning of the list
@@ -136,7 +140,7 @@ export class RtkPaginatedList {
       writeTask(() => {
         for (const entry of entries) {
           if (entry.target.id === 'top-scroll' && entry.isIntersecting) {
-            this.loadOld();
+            this.laodPrevPage();
           }
         }
       });
@@ -148,7 +152,7 @@ export class RtkPaginatedList {
     if (this.$containerRef) {
       this.$containerRef.onscrollend = () => {
         if (this.isAtBottom() && this.firstEmptyIndex > -1) {
-          this.loadNew();
+          this.loadNextPage();
         }
       };
     }
@@ -159,7 +163,7 @@ export class RtkPaginatedList {
     this.intersectionObserver.observe(el);
   };
 
-  private async loadOld() {
+  private async laodPrevPage() {
     /**
      * NOTE(ikabra): this case also runs on initial load
      * if scrolling up ->
@@ -172,8 +176,10 @@ export class RtkPaginatedList {
 
     // load data
     this.isLoading = true;
+    this.isLoadingTop = true;
     const data = await this.fetchData(this.oldTS - 1, this.pageSize, true);
     this.isLoading = false;
+    this.isLoadingTop = false;
 
     // no more old messages to show, we are at the top of the page
     if (!data.length) return;
@@ -197,20 +203,19 @@ export class RtkPaginatedList {
     this.rerender();
   }
 
-  private async loadNew() {
+  private async loadNextPage() {
     // new timestamp needs to be assigned by loadOld method
     if (!this.newTS) return;
 
     // load data
     this.isLoading = true;
+    this.isLoadingBottom = true;
     const data = await this.fetchData(this.newTS + 1, this.pageSize, false);
     this.isLoading = false;
+    this.isLoadingBottom = false;
 
     // no more new messages to load
     if (!data.length) return;
-
-    // index 0: oldest
-    // index last: newest
 
     this.pages[this.firstEmptyIndex] = data.reverse();
 
@@ -244,7 +249,7 @@ export class RtkPaginatedList {
     return (
       <Host>
         <div class="scrollbar container" part="container" ref={(el) => (this.$containerRef = el)}>
-          <div class={'show-new-messages'}>
+          <div class={'show-new-messages-ctr'}>
             <rtk-button
               class="show-new-messages"
               kind="icon"
@@ -259,7 +264,10 @@ export class RtkPaginatedList {
             id="bottom-scroll"
             ref={(el) => (this.$bottomRef = el)}
           ></div>
-          {this.isLoading && <rtk-spinner size="lg" />}
+          {/* Loader for next page */}
+          {this.isLoadingBottom && this.pages.length > 0 && <rtk-spinner size="sm" />}
+          {/* Initial data loader */}
+          {this.isLoading && this.pages.length < 1 && <rtk-spinner size="lg" />}
           {!this.isLoading && this.pages.flat().length === 0 ? (
             <div class="empty-list">{this.t('list.empty')}</div>
           ) : (
@@ -271,6 +279,8 @@ export class RtkPaginatedList {
               ))}
             </div>
           )}
+          {/* Loader for previous page */}
+          {this.isLoadingTop && this.pages.length > 0 && <rtk-spinner size="sm" />}
           <div class="smallest-dom-element" id="top-scroll" ref={(el) => (this.$topRef = el)}></div>
         </div>
       </Host>
