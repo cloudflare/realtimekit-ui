@@ -21,6 +21,9 @@ export class RtkMessageView {
   /** Appearance */
   @Prop() variant: 'plain' | 'bubble' = 'bubble';
 
+  /** Is message pinned */
+  @Prop() pinned: boolean = false;
+
   /** Render */
   @Prop() viewType: 'incoming' | 'outgoing' = 'outgoing';
 
@@ -53,16 +56,16 @@ export class RtkMessageView {
   /** action event */
   @Event({ eventName: 'action' }) onAction: EventEmitter<string>;
 
-  private renderActions(isSelf: boolean) {
+  private renderActions() {
     return (
-      <rtk-menu placement={isSelf ? 'bottom-start' : 'bottom-end'} offset={1}>
+      <rtk-menu placement={this.isSelf ? 'bottom-start' : 'bottom-end'} offset={1}>
         <button slot="trigger" class="actions">
           <rtk-icon icon={this.iconPack.chevron_down} />
         </button>
-        <rtk-menu-list menuVariant={isSelf ? 'primary' : 'secondary'}>
+        <rtk-menu-list menuVariant={this.isSelf ? 'primary' : 'secondary'}>
           {this.actions.map((action) => (
             <rtk-menu-item
-              menuVariant={isSelf ? 'primary' : 'secondary'}
+              menuVariant={this.isSelf ? 'primary' : 'secondary'}
               onClick={() => this.onAction.emit(action.id)}
             >
               {action.icon && <rtk-icon icon={action.icon} slot="start" />}
@@ -96,10 +99,11 @@ export class RtkMessageView {
               <slot></slot>
               {!this.hideMetadata && !!this.time && (
                 <div class="metadata" title={formatDateTime(this.time)}>
+                  {this.pinned && <rtk-icon icon={this.iconPack.pin} size="sm" />}
                   {elapsedDuration(this.time, new Date(Date.now()))}
                 </div>
               )}
-              {this.actions.length !== 0 && this.renderActions(this.isSelf)}
+              {this.actions.length !== 0 && this.renderActions()}
             </div>
           </div>
         </div>

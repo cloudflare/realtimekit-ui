@@ -1,3 +1,44 @@
+# [1.1.0-staging.3](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.1.0-staging.2...@cloudflare/realtimekit-ui-v1.1.0-staging.3) (2026-01-14)
+
+
+### Features
+
+* introduce UI Kit overrides in rtk-ui-provider and rtk-meeting ([9d24fd8](https://github.com/cloudflare/realtimekit-ui/commit/9d24fd8a508e4fb93c94060806fed3827e1a2d09))
+
+# [1.1.0-staging.2](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.1.0-staging.1...@cloudflare/realtimekit-ui-v1.1.0-staging.2) (2026-01-12)
+
+
+### Bug Fixes
+
+* commented delete and edit actions ([c43e4f7](https://github.com/cloudflare/realtimekit-ui/commit/c43e4f7141173d5af378c49bf613c04ca7ee4452))
+* styles for rtk-menu ([5daaf4d](https://github.com/cloudflare/realtimekit-ui/commit/5daaf4d815949e04da5756c722479fa0feec2868))
+* update prop name ([ce0aafe](https://github.com/cloudflare/realtimekit-ui/commit/ce0aafecdb000ef062fde68c31716ee0b5697f00))
+
+# [1.1.0-staging.1](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.9-staging.4...@cloudflare/realtimekit-ui-v1.1.0-staging.1) (2026-01-12)
+
+
+### Features
+
+* **chat:** added support to delete chat message ([df015f6](https://github.com/cloudflare/realtimekit-ui/commit/df015f60f3657d757d2d277dcb04cae4ee82df14))
+
+## [1.0.9-staging.4](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.9-staging.3...@cloudflare/realtimekit-ui-v1.0.9-staging.4) (2026-01-12)
+
+
+### Bug Fixes
+
+* **paginated-list-loaders:** added loaders in paginated list ([d124d6e](https://github.com/cloudflare/realtimekit-ui/commit/d124d6e7dca7cbc0e86abf5ba0e8dee4762a6786))
+
+## [1.0.9-staging.3](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.9-staging.2...@cloudflare/realtimekit-ui-v1.0.9-staging.3) (2026-01-12)
+
+
+### Bug Fixes
+
+* deprecate chat-messages-ui component ([c0a602e](https://github.com/cloudflare/realtimekit-ui/commit/c0a602e761b3c722852d6d7bcb620b083eb78f51))
+* position for renderActions ([06ca23d](https://github.com/cloudflare/realtimekit-ui/commit/06ca23df87db5d7519cc500fde0c0f3e7728495c))
+* remove chat sdk usage from rtk-chat ([02dbce5](https://github.com/cloudflare/realtimekit-ui/commit/02dbce5d77d9ff3f7fb63607e14260d4457bbea8))
+* remove unused declarations ([79d54ee](https://github.com/cloudflare/realtimekit-ui/commit/79d54eed37eb0733088a043381957716f7a5b152))
+* ui for chat messages ([0f396ed](https://github.com/cloudflare/realtimekit-ui/commit/0f396ed02f75e8af7e924e2fda893fd7421c4ec0))
+
 ## [1.0.9-staging.2](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.9-staging.1...@cloudflare/realtimekit-ui-v1.0.9-staging.2) (2026-01-09)
 
 

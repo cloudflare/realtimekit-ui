@@ -159,19 +159,15 @@ export class RtkChatMessagesUiPaginated {
   private getMessageActions = (message: Message) => {
     const actions = [];
 
-    const isSelf = this.meeting.self.userId === message.userId;
-    const chatMessagePermissions = this.meeting.self.permissions?.chatMessage;
-    const canEdit =
-      chatMessagePermissions === undefined
-        ? isSelf
-        : chatMessagePermissions.canEdit === 'ALL' ||
-          (chatMessagePermissions.canEdit === 'SELF' && isSelf);
+    // const isSelf = this.meeting.self.userId === message.userId;
+    // const chatMessagePermissions = this.meeting.self.permissions?.chatMessage;
+    // const canEdit =
+    //   chatMessagePermissions === undefined
+    //     ? isSelf
+    //     : chatMessagePermissions.canEdit === 'ALL' ||
+    //       (chatMessagePermissions.canEdit === 'SELF' && isSelf);
 
-    const canDelete =
-      chatMessagePermissions === undefined
-        ? isSelf
-        : chatMessagePermissions.canDelete === 'ALL' ||
-          (chatMessagePermissions.canDelete === 'SELF' && isSelf);
+    const canDelete = message.userId === this.meeting.self.userId;
 
     if (this.meeting.self.permissions.pinParticipant) {
       actions.push({
@@ -186,14 +182,6 @@ export class RtkChatMessagesUiPaginated {
         id: 'delete_message',
         label: this.t('chat.delete_msg'),
         icon: this.iconPack.delete,
-      });
-    }
-
-    if (canEdit) {
-      actions.push({
-        id: 'edit_message',
-        label: this.t('chat.edit_msg'),
-        icon: this.iconPack.edit,
       });
     }
 
@@ -238,9 +226,10 @@ export class RtkChatMessagesUiPaginated {
     const isSelf = message.userId === this.meeting.self.userId;
     const viewType = isSelf ? 'outgoing' : 'incoming';
     return (
-      <div class={{ pinned: message.pinned }}>
+      <div>
         <div class="message-wrapper">
           <rtk-message-view
+            pinned={message.pinned}
             time={message.time}
             actions={this.getMessageActions(message)}
             authorName={message.displayName}
@@ -274,11 +263,6 @@ export class RtkChatMessagesUiPaginated {
                   ></rtk-image-message-view>
                 )}
               </div>
-              {message.pinned && (
-                <div class="pin-icon" part="pin-icon">
-                  <rtk-icon icon={this.iconPack.pin} size="sm" />
-                </div>
-              )}
             </div>
           </rtk-message-view>
         </div>

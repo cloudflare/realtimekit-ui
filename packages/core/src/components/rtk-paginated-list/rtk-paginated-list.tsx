@@ -140,7 +140,7 @@ export class RtkPaginatedList {
       writeTask(() => {
         for (const entry of entries) {
           if (entry.target.id === 'top-scroll' && entry.isIntersecting) {
-            this.laodPrevPage();
+            this.loadPrevPage();
           }
         }
       });
@@ -163,7 +163,7 @@ export class RtkPaginatedList {
     this.intersectionObserver.observe(el);
   };
 
-  private async laodPrevPage() {
+  private async loadPrevPage() {
     /**
      * NOTE(ikabra): this case also runs on initial load
      * if scrolling up ->

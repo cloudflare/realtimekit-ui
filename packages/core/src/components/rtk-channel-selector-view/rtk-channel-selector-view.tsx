@@ -250,6 +250,7 @@ export class RtkChannelSelectorView {
         {this.viewAs === 'dropdown' && (
           <button class="dropdown-trigger" onClick={this.toggleDropdown}>
             <span>
+              <rtk-icon icon={this.iconPack.participants} />
               {this.selectedChannelId &&
                 `${this.t('to')} ${this.getChannelById(this.selectedChannelId).name}`}
 
