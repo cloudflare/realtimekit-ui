@@ -18,13 +18,13 @@
  *
  * For scrolling down, when scroll ends we see if the bottomRef is in view.
  * If yes, we fetch the new page and insert it at the firstEmptyIndex.
- * We update timestamps and firstEmptyIndex, and rerender.
+ * We update timestamps & firstEmptyIndex, then we rerender.
  *
  * If we have exceeded our page allowance we delete old pages.
  *
  * In this case deleting pages is okay as we are not relying on the index of dom elements to detect page end.
  *
- * This also works out for us because when a user scrolls up we do not need to manage a lastEmptyIndex.
+ * This also simplifies the code because when a user scrolls up we do not need to manage a lastEmptyIndex.
  */
 
 import { Component, Host, h, VNode, Prop, writeTask, State, Method } from '@stencil/core';
