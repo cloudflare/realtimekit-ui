@@ -1,9 +1,3 @@
-import { Component, Host, h, VNode, Prop, writeTask, State, Method } from '@stencil/core';
-import { defaultIconPack, IconPack } from '../../lib/icons';
-import { RtkI18n, useLanguage } from '../../lib/lang';
-import { SyncWithStore } from '../../utils/sync-with-store';
-import { debounce } from 'lodash-es';
-
 /**
  * HOW INFINITE SCROLL WORKS:
  *
@@ -33,6 +27,11 @@ import { debounce } from 'lodash-es';
  * This also works out for us because when a user scrolls up we do not need to manage a lastEmptyIndex.
  */
 
+import { Component, Host, h, VNode, Prop, writeTask, State, Method } from '@stencil/core';
+import { defaultIconPack, IconPack } from '../../lib/icons';
+import { RtkI18n, useLanguage } from '../../lib/lang';
+import { SyncWithStore } from '../../utils/sync-with-store';
+import { debounce } from 'lodash-es';
 export interface DataNode {
   id: string;
   [key: string]: any;
@@ -105,15 +104,25 @@ export class RtkPaginatedList {
 
   @State() isLoading: boolean = false;
 
-  /** Adds a new node to the beginning of the paginated list */
+  /**
+   * Adds a new node to the beginning of the paginated list
+   * @param {DataNode} node - The data node to add to the beginning of the list
+   */
   @Method()
   async onNewNode(node: DataNode) {}
 
-  /** Deletes a node anywhere from the list */
+  /**
+   * Deletes a node anywhere from the list
+   * @param {string} id - The id of the node to delete
+   * */
   @Method()
   async onNodeDelete(id: string) {}
 
-  /** Updates a new node anywhere in the list */
+  /**
+   * Updates a new node anywhere in the list
+   * @param {string} id - The id of the node to update
+   * @param {DataNode} node - The updated data node
+   * */
   @Method()
   async onNodeUpdate(id: string, node: DataNode) {}
 
@@ -231,7 +240,6 @@ export class RtkPaginatedList {
     /**
      * div.container is flex=column-reverse
      * which is why div#bottom-scroll comes before div#top-scroll
-     * div.page-wrapper prevents reversal of messages
      */
     return (
       <Host>
