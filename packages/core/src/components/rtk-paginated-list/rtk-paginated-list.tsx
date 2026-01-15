@@ -111,6 +111,13 @@ export class RtkPaginatedList {
   @State() isLoadingBottom: boolean = false;
 
   /**
+   * Even when auto scroll is enabled, we only want to scroll if a new realtime message has arrived
+   * This variable tells us if we should respect auto scroll after a new page has been loaded.
+   * It is also used by the manual scroll to bottom button.
+   *  */
+  private shouldScrollToBottom: boolean = false;
+
+  /**
    * Adds a new node to the beginning of the paginated list
    * @param {DataNode} node - The data node to add to the beginning of the list
    */
@@ -128,12 +135,18 @@ export class RtkPaginatedList {
         this.loadNextPage();
       }
     }
-    /**
-     * Always update the maxTS.
-     * 1. when we scroll down, new messages will load automatically based on this setting.
-     * 2. new message indicator relies on this value
-     */
+    // Always update the maxTS. New messages will load automatically based on this setting.
     this.maxTS = Math.max(this.maxTS, node.timeMs);
+
+    // If autoscroll is enabled this function will scroll to the bottom
+    if (this.autoScroll) {
+      this.shouldScrollToBottom = true;
+      this.scrollToBottom();
+    }
+  }
+
+  private scrollToBottom() {
+    this.$bottomRef.scrollIntoView({ behavior: 'smooth' });
   }
 
   /**
@@ -171,14 +184,15 @@ export class RtkPaginatedList {
   componentDidLoad() {
     this.observe(this.$topRef);
     if (this.$containerRef) {
-      this.$containerRef.onscrollend = () => {
+      this.$containerRef.onscrollend = async () => {
         /**
          * Load new page if:
          * if there are nodes to load at the bottom (maxTS > newTS)
          * or if there are pages to fill at the bottom (firstEmptyIndex > -1)
          */
         if (this.isAtBottom() && (this.maxTS > this.newTS || this.firstEmptyIndex > -1)) {
-          this.loadNextPage();
+          await this.loadNextPage();
+          if (this.shouldScrollToBottom) this.scrollToBottom();
         }
       };
     }
@@ -231,7 +245,10 @@ export class RtkPaginatedList {
 
   private async loadNextPage() {
     // new timestamp needs to be assigned by loadOld method
-    if (!this.newTS) return;
+    if (!this.newTS) {
+      this.shouldScrollToBottom = false;
+      return;
+    }
 
     // load data
     this.isLoading = true;
@@ -241,7 +258,10 @@ export class RtkPaginatedList {
     this.isLoadingBottom = false;
 
     // no more new messages to load
-    if (!data.length) return;
+    if (!data.length) {
+      this.shouldScrollToBottom = false;
+      return;
+    }
 
     // when filling empty pages
     if (this.firstEmptyIndex > -1) {
