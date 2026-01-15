@@ -62,6 +62,8 @@ export class RtkPaginatedList {
 
   private newTS;
 
+  private maxTS = 0;
+
   /** Page Size */
   @Prop() pageSize: number;
 
@@ -113,7 +115,26 @@ export class RtkPaginatedList {
    * @param {DataNode} node - The data node to add to the beginning of the list
    */
   @Method()
-  async onNewNode(node: DataNode) {}
+  async onNewNode(node: DataNode) {
+    // if we are at the bottom of the page
+    if (this.firstEmptyIndex === -1) {
+      // just append messages to the page if page has not reached full capacity
+      if (this.pages[0].length < this.pageSize) {
+        this.pages[0].unshift(node);
+        this.newTS = node.timeMs;
+        this.rerender();
+      } else {
+        // if page is at full capacity, load next page
+        this.loadNextPage();
+      }
+    }
+    /**
+     * Always update the maxTS.
+     * 1. when we scroll down, new messages will load automatically based on this setting.
+     * 2. new message indicator relies on this value
+     */
+    this.maxTS = Math.max(this.maxTS, node.timeMs);
+  }
 
   /**
    * Deletes a node anywhere from the list
@@ -151,7 +172,12 @@ export class RtkPaginatedList {
     this.observe(this.$topRef);
     if (this.$containerRef) {
       this.$containerRef.onscrollend = () => {
-        if (this.isAtBottom() && this.firstEmptyIndex > -1) {
+        /**
+         * Load new page if:
+         * if there are nodes to load at the bottom (maxTS > newTS)
+         * or if there are pages to fill at the bottom (firstEmptyIndex > -1)
+         */
+        if (this.isAtBottom() && (this.maxTS > this.newTS || this.firstEmptyIndex > -1)) {
           this.loadNextPage();
         }
       };
@@ -217,13 +243,20 @@ export class RtkPaginatedList {
     // no more new messages to load
     if (!data.length) return;
 
-    this.pages[this.firstEmptyIndex] = data.reverse();
+    // when filling empty pages
+    if (this.firstEmptyIndex > -1) {
+      this.pages[this.firstEmptyIndex] = data.reverse();
+    } else {
+      // when already at the bottom and loading messages in realtime
+      this.pages.unshift(data.reverse());
+    }
 
     if (this.pages.length > this.pagesAllowed) {
       this.pages.pop();
     }
 
-    this.newTS = this.pages[this.firstEmptyIndex][0].timeMs;
+    // smallest value for firstEmptyIndex can be -1, so we cap the index at 0
+    this.newTS = this.pages[Math.max(0, this.firstEmptyIndex)][0].timeMs;
 
     // update the old timestamp
     const lastPage = this.pages[this.pages.length - 1];
@@ -231,7 +264,8 @@ export class RtkPaginatedList {
     // when scrolling too fast scroll a bit to the top to be able to load new messages when you scroll down
     if (this.$containerRef.scrollTop === 0) this.$containerRef.scrollTop = -60;
 
-    this.firstEmptyIndex--;
+    // smallest value for this index can be -1 (indicates we are at the bottom of the page).
+    this.firstEmptyIndex = Math.max(-1, this.firstEmptyIndex - 1);
 
     this.rerender();
   }
@@ -249,7 +283,7 @@ export class RtkPaginatedList {
     return (
       <Host>
         <div class="scrollbar container" part="container" ref={(el) => (this.$containerRef = el)}>
-          <div class={'show-new-messages-ctr'}>
+          <div class={{ 'show-new-messages-ctr': true }}>
             <rtk-button
               class="show-new-messages"
               kind="icon"
