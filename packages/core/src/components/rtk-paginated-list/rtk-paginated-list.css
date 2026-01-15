@@ -153,13 +153,13 @@ a {
 }
 
 .show-new-messages-ctr {
-  @apply pointer-events-none absolute bottom-2 right-2;
+  @apply absolute bottom-4 right-4;
   @apply z-10 -mt-14;
   @apply translate-y-28 opacity-0 transition;
 }
 
 .show-new-messages-ctr.active {
-  @apply translate-y-0 opacity-100;
+  @apply translate-y-0 cursor-pointer opacity-100;
 }
 
 .show-new-messages {

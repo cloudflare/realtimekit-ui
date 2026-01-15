@@ -111,11 +111,16 @@ export class RtkPaginatedList {
   @State() isLoadingBottom: boolean = false;
 
   /**
-   * Even when auto scroll is enabled, we only want to scroll if a new realtime message has arrived
+   * Even when auto scroll is enabled, we only want to scroll if a new realtime message has arrived.
    * This variable tells us if we should respect auto scroll after a new page has been loaded.
-   * It is also used by the manual scroll to bottom button.
+   * It is also used by the manual scroll to bottom button and the autoScroll prop.
    *  */
   private shouldScrollToBottom: boolean = false;
+
+  /** UI Indicator for "scroll to bottom" button.
+   * Toggles on when a new node is added and autoscroll is disabled.
+   * Toggles off when all nodes are loaded */
+  private showNewMessagesCTR: boolean = false;
 
   /**
    * Adds a new node to the beginning of the paginated list
@@ -142,6 +147,8 @@ export class RtkPaginatedList {
     if (this.autoScroll) {
       this.shouldScrollToBottom = true;
       this.scrollToBottom();
+    } else {
+      this.showNewMessagesCTR = true;
     }
   }
 
@@ -171,10 +178,12 @@ export class RtkPaginatedList {
   connectedCallback() {
     this.rerender = debounce(this.rerender.bind(this), 50, { maxWait: 200 });
     this.intersectionObserver = new IntersectionObserver((entries) => {
-      writeTask(() => {
+      writeTask(async () => {
         for (const entry of entries) {
           if (entry.target.id === 'top-scroll' && entry.isIntersecting) {
-            this.loadPrevPage();
+            this.isLoadingTop = true;
+            await this.loadPrevPage();
+            this.isLoadingTop = false;
           }
         }
       });
@@ -191,7 +200,9 @@ export class RtkPaginatedList {
          * or if there are pages to fill at the bottom (firstEmptyIndex > -1)
          */
         if (this.isAtBottom() && (this.maxTS > this.newTS || this.firstEmptyIndex > -1)) {
+          this.isLoadingBottom = true;
           await this.loadNextPage();
+          this.isLoadingBottom = false;
           if (this.shouldScrollToBottom) this.scrollToBottom();
         }
       };
@@ -204,6 +215,7 @@ export class RtkPaginatedList {
   };
 
   private async loadPrevPage() {
+    if (this.isLoading) return;
     /**
      * NOTE(ikabra): this case also runs on initial load
      * if scrolling up ->
@@ -216,10 +228,8 @@ export class RtkPaginatedList {
 
     // load data
     this.isLoading = true;
-    this.isLoadingTop = true;
     const data = await this.fetchData(this.oldTS - 1, this.pageSize, true);
     this.isLoading = false;
-    this.isLoadingTop = false;
 
     // no more old messages to show, we are at the top of the page
     if (!data.length) return;
@@ -244,21 +254,22 @@ export class RtkPaginatedList {
   }
 
   private async loadNextPage() {
+    if (this.isLoading) return;
     // new timestamp needs to be assigned by loadOld method
     if (!this.newTS) {
+      this.showNewMessagesCTR = false;
       this.shouldScrollToBottom = false;
       return;
     }
 
     // load data
     this.isLoading = true;
-    this.isLoadingBottom = true;
     const data = await this.fetchData(this.newTS + 1, this.pageSize, false);
     this.isLoading = false;
-    this.isLoadingBottom = false;
 
     // no more new messages to load
     if (!data.length) {
+      this.showNewMessagesCTR = false;
       this.shouldScrollToBottom = false;
       return;
     }
@@ -303,12 +314,16 @@ export class RtkPaginatedList {
     return (
       <Host>
         <div class="scrollbar container" part="container" ref={(el) => (this.$containerRef = el)}>
-          <div class={{ 'show-new-messages-ctr': true }}>
+          <div class={{ 'show-new-messages-ctr': true, active: this.showNewMessagesCTR }}>
             <rtk-button
               class="show-new-messages"
               kind="icon"
               variant="secondary"
               part="show-new-messages"
+              onClick={() => {
+                this.shouldScrollToBottom = true;
+                this.scrollToBottom();
+              }}
             >
               <rtk-icon icon={this.iconPack.chevron_down} />
             </rtk-button>
