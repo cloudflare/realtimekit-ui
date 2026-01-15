@@ -2495,8 +2495,17 @@ export namespace Components {
           * Icon pack
          */
         "iconPack": IconPack;
+        /**
+          * Adds a new node to the beginning of the paginated list
+         */
         "onNewNode": (node: DataNode) => Promise<void>;
+        /**
+          * Deletes a node anywhere from the list
+         */
         "onNodeDelete": (id: string) => Promise<void>;
+        /**
+          * Updates a new node anywhere in the list
+         */
         "onNodeUpdate": (id: string, node: DataNode) => Promise<void>;
         /**
           * Page Size

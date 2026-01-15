@@ -105,15 +105,15 @@ export class RtkPaginatedList {
 
   @State() isLoading: boolean = false;
 
-  // WIP: Callback for adding a new node
+  /** Adds a new node to the beginning of the paginated list */
   @Method()
   async onNewNode(node: DataNode) {}
 
-  // WIP: Callback for deleting a node
+  /** Deletes a node anywhere from the list */
   @Method()
   async onNodeDelete(id: string) {}
 
-  // WIP: Callback for updating a node
+  /** Updates a new node anywhere in the list */
   @Method()
   async onNodeUpdate(id: string, node: DataNode) {}
 

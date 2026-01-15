@@ -149,6 +149,7 @@ export class RtkChatMessagesUiPaginated {
   };
 
   private disconnectMeeting = (meeting) => {
+    meeting?.chat?.removeListener('chatUpdate', this.chatUpdateListener);
     this.meeting?.self.permissions.removeListener(
       'permissionsUpdate',
       this.permissionsUpdateListener
