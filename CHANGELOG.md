@@ -1,3 +1,11 @@
+# [1.1.0-staging.4](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.1.0-staging.3...@cloudflare/realtimekit-ui-v1.1.0-staging.4) (2026-01-15)
+
+
+### Bug Fixes
+
+* do not display avatar picture for pinned messages ([1439a46](https://github.com/cloudflare/realtimekit-ui/commit/1439a4639476c842212acd97d01a27d3306617cf))
+* show paginated messages on top ([861d67d](https://github.com/cloudflare/realtimekit-ui/commit/861d67dd4f41aff306b6f63d2458f3a8e6dc8037))
+
 # [1.1.0-staging.3](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.1.0-staging.2...@cloudflare/realtimekit-ui-v1.1.0-staging.3) (2026-01-14)
 
 
