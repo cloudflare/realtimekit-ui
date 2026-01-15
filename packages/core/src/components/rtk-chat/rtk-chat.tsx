@@ -613,36 +613,59 @@ export class RtkChat {
     return [everyone, ...participants];
   };
 
-  private onTogglePinnedMessages = () => {
-    this.showPinnedMessages = !this.showPinnedMessages;
+  private getPinnedMessageLabel = (message: Message) => {
+    if (message.type === 'text') return message.message;
+    if (message.type === 'image') return 'Image';
+    if (message.type === 'file') return 'File';
+    return '';
   };
 
   private renderPinnedMessagesHeader = () => {
     if (this.meeting.chat.pinned.length === 0) return null;
 
+    /**
+     * We do not display a picture against the avatar because the chatMessage API does not provide it.
+     */
     return (
-      <rtk-tooltip label={this.t('chat.toggle_pinned_msgs')}>
+      <div class="pinned-messages">
         <div
-          class={{ 'pinned-messages-header': true, active: this.showPinnedMessages }}
-          onClick={this.onTogglePinnedMessages}
+          class="pinned-messages-header"
+          onClick={() => (this.showPinnedMessages = !this.showPinnedMessages)}
         >
-          <rtk-icon icon={this.iconPack.pin} />
-          {this.t('chat.pinned_msgs')}
-          {` (${this.meeting.chat.pinned.length})`}
+          <div>
+            <rtk-icon icon={this.iconPack.pin} size="sm" />
+            {this.t('chat.pinned_msgs')}
+            {` (${this.meeting.chat.pinned.length})`}
+          </div>
+          <rtk-icon
+            icon={this.showPinnedMessages ? this.iconPack.chevron_up : this.iconPack.chevron_down}
+            size="sm"
+          />
         </div>
-      </rtk-tooltip>
+        {this.showPinnedMessages && (
+          <div class="pinned-messages-content">
+            {this.meeting.chat.pinned.map((message) => {
+              const label = this.getPinnedMessageLabel(message as Message);
+              return (
+                <div class="pinned-message">
+                  <rtk-avatar
+                    class="pinned-message-avatar"
+                    participant={{ name: message.displayName, picture: '' }}
+                    size="sm"
+                  />
+                  <span>{label.length > 20 ? `${label.substring(0, 20)}...` : label}</span>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
     );
   };
 
   render() {
     if (!this.meeting) {
       return null;
-    }
-
-    let chatMessages = this.chatGroups[this.selectedGroup] || [];
-
-    if (this.showPinnedMessages && this.meeting.chat.pinned.length !== 0) {
-      chatMessages = chatMessages.filter((chat) => chat.type === 'chat' && chat.message.pinned);
     }
 
     return (

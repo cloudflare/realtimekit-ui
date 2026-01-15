@@ -226,9 +226,10 @@ export class RtkChatMessagesUiPaginated {
     const isSelf = message.userId === this.meeting.self.userId;
     const viewType = isSelf ? 'outgoing' : 'incoming';
     return (
-      <div class={{ pinned: message.pinned }}>
+      <div>
         <div class="message-wrapper">
           <rtk-message-view
+            pinned={message.pinned}
             time={message.time}
             actions={this.getMessageActions(message)}
             authorName={message.displayName}
@@ -262,11 +263,6 @@ export class RtkChatMessagesUiPaginated {
                   ></rtk-image-message-view>
                 )}
               </div>
-              {message.pinned && (
-                <div class="pin-icon" part="pin-icon">
-                  <rtk-icon icon={this.iconPack.pin} size="sm" />
-                </div>
-              )}
             </div>
           </rtk-message-view>
         </div>
