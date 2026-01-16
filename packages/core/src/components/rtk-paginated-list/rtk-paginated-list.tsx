@@ -190,11 +190,11 @@ export class RtkPaginatedList {
 
   /**
    * Updates a new node anywhere in the list
-   * @param {string} id - The id of the node to update
-   * @param {DataNode} node - The updated data node
+   * @param {string} _id - The id of the node to update
+   * @param {DataNode} _node - The updated data node
    * */
   @Method()
-  async onNodeUpdate(id: string, node: DataNode) {}
+  async onNodeUpdate(_id: string, _node: DataNode) {}
 
   private rerender() {
     this.rerenderBoolean = !this.rerenderBoolean;

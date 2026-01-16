@@ -2521,10 +2521,10 @@ export namespace Components {
         "onNodeDelete": (id: string) => Promise<void>;
         /**
           * Updates a new node anywhere in the list
-          * @param id - The id of the node to update
-          * @param node - The updated data node
+          * @param _id - The id of the node to update
+          * @param _node - The updated data node
          */
-        "onNodeUpdate": (id: string, node: DataNode) => Promise<void>;
+        "onNodeUpdate": (_id: string, _node: DataNode) => Promise<void>;
         /**
           * Page Size
          */
