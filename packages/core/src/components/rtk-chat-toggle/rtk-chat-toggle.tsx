@@ -91,7 +91,7 @@ export class RtkChatToggle {
 
     const meetingStartedTimeMs = this.meeting.meta?.meetingStartedTimestamp.getTime() ?? 0;
     const newMessages = messages.filter((m) => m.timeMs > meetingStartedTimeMs);
-    if (newMessages.length === messages.length) {
+    if (newMessages.length === messages.length && messages.length > 0) {
       this.unreadMessageCount = 10;
     } else {
       this.unreadMessageCount = newMessages.length;
