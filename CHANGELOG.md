@@ -1,3 +1,27 @@
+# [1.1.0-staging.5](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.1.0-staging.4...@cloudflare/realtimekit-ui-v1.1.0-staging.5) (2026-01-16)
+
+
+### Bug Fixes
+
+* add loaders when fetching new pages ([b7f92a0](https://github.com/cloudflare/realtimekit-ui/commit/b7f92a0ad131be1e829322a65d83102ebb0b3355))
+* auto scroll when a new message arrives ([89d3342](https://github.com/cloudflare/realtimekit-ui/commit/89d33428a24bbca7e4b5f6cec88d96591791be4d))
+* broken contracts ([53c6a0a](https://github.com/cloudflare/realtimekit-ui/commit/53c6a0a6303a4fa6dee2127731ea953eec34fb0f))
+* cleanup chat listeners ([cdf2d07](https://github.com/cloudflare/realtimekit-ui/commit/cdf2d077f83345fde43bd570c78e8e85a8a1ddea))
+* comments ([95513e6](https://github.com/cloudflare/realtimekit-ui/commit/95513e6c9d1795e1eaca0a594d0fde2dc4a16c6c))
+* do not update badge if unread count is 0 ([6adc2b2](https://github.com/cloudflare/realtimekit-ui/commit/6adc2b25ba2a718d7d77695df2813b658bea7726))
+* improve experience when scrolling down too fast ([bb0c84f](https://github.com/cloudflare/realtimekit-ui/commit/bb0c84f16c44a84a7b43f46ba3057aa337735e8e))
+* infinite paginated scroll ([09b3ab4](https://github.com/cloudflare/realtimekit-ui/commit/09b3ab45e1da79235efd4a5ed8f4c69043daef4b))
+* infinite scroll for paginated chat ([1188480](https://github.com/cloudflare/realtimekit-ui/commit/118848014dd508ce4d820c2c852f1c5ce9193047))
+* infinite top scroll ([1a2b1dd](https://github.com/cloudflare/realtimekit-ui/commit/1a2b1dd6f768f3cbb59c54b506cdb68a2c814e89))
+* jsdocs ([368c36b](https://github.com/cloudflare/realtimekit-ui/commit/368c36b5f7156e8a16324b5cda2309fdda7a6eb9))
+* manage pagination states when a node is deleted ([438dfa6](https://github.com/cloudflare/realtimekit-ui/commit/438dfa60e5cf1f4122291220e20013688cf54775))
+* new message indicator ([b041958](https://github.com/cloudflare/realtimekit-ui/commit/b041958b9d8381115006716338846c38cc208b27))
+* render new messages ([642afdf](https://github.com/cloudflare/realtimekit-ui/commit/642afdfb0ed2ebbf71ad4ba0bb0f21a813b330c8))
+* revert breaking contracts for rtk-paginated-list ([6eb973d](https://github.com/cloudflare/realtimekit-ui/commit/6eb973d3af37fa8a35190f16130406f44fd505bc))
+* unread count for chat ([4661fe7](https://github.com/cloudflare/realtimekit-ui/commit/4661fe745ff7c2c59747fa6fe573527f3638d28e))
+* update jsdoc ([5f428dd](https://github.com/cloudflare/realtimekit-ui/commit/5f428dd2992b666c0338411b80221bbd1a519da0))
+* use a pagesize var instead of harcoding ([6e06373](https://github.com/cloudflare/realtimekit-ui/commit/6e0637302fb98cac7260e612c9f840f3b70d8de8))
+
 # [1.1.0-staging.4](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.1.0-staging.3...@cloudflare/realtimekit-ui-v1.1.0-staging.4) (2026-01-15)
 
 
