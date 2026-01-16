@@ -1,3 +1,11 @@
+# [1.1.0-staging.6](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.1.0-staging.5...@cloudflare/realtimekit-ui-v1.1.0-staging.6) (2026-01-16)
+
+
+### Bug Fixes
+
+* manage adding and deleting the first element to the page ([612d3c9](https://github.com/cloudflare/realtimekit-ui/commit/612d3c9cf0a5dedae56e0eff07e9869d7369c225))
+* use page size to determine unread count ([3481f3b](https://github.com/cloudflare/realtimekit-ui/commit/3481f3b634e5e10ff846c659ed4978d300c46f7a))
+
 # [1.1.0-staging.5](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.1.0-staging.4...@cloudflare/realtimekit-ui-v1.1.0-staging.5) (2026-01-16)
 
 
