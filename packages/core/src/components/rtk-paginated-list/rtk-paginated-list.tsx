@@ -133,14 +133,21 @@ export class RtkPaginatedList {
 
     // if we are at the bottom of the page
     if (this.firstEmptyIndex === -1) {
-      // append messages to the page if page has not reached full capacity
-      if (this.pages[0].length < this.pageSize) {
-        this.pages[0].unshift(node);
-        this.newTS = node.timeMs;
-        this.rerender();
+      // if there are no pages, load the first page
+      if (this.pages.length < 1) {
+        // update old timer to 1ms ahead of the latest message as we subtract this value to avoid loading duplicate messages when scrolling
+        this.oldTS = node.timeMs + 1;
+        this.loadPrevPage();
       } else {
-        // if page is at full capacity, load next page
-        this.loadNextPage();
+        // append messages to the page if page has not reached full capacity
+        if (this.pages[0].length < this.pageSize) {
+          this.pages[0].unshift(node);
+          this.newTS = node.timeMs;
+          this.rerender();
+        } else {
+          // if page is at full capacity, load next page
+          this.loadNextPage();
+        }
       }
     }
 
@@ -171,7 +178,11 @@ export class RtkPaginatedList {
       if (index !== -1) {
         // delete message
         this.pages[i].splice(index, 1);
-        if (i === this.firstEmptyIndex + 1) {
+        // if we are on the first page and it's now empty, we need to go back to initial state
+        if (i === 0 && this.pages[i].length === 0) {
+          this.pages.shift();
+          this.firstEmptyIndex = -1;
+        } else if (i === this.firstEmptyIndex + 1) {
           //  if newest page is empty, update first empty index
           if (this.pages[i].length === 0) this.firstEmptyIndex++;
           // update timestamp, first empty index could be -1, so we need to cap it at 0
