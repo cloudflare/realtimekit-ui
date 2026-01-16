@@ -56,6 +56,8 @@ export class RtkChatToggle {
 
   @State() canViewChat: boolean = false;
 
+  private pageSize: number = 11;
+
   connectedCallback() {
     this.meetingChanged(this.meeting);
     this.statesChanged(this.states);
@@ -87,12 +89,13 @@ export class RtkChatToggle {
   private async setUnreadMessageCount() {
     const chat = this.meeting.chat;
     if (!chat) return;
-    const { messages } = await chat.getMessages(new Date().getTime(), 11, true);
+    const { messages } = await chat.getMessages(new Date().getTime(), this.pageSize, true);
 
     const meetingStartedTimeMs = this.meeting.meta?.meetingStartedTimestamp.getTime() ?? 0;
     const newMessages = messages.filter((m) => m.timeMs > meetingStartedTimeMs);
     if (newMessages.length === messages.length && messages.length > 0) {
-      this.unreadMessageCount = 10;
+      // all messages are new, so we can't know the exact count, but we know there are at least pageSize - 1 new messages
+      this.unreadMessageCount = this.pageSize - 1;
     } else {
       this.unreadMessageCount = newMessages.length;
     }
@@ -146,7 +149,7 @@ export class RtkChatToggle {
       <Host title={this.t('chat')}>
         {this.unreadMessageCount !== 0 && !this.chatActive && (
           <div class="unread-count" part="unread-count">
-            <span>{this.unreadMessageCount <= 10 ? this.unreadMessageCount : '10+'}</span>
+            <span>{this.unreadMessageCount < this.pageSize ? this.unreadMessageCount : '10+'}</span>
           </div>
         )}
         <rtk-controlbar-button
