@@ -113,11 +113,11 @@ export class RtkPaginatedList {
   /**
    * Even when auto scroll is enabled, we only want to scroll if a new realtime message has arrived.
    * This variable tells us if we should respect auto scroll after a new page has been loaded.
-   * It is also used by the manual scroll to bottom button and the autoScroll prop.
+   * It is also used by the scroll to bottom button.
    *  */
   private shouldScrollToBottom: boolean = false;
 
-  /** UI Indicator for "scroll to bottom" button.
+  /** UI Indicator for the "scroll to bottom" button.
    * Toggles on when a new node is added and autoscroll is disabled.
    * Toggles off when all nodes are loaded */
   private showNewMessagesCTR: boolean = false;
@@ -128,9 +128,12 @@ export class RtkPaginatedList {
    */
   @Method()
   async onNewNode(node: DataNode) {
+    // Always update the maxTS. New messages will load on scroll till the end cursor (newTS) reaches this value.
+    this.maxTS = Math.max(this.maxTS, node.timeMs);
+
     // if we are at the bottom of the page
     if (this.firstEmptyIndex === -1) {
-      // just append messages to the page if page has not reached full capacity
+      // append messages to the page if page has not reached full capacity
       if (this.pages[0].length < this.pageSize) {
         this.pages[0].unshift(node);
         this.newTS = node.timeMs;
@@ -140,10 +143,8 @@ export class RtkPaginatedList {
         this.loadNextPage();
       }
     }
-    // Always update the maxTS. New messages will load automatically based on this setting.
-    this.maxTS = Math.max(this.maxTS, node.timeMs);
 
-    // If autoscroll is enabled this function will scroll to the bottom
+    // If autoscroll is enabled, this method will scroll to the bottom
     if (this.autoScroll) {
       this.shouldScrollToBottom = true;
       this.scrollToBottom();
@@ -152,6 +153,7 @@ export class RtkPaginatedList {
     }
   }
 
+  // this method is called recursively based on shouldScrollToBottom (see scrollEnd listener)
   private scrollToBottom() {
     this.$bottomRef.scrollIntoView({ behavior: 'smooth' });
   }
@@ -255,7 +257,7 @@ export class RtkPaginatedList {
 
   private async loadNextPage() {
     if (this.isLoading) return;
-    // new timestamp needs to be assigned by loadOld method
+    // new timestamp needs to be assigned by loadPrevPage method
     if (!this.newTS) {
       this.showNewMessagesCTR = false;
       this.shouldScrollToBottom = false;

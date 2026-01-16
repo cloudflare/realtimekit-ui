@@ -3,7 +3,6 @@ import { defaultIconPack, IconPack } from '../../lib/icons';
 import { RtkI18n, useLanguage } from '../../lib/lang';
 import { Meeting } from '../../types/rtk-client';
 import { Size, States } from '../../types/props';
-import { usePaginatedChat } from '../../utils/flags';
 import { canViewChat } from '../../utils/sidebar';
 import { SyncWithStore } from '../../utils/sync-with-store';
 import { ControlBarVariant } from '../rtk-controlbar-button/rtk-controlbar-button';
@@ -57,10 +56,7 @@ export class RtkChatToggle {
 
   @State() canViewChat: boolean = false;
 
-  /**
-   * Only used when paginated chat is enabled
-   */
-  @State() hasNewMessages: boolean = false;
+  private pageSize: number = 11;
 
   connectedCallback() {
     this.meetingChanged(this.meeting);
@@ -76,15 +72,9 @@ export class RtkChatToggle {
   @Watch('meeting')
   meetingChanged(meeting: Meeting) {
     if (!meeting) return;
-    meeting.chat?.getMessages(new Date().getTime(), 1, true).then((res) => {
-      if (res?.messages?.length) this.hasNewMessages = true;
-    });
-
-    const meetingStartedTimeMs = meeting.meta?.meetingStartedTimestamp.getTime() ?? 0;
-    const newMessages = meeting.chat?.messages.filter((m) => m.timeMs > meetingStartedTimeMs);
-    this.unreadMessageCount = newMessages.length || 0;
-    meeting.chat?.addListener('chatUpdate', this.onChatUpdate);
+    this.setUnreadMessageCount();
     this.canViewChat = canViewChat(meeting);
+    meeting.chat?.addListener('chatUpdate', this.onChatUpdate);
     meeting?.stage?.on('stageStatusUpdate', this.updateCanView);
     meeting?.self?.permissions.on('chatUpdate', this.updateCanView);
   }
@@ -96,24 +86,36 @@ export class RtkChatToggle {
     }
   }
 
+  private async setUnreadMessageCount() {
+    const chat = this.meeting.chat;
+    if (!chat) return;
+    const { messages } = await chat.getMessages(new Date().getTime(), this.pageSize, true);
+
+    const meetingStartedTimeMs = this.meeting.meta?.meetingStartedTimestamp.getTime() ?? 0;
+    const newMessages = messages.filter((m) => m.timeMs > meetingStartedTimeMs);
+    if (newMessages.length === messages.length && messages.length > 0) {
+      // all messages are new, so we can't know the exact count, but we know there are at least pageSize - 1 new messages
+      this.unreadMessageCount = this.pageSize - 1;
+    } else {
+      this.unreadMessageCount = newMessages.length;
+    }
+  }
+
   private onChatUpdate = ({ action, message }) => {
     if (this.chatActive) return;
 
     if (action === 'add' && message.userId !== this.meeting?.self.userId) {
-      this.hasNewMessages = true;
-      this.unreadMessageCount += 1;
+      if (this.unreadMessageCount <= 10) {
+        this.unreadMessageCount += 1;
+      }
     }
   };
-
-  /** Emits updated state data */
-  @Event({ eventName: 'rtkStateUpdate' }) stateUpdate: EventEmitter<States>;
 
   private toggleChat = () => {
     const states = this.states;
     this.chatActive = !(states?.activeSidebar && states?.sidebar === 'chat');
     if (this.chatActive) {
       this.unreadMessageCount = 0;
-      this.hasNewMessages = false;
     }
     this.stateUpdate.emit({
       activeSidebar: this.chatActive,
@@ -135,6 +137,9 @@ export class RtkChatToggle {
     }
   }
 
+  /** Emits updated state data */
+  @Event({ eventName: 'rtkStateUpdate' }) stateUpdate: EventEmitter<States>;
+
   private buttonEl: HTMLRtkControlbarButtonElement;
 
   render() {
@@ -142,14 +147,11 @@ export class RtkChatToggle {
     if (!this.canViewChat) return <Host data-hidden />;
     return (
       <Host title={this.t('chat')}>
-        {usePaginatedChat()
-          ? this.hasNewMessages && <div class="unread-count-dot" part="unread-count-dot"></div>
-          : this.unreadMessageCount !== 0 &&
-            !this.chatActive && (
-              <div class="unread-count" part="unread-count">
-                <span>{this.unreadMessageCount <= 100 ? this.unreadMessageCount : '99+'}</span>
-              </div>
-            )}
+        {this.unreadMessageCount !== 0 && !this.chatActive && (
+          <div class="unread-count" part="unread-count">
+            <span>{this.unreadMessageCount < this.pageSize ? this.unreadMessageCount : '10+'}</span>
+          </div>
+        )}
         <rtk-controlbar-button
           ref={(el) => (this.buttonEl = el)}
           part="controlbar-button"
