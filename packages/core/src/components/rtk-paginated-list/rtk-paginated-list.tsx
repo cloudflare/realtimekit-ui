@@ -163,7 +163,30 @@ export class RtkPaginatedList {
    * @param {string} id - The id of the node to delete
    * */
   @Method()
-  async onNodeDelete(id: string) {}
+  async onNodeDelete(id: string) {
+    // Iterate only over pages that have content (not empty)
+    for (let i = this.pages.length - 1; i > this.firstEmptyIndex; i--) {
+      const index = this.pages[i].findIndex((node) => node.id === id);
+      // message in view
+      if (index !== -1) {
+        // delete message
+        this.pages[i].splice(index, 1);
+        if (i === this.firstEmptyIndex + 1) {
+          //  if newest page is empty, update first empty index
+          if (this.pages[i].length === 0) this.firstEmptyIndex++;
+          // update timestamp, first empty index could be -1, so we need to cap it at 0
+          this.newTS = this.pages[Math.max(this.firstEmptyIndex, 0)][0].timeMs;
+        } else if (i === this.firstEmptyIndex + this.pagesAllowed) {
+          //  if oldest page is empty, remove it
+          if (this.pages[i].length === 0) this.pages.pop();
+          // update timestamp
+          const lastPage = this.pages[this.firstEmptyIndex + this.pagesAllowed];
+          this.oldTS = lastPage[lastPage.length - 1].timeMs;
+        }
+        this.rerender();
+      }
+    }
+  }
 
   /**
    * Updates a new node anywhere in the list
@@ -242,7 +265,16 @@ export class RtkPaginatedList {
     // clear old pages when we reach the limit
     if (this.pages.length > this.pagesAllowed) {
       this.pages[this.pages.length - this.pagesAllowed - 1] = [];
-      this.firstEmptyIndex = this.pages.length - this.pagesAllowed - 1;
+      /**
+       * find last non empty page in range (this.pages.length, this.firstEmptyIndex)
+       * we are doing this because any of the middle pages in the currently rendered pages
+       * could be empty as we allow deleting messages.
+       * This helps us set the first empty index correctly.
+       */
+      for (let i = this.firstEmptyIndex + 1; i < this.pages.length; i++) {
+        if (this.pages[i].length > 0) break;
+        this.firstEmptyIndex = i;
+      }
     }
 
     // update the old timestamp
@@ -273,6 +305,9 @@ export class RtkPaginatedList {
     if (!data.length) {
       this.showNewMessagesCTR = false;
       this.shouldScrollToBottom = false;
+      // remove extra pages from the start if any (could be due to users deleting messages)
+      this.pages = this.pages.filter((page) => page.length > 0);
+      this.firstEmptyIndex = -1;
       return;
     }
 
@@ -291,6 +326,12 @@ export class RtkPaginatedList {
     // smallest value for firstEmptyIndex can be -1, so we cap the index at 0
     this.newTS = this.pages[Math.max(0, this.firstEmptyIndex)][0].timeMs;
 
+    // remove all empty pages from the end
+    for (let i = this.pages.length - 1; i > this.firstEmptyIndex; i--) {
+      if (this.pages[i].length > 0) break;
+      // if page is empty, remove it
+      this.pages.pop();
+    }
     // update the old timestamp
     const lastPage = this.pages[this.pages.length - 1];
     this.oldTS = (lastPage[lastPage.length - 1] as any).timeMs;
