@@ -2510,17 +2510,21 @@ export namespace Components {
          */
         "iconPack": IconPack;
         /**
-          * On a new node created
+          * Adds a new node to the beginning of the paginated list
+          * @param node - The data node to add to the beginning of the list
          */
         "onNewNode": (node: DataNode) => Promise<void>;
         /**
-          * On node deleted
+          * Deletes a node anywhere from the list
+          * @param id - The id of the node to delete
          */
-        "onNodeDelete": (key: string) => Promise<void>;
+        "onNodeDelete": (id: string) => Promise<void>;
         /**
-          * On node updated
+          * Updates a new node anywhere in the list
+          * @param id - The id of the node to update
+          * @param node - The updated data node
          */
-        "onNodeUpdate": (key: string, newItem: DataNode) => Promise<void>;
+        "onNodeUpdate": (id: string, node: DataNode) => Promise<void>;
         /**
           * Page Size
          */
