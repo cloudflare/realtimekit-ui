@@ -623,9 +623,7 @@ export class RtkChat {
   private renderPinnedMessagesHeader = () => {
     if (this.meeting.chat.pinned.length === 0) return null;
 
-    /**
-     * We do not display a picture against the avatar because the chatMessage API does not provide it.
-     */
+    // We do not display a picture against the avatar because the chatMessage API does not provide it.
     return (
       <div class="pinned-messages">
         <div
@@ -664,9 +662,7 @@ export class RtkChat {
   };
 
   render() {
-    if (!this.meeting) {
-      return null;
-    }
+    if (!this.meeting) return null;
 
     return (
       <Host>
