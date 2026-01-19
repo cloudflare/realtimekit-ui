@@ -95,7 +95,7 @@ export class RtkChatToggle {
     const newMessages = messages.filter((m) => m.timeMs > meetingStartedTimeMs);
     if (newMessages.length === this.pageSize && newMessages.length > 0) {
       // all messages are new, so we can't know the exact count, but we know there are at least pageSize - 1 new messages
-      this.unreadMessageCount = this.pageSize - 1;
+      this.unreadMessageCount = newMessages.length;
     } else {
       this.unreadMessageCount = newMessages.length;
     }
