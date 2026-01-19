@@ -57,11 +57,17 @@ export class RtkPaginatedList {
 
   private newTS;
 
-  /** Page Size */
-  @Prop() pageSize: number;
-
   // the length of pages will always be pageSize + 2
   private pages: any[][] = [];
+
+  // Controls whether to keep auto-scrolling when a new page load.
+  private shouldScrollToBottom: boolean = false;
+
+  // Shows "scroll to bottom" button when new nodes arrive and autoscroll is off.
+  private showNewMessagesCTR: boolean = false;
+
+  /** Page Size */
+  @Prop() pageSize: number;
 
   /**
    * Number of pages allowed to be shown
@@ -83,10 +89,6 @@ export class RtkPaginatedList {
   /** auto scroll list to bottom */
   @Prop() autoScroll: boolean;
 
-  @State() rerenderBoolean: boolean = false;
-
-  @State() showEmptyListLabel = false;
-
   /** Icon pack */
   @SyncWithStore()
   @Prop()
@@ -97,17 +99,15 @@ export class RtkPaginatedList {
   @Prop()
   t: RtkI18n = useLanguage();
 
+  @State() rerenderBoolean: boolean = false;
+
+  @State() showEmptyListLabel = false;
+
   @State() isLoading: boolean = false;
 
   @State() isLoadingTop: boolean = false;
 
   @State() isLoadingBottom: boolean = false;
-
-  // Controls whether to keep auto-scrolling when a new page load.
-  private shouldScrollToBottom: boolean = false;
-
-  // Shows "scroll to bottom" button when new nodes arrive and autoscroll is off.
-  private showNewMessagesCTR: boolean = false;
 
   /**
    * Adds a new node to the beginning of the paginated list
@@ -117,7 +117,6 @@ export class RtkPaginatedList {
   async onNewNode(node: DataNode) {
     // if there are no pages, load the first page
     if (this.pages.length < 1) {
-      // update old timer to 1ms ahead of the latest message as we subtract this value to avoid loading duplicate messages when scrolling
       this.oldTS = node.timeMs + 1;
       this.loadPrevPage();
     } else {
@@ -132,20 +131,11 @@ export class RtkPaginatedList {
       }
     }
 
-    // If autoscroll is enabled, this method will scroll to the bottom
+    // If autoscroll is enabled, scroll to the bottom
     if (this.autoScroll) {
       this.shouldScrollToBottom = true;
       this.scrollToBottom();
     }
-  }
-
-  // this method is called recursively based on shouldScrollToBottom (see scrollEnd listener)
-  private scrollToBottom() {
-    this.$bottomRef.scrollIntoView({ behavior: 'smooth' });
-  }
-
-  private waitForNextFrame() {
-    return new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
   }
 
   /**
@@ -154,7 +144,6 @@ export class RtkPaginatedList {
    * */
   @Method()
   async onNodeDelete(id: string) {
-    // Iterate only over pages
     let didDelete = false;
     for (let i = this.pages.length - 1; i >= 0; i--) {
       const index = this.pages[i].findIndex((node) => node.id === id);
@@ -188,75 +177,6 @@ export class RtkPaginatedList {
   // Tells us if we need to scroll to a specific anchor after a rerender
   private pendingScrollAnchor: ScrollAnchor | null = null;
 
-  // Find the element that is closest to the top of the container
-  private getScrollAnchor(edge: ScrollAnchorEdge = 'top') {
-    if (!this.$containerRef) return null;
-
-    const containerRect = this.$containerRef.getBoundingClientRect();
-    const candidates = Array.from(this.$containerRef.querySelectorAll<HTMLElement>('[id]')).filter(
-      (el) => el.id !== 'top-scroll' && el.id !== 'bottom-scroll'
-    );
-
-    let best: ScrollAnchor | null = null;
-    for (const el of candidates) {
-      const rect = el.getBoundingClientRect();
-      const isVisibleInContainer =
-        rect.bottom > containerRect.top && rect.top < containerRect.bottom;
-      if (!isVisibleInContainer) continue;
-
-      if (edge === 'top') {
-        const offsetTop = rect.top - containerRect.top;
-        if (best == null || (best.edge === 'top' && offsetTop < best.offsetTop)) {
-          best = { id: el.id, edge: 'top', offsetTop };
-        }
-      } else {
-        const offsetBottom = containerRect.bottom - rect.bottom;
-        if (best == null || (best.edge === 'bottom' && offsetBottom < best.offsetBottom)) {
-          best = { id: el.id, edge: 'bottom', offsetBottom };
-        }
-      }
-    }
-    return best;
-  }
-
-  //instant scroll to anchor to make sure we are at the same position after a rerender
-  private restoreScrollToAnchor(anchor: ScrollAnchor) {
-    if (!this.$containerRef) return;
-
-    // turn element id into something safe to use inside a CSS selector
-    const escapeId = (id: string) => {
-      const cssEscape = (globalThis as any).CSS?.escape;
-      return typeof cssEscape === 'function'
-        ? cssEscape(id)
-        : id.replace(/[^a-zA-Z0-9_-]/g, '\\$&');
-    };
-
-    const el = this.$containerRef.querySelector<HTMLElement>(`#${escapeId(anchor.id)}`);
-    if (!el) return;
-
-    const containerRect = this.$containerRef.getBoundingClientRect();
-    const rect = el.getBoundingClientRect();
-
-    if (anchor.edge === 'top') {
-      const newOffsetTop = rect.top - containerRect.top;
-      this.$containerRef.scrollTop += newOffsetTop - anchor.offsetTop;
-    } else {
-      const newOffsetBottom = containerRect.bottom - rect.bottom;
-      this.$containerRef.scrollTop += anchor.offsetBottom - newOffsetBottom;
-    }
-  }
-
-  componentDidRender() {
-    if (!this.pendingScrollAnchor) return;
-    const anchor = this.pendingScrollAnchor;
-    this.pendingScrollAnchor = null;
-    this.restoreScrollToAnchor(anchor);
-  }
-
-  private rerender() {
-    this.rerenderBoolean = !this.rerenderBoolean;
-  }
-
   connectedCallback() {
     this.rerender = debounce(this.rerender.bind(this), 50, { maxWait: 200 });
   }
@@ -269,7 +189,6 @@ export class RtkPaginatedList {
       this.$containerRef.onscrollend = async () => {
         if (this.isInView(this.$bottomRef)) {
           await this.loadNextPage();
-          if (this.shouldScrollToBottom) this.scrollToBottom();
         } else if (this.isInView(this.$topRef)) {
           this.showNewMessagesCTR = true;
           await this.loadPrevPage();
@@ -278,10 +197,16 @@ export class RtkPaginatedList {
     }
   }
 
+  componentDidRender() {
+    if (!this.pendingScrollAnchor) return;
+    const anchor = this.pendingScrollAnchor;
+    this.pendingScrollAnchor = null;
+    this.restoreScrollToAnchor(anchor);
+  }
+
   private async loadPrevPage() {
     if (this.isLoading) return;
 
-    // element visible closest to the top
     const scrollAnchor = this.getScrollAnchor('top');
 
     // if no old timestamp, it means we are at initial state
@@ -376,10 +301,81 @@ export class RtkPaginatedList {
     }
   }
 
+  // Find the element that is closest to the top/bottom of the container
+  private getScrollAnchor(edge: ScrollAnchorEdge = 'top') {
+    if (!this.$containerRef) return null;
+
+    const containerRect = this.$containerRef.getBoundingClientRect();
+    const candidates = Array.from(this.$containerRef.querySelectorAll<HTMLElement>('[id]')).filter(
+      (el) => el.id !== 'top-scroll' && el.id !== 'bottom-scroll'
+    );
+
+    let best: ScrollAnchor | null = null;
+    for (const el of candidates) {
+      const rect = el.getBoundingClientRect();
+      const isVisibleInContainer =
+        rect.bottom > containerRect.top && rect.top < containerRect.bottom;
+      if (!isVisibleInContainer) continue;
+
+      if (edge === 'top') {
+        const offsetTop = rect.top - containerRect.top;
+        if (best == null || (best.edge === 'top' && offsetTop < best.offsetTop)) {
+          best = { id: el.id, edge: 'top', offsetTop };
+        }
+      } else {
+        const offsetBottom = containerRect.bottom - rect.bottom;
+        if (best == null || (best.edge === 'bottom' && offsetBottom < best.offsetBottom)) {
+          best = { id: el.id, edge: 'bottom', offsetBottom };
+        }
+      }
+    }
+    return best;
+  }
+
+  //instant scroll to anchor to make sure we are at the same position after a rerender
+  private restoreScrollToAnchor(anchor: ScrollAnchor) {
+    if (!this.$containerRef) return;
+
+    // make element id safe to use inside a CSS selector
+    const escapeId = (id: string) => {
+      const cssEscape = (globalThis as any).CSS?.escape;
+      return typeof cssEscape === 'function'
+        ? cssEscape(id)
+        : id.replace(/[^a-zA-Z0-9_-]/g, '\\$&');
+    };
+
+    const el = this.$containerRef.querySelector<HTMLElement>(`#${escapeId(anchor.id)}`);
+    if (!el) return;
+
+    const containerRect = this.$containerRef.getBoundingClientRect();
+    const rect = el.getBoundingClientRect();
+
+    if (anchor.edge === 'top') {
+      const newOffsetTop = rect.top - containerRect.top;
+      this.$containerRef.scrollTop += newOffsetTop - anchor.offsetTop;
+    } else {
+      const newOffsetBottom = containerRect.bottom - rect.bottom;
+      this.$containerRef.scrollTop += anchor.offsetBottom - newOffsetBottom;
+    }
+  }
+
   private isInView = (el: HTMLDivElement) => {
     const rect = el.getBoundingClientRect();
     return rect.top >= 0 && rect.bottom <= window.innerHeight;
   };
+
+  // this method is called recursively based on shouldScrollToBottom (see loadNextPage)
+  private scrollToBottom() {
+    this.$bottomRef.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  private waitForNextFrame() {
+    return new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+  }
+
+  private rerender() {
+    this.rerenderBoolean = !this.rerenderBoolean;
+  }
 
   render() {
     /**
