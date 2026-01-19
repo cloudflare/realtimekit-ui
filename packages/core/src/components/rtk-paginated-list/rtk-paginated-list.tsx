@@ -282,9 +282,6 @@ export class RtkPaginatedList {
       this.oldTS = (lastPage[lastPage.length - 1] as any).timeMs;
       this.newTS = this.pages[0][0].timeMs;
 
-      // when scrolling too fast, scroll a bit to the top for better ux
-      if (this.$containerRef.scrollTop === 0) this.$containerRef.scrollTop = -60;
-
       this.rerender();
       this.pendingScrollAnchor = scrollAnchor;
 
