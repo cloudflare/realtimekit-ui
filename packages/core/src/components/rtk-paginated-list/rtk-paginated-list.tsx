@@ -124,6 +124,7 @@ export class RtkPaginatedList {
       this.newTS = node.timeMs;
       this.maxTS = node.timeMs;
       this.rerender();
+      if (this.autoScroll) this.$bottomRef.scrollIntoView({ behavior: 'smooth' });
     } else if (this.maxTS === this.newTS) {
       this.maxTS = node.timeMs;
       // append messages to the page if page has not reached full capacity
@@ -143,6 +144,9 @@ export class RtkPaginatedList {
         this.newTS = this.pages[0][0].timeMs;
         this.rerender();
       }
+      if (this.autoScroll) this.$bottomRef.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      if (this.autoScroll) this.scrollToBottom();
     }
     this.pendingScrollAnchor = null;
   }
@@ -203,6 +207,9 @@ export class RtkPaginatedList {
     this.loadPrevPage();
     if (this.$containerRef) {
       this.$containerRef.onscrollend = async () => {
+        // do not do anything if we are scrolling to bottom
+        if (this.shouldScrollToBottom) return;
+        // handle top and bottom scroll
         if (this.isInView(this.$bottomRef)) {
           await this.loadNextPage();
         } else if (this.isInView(this.$topRef)) {
@@ -257,13 +264,12 @@ export class RtkPaginatedList {
   }
 
   private async loadNextPage() {
-    if (this.isLoading) return;
+    if (this.isLoading) return [];
 
     // Do nothing. New timestamp needs to be assigned by loadPrevPage method
     if (!this.newTS) {
       this.showNewMessagesCTR = false;
-      this.shouldScrollToBottom = false;
-      return;
+      return [];
     }
 
     this.isLoading = true;
@@ -279,12 +285,25 @@ export class RtkPaginatedList {
     if (!data.length) {
       this.maxTS = this.newTS;
       this.showNewMessagesCTR = false;
-      this.shouldScrollToBottom = false;
-      return;
+      return [];
     }
 
     // load new messages and append to the start
-    this.pages.unshift(data.reverse());
+    const incoming = [...data].reverse();
+
+    if (this.pages.length === 0) this.pages.unshift([]);
+
+    const firstPage = this.pages[0];
+    const spaceInFirstPage = this.pageSize - firstPage.length;
+
+    if (spaceInFirstPage > 0) {
+      const toFill = incoming.splice(0, spaceInFirstPage);
+      firstPage.unshift(...toFill);
+    }
+
+    while (incoming.length > 0) {
+      this.pages.unshift(incoming.splice(0, this.pageSize));
+    }
 
     // remove pages if out of bounds
     if (this.pages.length > this.pagesAllowed) this.pages.pop();
@@ -296,6 +315,8 @@ export class RtkPaginatedList {
 
     this.rerender();
     this.pendingScrollAnchor = scrollAnchor;
+
+    return data;
   }
 
   // Find the element that is closest to the top/bottom of the container
@@ -362,8 +383,13 @@ export class RtkPaginatedList {
   };
 
   // this method is called recursively based on shouldScrollToBottom (see loadNextPage)
-  private scrollToBottom() {
-    this.$bottomRef.scrollIntoView({ behavior: 'smooth' });
+  private async scrollToBottom() {
+    this.shouldScrollToBottom = true;
+    while (this.shouldScrollToBottom) {
+      const response = await this.loadNextPage();
+      this.$bottomRef.scrollIntoView({ behavior: 'smooth' });
+      if (response.length === 0) this.shouldScrollToBottom = false;
+    }
   }
 
   private rerender() {
@@ -384,7 +410,6 @@ export class RtkPaginatedList {
               variant="secondary"
               part="show-new-messages"
               onClick={() => {
-                this.shouldScrollToBottom = true;
                 this.scrollToBottom();
               }}
             >
