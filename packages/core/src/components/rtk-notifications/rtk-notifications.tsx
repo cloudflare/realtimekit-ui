@@ -240,7 +240,9 @@ export class RtkNotifications {
       this.remove(`${participant.id}-joined-waitlist`);
     };
 
-    this.chatUpdateListener = ({ message }) => {
+    this.chatUpdateListener = ({ message, action }) => {
+      // NOTE(ikabra): we only want notifications for new messages
+      if (action !== 'add') return;
       const parsedMessage = parseMessageForTarget(message);
       if (parsedMessage != null) {
         if (parsedMessage.userId === meeting.self.userId) {

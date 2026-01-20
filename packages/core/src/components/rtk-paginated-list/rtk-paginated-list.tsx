@@ -1,33 +1,31 @@
 /**
- * HOW INFINITE SCROLL WORKS:
+ * NOTE(ikabra): INFINITE SCROLL IMPLEMENTATION:
  *
- * We use intersectionObserver to scroll up.
- * We use scrollEnd listener to scroll down.
+ * Uses scrollend listener for 2way scrolling.
+ * Empty divs ($topRef, $bottomRef) act as scroll triggers to fetch new messages.
  *
- * Why?
- * intersectionObserver doesn't work reliably for 2 way scrolling but has great ux,
- * so we use it to smoothly scroll up.
+ * UPWARD SCROLLING:
+ * - Fetch top anchor (element currently visible to the user near top)
+ * - Fetch older messages, push to end of 2D array
+ * - When exceeding pagesAllowed, delete pages and scroll back to anchor
  *
- * We have empty divs at the top and bottom ($topRef, $bottomRef)
- * which act as triggers to tell that we have reached the top or end of our messages and need to fetch new messages,
+ * DOWNWARD SCROLLING:
+ * - Fetch bottom anchor (element currently visible to the user near bottom)
+ * - Fetch new page, insert at the start
+ * - Update timestamps & firstEmptyIndex, then rerender
+ * - When exceeding pagesAllowed, delete pages and scroll back to anchor
  *
- * When scrolling up, we can't remove pages as intersectionObserver relies on
- * the index of dom elements to work properly.
- * So instead, we fetch older messages and push them to the end of the 2d array
- * if length exceeds pagesAllowed, we free up the pages and keep the first empty index in memory (firstEmptyIndex).
+ * ADDING NEW NODES:
+ * - If no pages exist, load old page
+ * - If on 1st page, append messages till page size is full and then load new page
  *
- * For scrolling down, when scroll ends we see if the bottomRef is in view.
- * If yes, we fetch the new page and insert it at the firstEmptyIndex.
- * We update timestamps & firstEmptyIndex, then we rerender.
- *
- * If we have exceeded our page allowance we delete old pages.
- *
- * In this case deleting pages is okay as we are not relying on the index of dom elements to detect page end.
- *
- * This also simplifies the code because when a user scrolls up we do not need to manage a lastEmptyIndex.
+ * DELETE NODE:
+ * - If deleting the only available node, reset to initial state
+ * - If page is empty, delete it
+ * - Update timestamp curors
  */
 
-import { Component, Host, h, VNode, Prop, writeTask, State, Method } from '@stencil/core';
+import { Component, Host, h, VNode, Prop, State, Method } from '@stencil/core';
 import { defaultIconPack, IconPack } from '../../lib/icons';
 import { RtkI18n, useLanguage } from '../../lib/lang';
 import { SyncWithStore } from '../../utils/sync-with-store';
@@ -37,38 +35,39 @@ export interface DataNode {
   [key: string]: any;
 }
 
+type ScrollAnchorEdge = 'top' | 'bottom';
+
+type ScrollAnchor =
+  | { id: string; edge: 'top'; offsetTop: number }
+  | { id: string; edge: 'bottom'; offsetBottom: number };
+
 @Component({
   tag: 'rtk-paginated-list',
   styleUrl: 'rtk-paginated-list.css',
   shadow: true,
 })
 export class RtkPaginatedList {
-  private intersectionObserver: IntersectionObserver;
-
   private $containerRef: HTMLDivElement;
 
   private $topRef: HTMLDivElement;
 
   private $bottomRef: HTMLDivElement;
 
-  /**
-   * when scrolling up, we can't remove pages as intersectionObserver relies on
-   * the index of dom elements to stay stable.
-   * So, instead we free up the pages and keep the last empty index in memory.
-   */
-  private firstEmptyIndex: number = -1;
-
   private oldTS;
 
   private newTS;
 
-  private maxTS = 0;
+  // the length of pages will always be pageSize + 2
+  private pages: any[][] = [];
+
+  // Controls whether to keep auto-scrolling when a new page load.
+  private shouldScrollToBottom: boolean = false;
+
+  // Shows "scroll to bottom" button when new nodes arrive and autoscroll is off.
+  private showNewMessagesCTR: boolean = false;
 
   /** Page Size */
   @Prop() pageSize: number;
-
-  // the length of pages will always be pageSize + 2
-  private pages: any[][] = [];
 
   /**
    * Number of pages allowed to be shown
@@ -90,10 +89,6 @@ export class RtkPaginatedList {
   /** auto scroll list to bottom */
   @Prop() autoScroll: boolean;
 
-  @State() rerenderBoolean: boolean = false;
-
-  @State() showEmptyListLabel = false;
-
   /** Icon pack */
   @SyncWithStore()
   @Prop()
@@ -104,6 +99,10 @@ export class RtkPaginatedList {
   @Prop()
   t: RtkI18n = useLanguage();
 
+  @State() rerenderBoolean: boolean = false;
+
+  @State() showEmptyListLabel = false;
+
   @State() isLoading: boolean = false;
 
   @State() isLoadingTop: boolean = false;
@@ -111,58 +110,32 @@ export class RtkPaginatedList {
   @State() isLoadingBottom: boolean = false;
 
   /**
-   * Even when auto scroll is enabled, we only want to scroll if a new realtime message has arrived.
-   * This variable tells us if we should respect auto scroll after a new page has been loaded.
-   * It is also used by the scroll to bottom button.
-   *  */
-  private shouldScrollToBottom: boolean = false;
-
-  /** UI Indicator for the "scroll to bottom" button.
-   * Toggles on when a new node is added and autoscroll is disabled.
-   * Toggles off when all nodes are loaded */
-  private showNewMessagesCTR: boolean = false;
-
-  /**
    * Adds a new node to the beginning of the paginated list
    * @param {DataNode} node - The data node to add to the beginning of the list
    */
   @Method()
   async onNewNode(node: DataNode) {
-    // Always update the maxTS. New messages will load on scroll till the end cursor (newTS) reaches this value.
-    this.maxTS = Math.max(this.maxTS, node.timeMs);
-
-    // if we are at the bottom of the page
-    if (this.firstEmptyIndex === -1) {
-      // if there are no pages, load the first page
-      if (this.pages.length < 1) {
-        // update old timer to 1ms ahead of the latest message as we subtract this value to avoid loading duplicate messages when scrolling
-        this.oldTS = node.timeMs + 1;
-        this.loadPrevPage();
+    // if there are no pages, load the first page
+    if (this.pages.length < 1) {
+      this.oldTS = node.timeMs + 1;
+      this.loadPrevPage();
+    } else {
+      // append messages to the page if page has not reached full capacity
+      if (this.pages[0].length < this.pageSize) {
+        this.pages[0].unshift(node);
+        this.newTS = node.timeMs;
+        this.rerender();
       } else {
-        // append messages to the page if page has not reached full capacity
-        if (this.pages[0].length < this.pageSize) {
-          this.pages[0].unshift(node);
-          this.newTS = node.timeMs;
-          this.rerender();
-        } else {
-          // if page is at full capacity, load next page
-          this.loadNextPage();
-        }
+        // if page is at full capacity, load next page
+        this.loadNextPage();
       }
     }
 
-    // If autoscroll is enabled, this method will scroll to the bottom
+    // If autoscroll is enabled, scroll to the bottom
     if (this.autoScroll) {
       this.shouldScrollToBottom = true;
       this.scrollToBottom();
-    } else {
-      this.showNewMessagesCTR = true;
     }
-  }
-
-  // this method is called recursively based on shouldScrollToBottom (see scrollEnd listener)
-  private scrollToBottom() {
-    this.$bottomRef.scrollIntoView({ behavior: 'smooth' });
   }
 
   /**
@@ -171,32 +144,26 @@ export class RtkPaginatedList {
    * */
   @Method()
   async onNodeDelete(id: string) {
-    // Iterate only over pages that have content (not empty)
-    for (let i = this.pages.length - 1; i > this.firstEmptyIndex; i--) {
+    let didDelete = false;
+    for (let i = this.pages.length - 1; i >= 0; i--) {
       const index = this.pages[i].findIndex((node) => node.id === id);
-      // message in view
-      if (index !== -1) {
-        // delete message
-        this.pages[i].splice(index, 1);
-        // if we are on the first page and it's now empty, we need to go back to initial state
-        if (i === 0 && this.pages[i].length === 0) {
-          this.pages.shift();
-          this.firstEmptyIndex = -1;
-        } else if (i === this.firstEmptyIndex + 1) {
-          //  if newest page is empty, update first empty index
-          if (this.pages[i].length === 0) this.firstEmptyIndex++;
-          // update timestamp, first empty index could be -1, so we need to cap it at 0
-          this.newTS = this.pages[Math.max(this.firstEmptyIndex, 0)][0].timeMs;
-        } else if (i === this.firstEmptyIndex + this.pagesAllowed) {
-          //  if oldest page is empty, remove it
-          if (this.pages[i].length === 0) this.pages.pop();
-          // update timestamp
-          const lastPage = this.pages[this.firstEmptyIndex + this.pagesAllowed];
-          this.oldTS = lastPage[lastPage.length - 1].timeMs;
-        }
-        this.rerender();
-      }
+      // if message not found, move on
+      if (index === -1) continue;
+      // delete message
+      this.pages[i].splice(index, 1);
+      // if page is empty, delete it
+      if (this.pages[i].length === 0) this.pages.splice(i, 1);
+      didDelete = true;
+      break;
     }
+
+    if (!didDelete) return;
+    // update timestamps
+    const firstPage = this.pages[0];
+    const lastPage = this.pages[this.pages.length - 1];
+    this.newTS = firstPage?.[0]?.timeMs;
+    this.oldTS = lastPage?.[lastPage.length - 1]?.timeMs;
+    this.rerender();
   }
 
   /**
@@ -207,65 +174,50 @@ export class RtkPaginatedList {
   @Method()
   async onNodeUpdate(_id: string, _node: DataNode) {}
 
-  private rerender() {
-    this.rerenderBoolean = !this.rerenderBoolean;
-  }
+  // Tells us if we need to scroll to a specific anchor after a rerender
+  private pendingScrollAnchor: ScrollAnchor | null = null;
 
   connectedCallback() {
     this.rerender = debounce(this.rerender.bind(this), 50, { maxWait: 200 });
-    this.intersectionObserver = new IntersectionObserver((entries) => {
-      writeTask(async () => {
-        for (const entry of entries) {
-          if (entry.target.id === 'top-scroll' && entry.isIntersecting) {
-            this.isLoadingTop = true;
-            await this.loadPrevPage();
-            this.isLoadingTop = false;
-          }
-        }
-      });
-    });
   }
 
   componentDidLoad() {
-    this.observe(this.$topRef);
+    // initial load
+    this.loadPrevPage();
+
     if (this.$containerRef) {
       this.$containerRef.onscrollend = async () => {
-        /**
-         * Load new page if:
-         * if there are nodes to load at the bottom (maxTS > newTS)
-         * or if there are pages to fill at the bottom (firstEmptyIndex > -1)
-         */
-        if (this.isAtBottom() && (this.maxTS > this.newTS || this.firstEmptyIndex > -1)) {
-          this.isLoadingBottom = true;
+        if (this.isInView(this.$bottomRef)) {
           await this.loadNextPage();
-          this.isLoadingBottom = false;
-          if (this.shouldScrollToBottom) this.scrollToBottom();
+        } else if (this.isInView(this.$topRef)) {
+          this.showNewMessagesCTR = true;
+          await this.loadPrevPage();
         }
       };
     }
   }
 
-  private observe = (el: HTMLElement) => {
-    if (!el) return;
-    this.intersectionObserver.observe(el);
-  };
+  componentDidRender() {
+    if (!this.pendingScrollAnchor) return;
+    const anchor = this.pendingScrollAnchor;
+    this.pendingScrollAnchor = null;
+    this.restoreScrollToAnchor(anchor);
+  }
 
   private async loadPrevPage() {
     if (this.isLoading) return;
-    /**
-     * NOTE(ikabra): this case also runs on initial load
-     * if scrolling up ->
-     * fetch older messages and push to the end of the array
-     * cleanup 1st non empty page from the array if length exceeds pagesAllowed
-     */
+
+    const scrollAnchor = this.getScrollAnchor('top');
 
     // if no old timestamp, it means we are at initial state
     if (!this.oldTS) this.oldTS = new Date().getTime();
 
     // load data
     this.isLoading = true;
+    this.isLoadingTop = true;
     const data = await this.fetchData(this.oldTS - 1, this.pageSize, true);
     this.isLoading = false;
+    this.isLoadingTop = false;
 
     // no more old messages to show, we are at the top of the page
     if (!data.length) return;
@@ -274,96 +226,157 @@ export class RtkPaginatedList {
     this.pages.push(data);
 
     // clear old pages when we reach the limit
-    if (this.pages.length > this.pagesAllowed) {
-      this.pages[this.pages.length - this.pagesAllowed - 1] = [];
-      /**
-       * find last non empty page in range (this.pages.length, this.firstEmptyIndex)
-       * we are doing this because any of the middle pages in the currently rendered pages
-       * could be empty as we allow deleting messages.
-       * This helps us set the first empty index correctly.
-       */
-      for (let i = this.firstEmptyIndex + 1; i < this.pages.length; i++) {
-        if (this.pages[i].length > 0) break;
-        this.firstEmptyIndex = i;
-      }
-    }
+    if (this.pages.length > this.pagesAllowed) this.pages.shift();
 
-    // update the old timestamp
+    // update timestamps
     const lastPage = this.pages[this.pages.length - 1];
     this.oldTS = (lastPage[lastPage.length - 1] as any).timeMs;
-
-    // update the new timestamp
-    this.newTS = this.pages[this.firstEmptyIndex + 1][0].timeMs;
+    this.newTS = this.pages[0][0].timeMs;
 
     this.rerender();
+
+    // fix scroll position
+    if (scrollAnchor) this.pendingScrollAnchor = scrollAnchor;
   }
 
   private async loadNextPage() {
     if (this.isLoading) return;
-    // new timestamp needs to be assigned by loadPrevPage method
+
+    // Do nothing. New timestamp needs to be assigned by loadPrevPage method
     if (!this.newTS) {
       this.showNewMessagesCTR = false;
       this.shouldScrollToBottom = false;
       return;
     }
 
-    // load data
+    // for autoscroll or scroll to bottom button
+    const maxAutoLoads = 200;
+    let loads = 0;
+    let prevNewTS = this.newTS;
+
     this.isLoading = true;
-    const data = await this.fetchData(this.newTS + 1, this.pageSize, false);
-    this.isLoading = false;
+    this.isLoadingBottom = true;
 
-    // no more new messages to load
-    if (!data.length) {
-      this.showNewMessagesCTR = false;
-      this.shouldScrollToBottom = false;
-      // remove extra pages from the start if any (could be due to users deleting messages)
-      this.pages = this.pages.filter((page) => page.length > 0);
-      this.firstEmptyIndex = -1;
-      return;
-    }
+    while (loads < maxAutoLoads) {
+      const scrollAnchor = this.getScrollAnchor('bottom');
 
-    // when filling empty pages
-    if (this.firstEmptyIndex > -1) {
-      this.pages[this.firstEmptyIndex] = data.reverse();
-    } else {
-      // when already at the bottom and loading messages in realtime
+      const data = await this.fetchData(this.newTS + 1, this.pageSize, false);
+      this.isLoading = false;
+      this.isLoadingBottom = false;
+
+      // no more new messages to load
+      if (!data.length) {
+        this.showNewMessagesCTR = false;
+        this.shouldScrollToBottom = false;
+        break;
+      }
+
+      // load new messages and append to the start
       this.pages.unshift(data.reverse());
+
+      // remove pages if out of bounds
+      if (this.pages.length > this.pagesAllowed) this.pages.pop();
+
+      // update timestamps
+      const lastPage = this.pages[this.pages.length - 1];
+      this.oldTS = (lastPage[lastPage.length - 1] as any).timeMs;
+      this.newTS = this.pages[0][0].timeMs;
+
+      this.rerender();
+      this.pendingScrollAnchor = scrollAnchor;
+
+      if (!this.shouldScrollToBottom) break;
+      // if should scroll to bottom then retrigger
+      await this.waitForNextFrame();
+      this.scrollToBottom();
+      await this.waitForNextFrame();
+
+      // if no new messages, break
+      if (this.newTS === prevNewTS) break;
+      prevNewTS = this.newTS;
+      loads++;
     }
-
-    if (this.pages.length > this.pagesAllowed) {
-      this.pages.pop();
-    }
-
-    // smallest value for firstEmptyIndex can be -1, so we cap the index at 0
-    this.newTS = this.pages[Math.max(0, this.firstEmptyIndex)][0].timeMs;
-
-    // remove all empty pages from the end
-    for (let i = this.pages.length - 1; i > this.firstEmptyIndex; i--) {
-      if (this.pages[i].length > 0) break;
-      // if page is empty, remove it
-      this.pages.pop();
-    }
-    // update the old timestamp
-    const lastPage = this.pages[this.pages.length - 1];
-    this.oldTS = (lastPage[lastPage.length - 1] as any).timeMs;
-    // when scrolling too fast scroll a bit to the top to be able to load new messages when you scroll down
-    if (this.$containerRef.scrollTop === 0) this.$containerRef.scrollTop = -60;
-
-    // smallest value for this index can be -1 (indicates we are at the bottom of the page).
-    this.firstEmptyIndex = Math.max(-1, this.firstEmptyIndex - 1);
-
-    this.rerender();
   }
 
-  private isAtBottom = () => {
-    const rect = this.$bottomRef.getBoundingClientRect();
+  // Find the element that is closest to the top/bottom of the container
+  private getScrollAnchor(edge: ScrollAnchorEdge = 'top') {
+    if (!this.$containerRef) return null;
+
+    const containerRect = this.$containerRef.getBoundingClientRect();
+    const candidates = Array.from(this.$containerRef.querySelectorAll<HTMLElement>('[id]')).filter(
+      (el) => el.id !== 'top-scroll' && el.id !== 'bottom-scroll'
+    );
+
+    let best: ScrollAnchor | null = null;
+    for (const el of candidates) {
+      const rect = el.getBoundingClientRect();
+      const isVisibleInContainer =
+        rect.bottom > containerRect.top && rect.top < containerRect.bottom;
+      if (!isVisibleInContainer) continue;
+
+      if (edge === 'top') {
+        const offsetTop = rect.top - containerRect.top;
+        if (best == null || (best.edge === 'top' && offsetTop < best.offsetTop)) {
+          best = { id: el.id, edge: 'top', offsetTop };
+        }
+      } else {
+        const offsetBottom = containerRect.bottom - rect.bottom;
+        if (best == null || (best.edge === 'bottom' && offsetBottom < best.offsetBottom)) {
+          best = { id: el.id, edge: 'bottom', offsetBottom };
+        }
+      }
+    }
+    return best;
+  }
+
+  //instant scroll to anchor to make sure we are at the same position after a rerender
+  private restoreScrollToAnchor(anchor: ScrollAnchor) {
+    if (!this.$containerRef) return;
+
+    // make element id safe to use inside a CSS selector
+    const escapeId = (id: string) => {
+      const cssEscape = (globalThis as any).CSS?.escape;
+      return typeof cssEscape === 'function'
+        ? cssEscape(id)
+        : id.replace(/[^a-zA-Z0-9_-]/g, '\\$&');
+    };
+
+    const el = this.$containerRef.querySelector<HTMLElement>(`#${escapeId(anchor.id)}`);
+    if (!el) return;
+
+    const containerRect = this.$containerRef.getBoundingClientRect();
+    const rect = el.getBoundingClientRect();
+
+    if (anchor.edge === 'top') {
+      const newOffsetTop = rect.top - containerRect.top;
+      this.$containerRef.scrollTop += newOffsetTop - anchor.offsetTop;
+    } else {
+      const newOffsetBottom = containerRect.bottom - rect.bottom;
+      this.$containerRef.scrollTop += anchor.offsetBottom - newOffsetBottom;
+    }
+  }
+
+  private isInView = (el: HTMLDivElement) => {
+    const rect = el.getBoundingClientRect();
     return rect.top >= 0 && rect.bottom <= window.innerHeight;
   };
 
+  // this method is called recursively based on shouldScrollToBottom (see loadNextPage)
+  private scrollToBottom() {
+    this.$bottomRef.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  private waitForNextFrame() {
+    return new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+  }
+
+  private rerender() {
+    this.rerenderBoolean = !this.rerenderBoolean;
+  }
+
   render() {
     /**
-     * div.container is flex=column-reverse
-     * which is why div#bottom-scroll comes before div#top-scroll
+     * div.container is flex=column-reversewhich is why div#bottom-scroll comes before div#top-scroll
      */
     return (
       <Host>

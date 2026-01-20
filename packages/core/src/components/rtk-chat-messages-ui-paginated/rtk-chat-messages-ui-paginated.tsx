@@ -227,7 +227,7 @@ export class RtkChatMessagesUiPaginated {
     const viewType = isSelf ? 'outgoing' : 'incoming';
     return (
       <div>
-        <div class="message-wrapper">
+        <div class="message-wrapper" id={message.id}>
           <rtk-message-view
             pinned={message.pinned}
             time={message.time}
