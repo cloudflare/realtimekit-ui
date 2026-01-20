@@ -1,3 +1,13 @@
+# [1.1.0-staging.7](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.1.0-staging.6...@cloudflare/realtimekit-ui-v1.1.0-staging.7) (2026-01-20)
+
+
+### Bug Fixes
+
+* comments ([b7f3ebc](https://github.com/cloudflare/realtimekit-ui/commit/b7f3ebc9f5cdea93a4fca35b12b5d67528995088))
+* remove intersection observer as it does not perform well with next ([daf5ea8](https://github.com/cloudflare/realtimekit-ui/commit/daf5ea871251930cb8050f7288ed3774195a94e4))
+* remove unused code ([3262e64](https://github.com/cloudflare/realtimekit-ui/commit/3262e64e7cbd9a7700c7aecfcc3feac16893ee48))
+* unread chat count ([e682e03](https://github.com/cloudflare/realtimekit-ui/commit/e682e03a1d76e0db007fbe3cb3493981187aff6d))
+
 # [1.1.0-staging.6](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.1.0-staging.5...@cloudflare/realtimekit-ui-v1.1.0-staging.6) (2026-01-16)
 
 
