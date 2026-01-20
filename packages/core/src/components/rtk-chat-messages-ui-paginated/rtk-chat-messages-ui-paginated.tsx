@@ -63,6 +63,9 @@ export class RtkChatMessagesUiPaginated {
   /** Event emitted when a message is pinned or unpinned */
   @Event({ eventName: 'pinMessage' }) onPinMessage: EventEmitter<Message>;
 
+  /** Event emitted when a message is edited */
+  @Event({ eventName: 'editMessage' }) onEditMessage: EventEmitter<Message>;
+
   /** Event emitted when a message is deleted */
   @Event({ eventName: 'deleteMessage' }) onDeleteMessage: EventEmitter<Message>;
 
@@ -159,25 +162,21 @@ export class RtkChatMessagesUiPaginated {
   private getMessageActions = (message: Message) => {
     const actions = [];
 
-    // const isSelf = this.meeting.self.userId === message.userId;
-    // const chatMessagePermissions = this.meeting.self.permissions?.chatMessage;
-    // const canEdit =
-    //   chatMessagePermissions === undefined
-    //     ? isSelf
-    //     : chatMessagePermissions.canEdit === 'ALL' ||
-    //       (chatMessagePermissions.canEdit === 'SELF' && isSelf);
+    const messageBelongsToSelf = message.userId === this.meeting.self.userId;
 
-    const canDelete = message.userId === this.meeting.self.userId;
+    actions.push({
+      id: 'pin_message',
+      label: message.pinned ? this.t('unpin') : this.t('pin'),
+      icon: this.iconPack.pin,
+    });
 
-    if (this.meeting.self.permissions.pinParticipant) {
+    if (messageBelongsToSelf) {
       actions.push({
-        id: 'pin_message',
-        label: message.pinned ? this.t('unpin') : this.t('pin'),
-        icon: this.iconPack.pin,
+        id: 'edit_message',
+        label: this.t('chat.edit_msg'),
+        icon: this.iconPack.edit,
       });
-    }
 
-    if (canDelete) {
       actions.push({
         id: 'delete_message',
         label: this.t('chat.delete_msg'),
@@ -192,6 +191,9 @@ export class RtkChatMessagesUiPaginated {
     switch (actionId) {
       case 'pin_message':
         this.onPinMessage.emit(message);
+        break;
+      case 'edit_message':
+        this.onEditMessage.emit(message);
         break;
       case 'delete_message':
         this.onDeleteMessage.emit(message);

@@ -559,6 +559,14 @@ export class RtkChat {
     this.meeting.chat.deleteMessage(message.id);
   };
 
+  private onMessageEdit = (event: CustomEvent<Message>) => {
+    const message = event.detail;
+    if (message.type !== 'text') return;
+
+    this.replyMessage = null;
+    this.editingMessage = message as TextMessage;
+  };
+
   private renderComposerUI() {
     if (this.chatRecipientId === 'everyone') {
       if (!this.canSendTextMessage && !this.canSendFiles) return null;
@@ -570,10 +578,18 @@ export class RtkChat {
     const message = this.editingMessage ? this.editingMessage.message : '';
     const quotedMessage = this.replyMessage ? this.replyMessage.message : '';
 
+    const draftStorageKey = this.selectedChannelId
+      ? `rtk-chat-draft-${this.selectedChannelId}`
+      : 'rtk-chat-draft';
+    const editStorageKey = this.editingMessage
+      ? `rtk-chat-edit-${this.selectedChannelId ?? 'no-channel'}-${this.editingMessage.id}`
+      : 'rtk-chat-edit';
+    const storageKey = this.editingMessage ? editStorageKey : draftStorageKey;
+
     return (
       <rtk-chat-composer-view
         message={message}
-        storageKey={this.selectedChannelId ?? `draft-${this.selectedChannelId}`}
+        storageKey={storageKey}
         quotedMessage={quotedMessage}
         isEditing={!!this.editingMessage}
         canSendTextMessage={this.isTextMessagingAllowed()}
@@ -691,6 +707,7 @@ export class RtkChat {
             <rtk-chat-messages-ui-paginated
               meeting={this.meeting}
               onPinMessage={this.onPinMessage}
+              onEditMessage={this.onMessageEdit}
               onDeleteMessage={this.onDeleteMessage}
               size={this.size}
               iconPack={this.iconPack}
