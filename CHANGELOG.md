@@ -1,3 +1,10 @@
+# [1.1.0-staging.8](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.1.0-staging.7...@cloudflare/realtimekit-ui-v1.1.0-staging.8) (2026-01-20)
+
+
+### Bug Fixes
+
+* allow users to edit chat messages ([8c3baa0](https://github.com/cloudflare/realtimekit-ui/commit/8c3baa02acf116b5817224e5ea63772aa13874af))
+
 # [1.1.0-staging.7](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.1.0-staging.6...@cloudflare/realtimekit-ui-v1.1.0-staging.7) (2026-01-20)
 
 
