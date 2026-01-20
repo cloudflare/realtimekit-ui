@@ -153,7 +153,6 @@ export class RtkPaginatedList {
    * */
   @Method()
   async onNodeDelete(id: string) {
-    let didDelete = false;
     for (let i = this.pages.length - 1; i >= 0; i--) {
       const index = this.pages[i].findIndex((node) => node.id === id);
       // if message not found, move on
@@ -162,17 +161,16 @@ export class RtkPaginatedList {
       this.pages[i].splice(index, 1);
       // if page is empty, delete it
       if (this.pages[i].length === 0) this.pages.splice(i, 1);
-      didDelete = true;
+      // update timestamps
+      const firstPage = this.pages[0];
+      const lastPage = this.pages[this.pages.length - 1];
+      this.newTS = firstPage?.[0]?.timeMs;
+      this.oldTS = lastPage?.[lastPage.length - 1]?.timeMs;
+      // if I have deleted the latest message, update maxTS
+      if (index === 0 && i === 0) this.maxTS = this.newTS;
+      this.rerender();
       break;
     }
-
-    if (!didDelete) return;
-    // update timestamps
-    const firstPage = this.pages[0];
-    const lastPage = this.pages[this.pages.length - 1];
-    this.newTS = firstPage?.[0]?.timeMs;
-    this.oldTS = lastPage?.[lastPage.length - 1]?.timeMs;
-    this.rerender();
   }
 
   /**
