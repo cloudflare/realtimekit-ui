@@ -2521,10 +2521,10 @@ export namespace Components {
         "onNodeDelete": (id: string) => Promise<void>;
         /**
           * Updates a new node anywhere in the list
-          * @param _id - The id of the node to update
-          * @param _node - The updated data node
+          * @param id - The id of the node to update
+          * @param node - The updated data node
          */
-        "onNodeUpdate": (_id: string, _node: DataNode) => Promise<void>;
+        "onNodeUpdate": (id: string, node: DataNode) => Promise<void>;
         /**
           * Page Size
          */
@@ -4780,6 +4780,7 @@ declare global {
     flags: { isReply?: boolean; isEdit?: boolean };
   };
         "pinMessage": Message;
+        "editMessage": Message;
         "deleteMessage": Message;
         "rtkStateUpdate": States;
     }
@@ -7624,6 +7625,10 @@ declare namespace LocalJSX {
           * Event emitted when a message is deleted
          */
         "onDeleteMessage"?: (event: RtkChatMessagesUiPaginatedCustomEvent<Message>) => void;
+        /**
+          * Event emitted when a message is edited
+         */
+        "onEditMessage"?: (event: RtkChatMessagesUiPaginatedCustomEvent<Message>) => void;
         /**
           * Event for editing a message
          */

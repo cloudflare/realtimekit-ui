@@ -803,7 +803,7 @@ export class RtkChatMessagesUiPaginated {
   constructor(c: ChangeDetectorRef, r: ElementRef, protected z: NgZone) {
     c.detach();
     this.el = r.nativeElement;
-    proxyOutputs(this, this.el, ['editMessageInit', 'pinMessage', 'deleteMessage', 'rtkStateUpdate']);
+    proxyOutputs(this, this.el, ['editMessageInit', 'pinMessage', 'editMessage', 'deleteMessage', 'rtkStateUpdate']);
   }
 }
 
@@ -821,6 +821,10 @@ export declare interface RtkChatMessagesUiPaginated extends Components.RtkChatMe
    * Event emitted when a message is pinned or unpinned
    */
   pinMessage: EventEmitter<CustomEvent<IRtkChatMessagesUiPaginatedMessage>>;
+  /**
+   * Event emitted when a message is edited
+   */
+  editMessage: EventEmitter<CustomEvent<IRtkChatMessagesUiPaginatedMessage>>;
   /**
    * Event emitted when a message is deleted
    */

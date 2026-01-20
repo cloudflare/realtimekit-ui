@@ -57,6 +57,8 @@ export class RtkPaginatedList {
 
   private newTS;
 
+  private maxTS;
+
   // the length of pages will always be pageSize + 2
   private pages: any[][] = [];
 
@@ -119,7 +121,8 @@ export class RtkPaginatedList {
     if (this.pages.length < 1) {
       this.oldTS = node.timeMs + 1;
       this.loadPrevPage();
-    } else {
+    } else if (this.maxTS === this.newTS) {
+      this.maxTS = node.timeMs;
       // append messages to the page if page has not reached full capacity
       if (this.pages[0].length < this.pageSize) {
         this.pages[0].unshift(node);
@@ -168,11 +171,21 @@ export class RtkPaginatedList {
 
   /**
    * Updates a new node anywhere in the list
-   * @param {string} _id - The id of the node to update
-   * @param {DataNode} _node - The updated data node
+   * @param {string} id - The id of the node to update
+   * @param {DataNode} node - The updated data node
    * */
   @Method()
-  async onNodeUpdate(_id: string, _node: DataNode) {}
+  async onNodeUpdate(id: string, node: DataNode) {
+    for (let i = this.pages.length - 1; i >= 0; i--) {
+      const index = this.pages[i].findIndex((node) => node.id === id);
+      // if message not found, move on
+      if (index === -1) continue;
+      // edit message
+      this.pages[i][index] = node;
+      this.rerender();
+      break;
+    }
+  }
 
   // Tells us if we need to scroll to a specific anchor after a rerender
   private pendingScrollAnchor: ScrollAnchor | null = null;
@@ -232,6 +245,7 @@ export class RtkPaginatedList {
     const lastPage = this.pages[this.pages.length - 1];
     this.oldTS = (lastPage[lastPage.length - 1] as any).timeMs;
     this.newTS = this.pages[0][0].timeMs;
+    if (!this.maxTS) this.maxTS = this.newTS;
 
     this.rerender();
 
@@ -266,6 +280,7 @@ export class RtkPaginatedList {
 
       // no more new messages to load
       if (!data.length) {
+        this.maxTS = this.newTS;
         this.showNewMessagesCTR = false;
         this.shouldScrollToBottom = false;
         break;
