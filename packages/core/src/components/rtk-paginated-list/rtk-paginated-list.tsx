@@ -119,7 +119,7 @@ export class RtkPaginatedList {
   async onNewNode(node: DataNode) {
     // if there are no pages, append to the first page
     if (this.pages.length < 1) {
-      this.oldTS = node.timeMs + 1;
+      this.oldTS = node.timeMs;
       this.pages.unshift([node]);
       this.newTS = node.timeMs;
       this.maxTS = node.timeMs;
