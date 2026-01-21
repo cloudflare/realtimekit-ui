@@ -568,6 +568,26 @@ export class RtkChat {
 
   private onDeleteMessage = (event: CustomEvent<Message>) => {
     const message = event.detail;
+
+    if (this.editingMessage?.id === message.id) {
+      this.editingMessage = null;
+    }
+
+    try {
+      if (typeof localStorage !== 'undefined') {
+        const keysToRemove: string[] = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && key.startsWith('rtk-chat-edit-') && key.endsWith(`-${message.id}`)) {
+            keysToRemove.push(key);
+          }
+        }
+        keysToRemove.forEach((key) => localStorage.removeItem(key));
+      }
+    } catch {
+      // ignore storage access errors
+    }
+
     this.meeting.chat.deleteMessage(message.id);
   };
 
