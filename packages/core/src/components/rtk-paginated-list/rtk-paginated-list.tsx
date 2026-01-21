@@ -117,10 +117,14 @@ export class RtkPaginatedList {
    */
   @Method()
   async onNewNode(node: DataNode) {
-    // if there are no pages, load the first page
+    // if there are no pages, append to the first page
     if (this.pages.length < 1) {
-      this.oldTS = node.timeMs + 1;
-      this.loadPrevPage();
+      this.oldTS = node.timeMs;
+      this.pages.unshift([node]);
+      this.newTS = node.timeMs;
+      this.maxTS = node.timeMs;
+      this.rerender();
+      if (this.autoScroll) this.$bottomRef.scrollIntoView({ behavior: 'smooth' });
     } else if (this.maxTS === this.newTS) {
       this.maxTS = node.timeMs;
       // append messages to the page if page has not reached full capacity
@@ -130,15 +134,21 @@ export class RtkPaginatedList {
         this.rerender();
       } else {
         // if page is at full capacity, load next page
-        this.loadNextPage();
+        this.pages.unshift([node]);
+        this.newTS = node.timeMs;
+        // remove pages if out of bounds
+        if (this.pages.length > this.pagesAllowed) this.pages.pop();
+        // update timestamps
+        const lastPage = this.pages[this.pages.length - 1];
+        this.oldTS = (lastPage[lastPage.length - 1] as any).timeMs;
+        this.newTS = this.pages[0][0].timeMs;
+        this.rerender();
       }
+      if (this.autoScroll) this.$bottomRef.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      if (this.autoScroll) this.scrollToBottom();
     }
-
-    // If autoscroll is enabled, scroll to the bottom
-    if (this.autoScroll) {
-      this.shouldScrollToBottom = true;
-      this.scrollToBottom();
-    }
+    this.pendingScrollAnchor = null;
   }
 
   /**
@@ -147,7 +157,6 @@ export class RtkPaginatedList {
    * */
   @Method()
   async onNodeDelete(id: string) {
-    let didDelete = false;
     for (let i = this.pages.length - 1; i >= 0; i--) {
       const index = this.pages[i].findIndex((node) => node.id === id);
       // if message not found, move on
@@ -156,17 +165,16 @@ export class RtkPaginatedList {
       this.pages[i].splice(index, 1);
       // if page is empty, delete it
       if (this.pages[i].length === 0) this.pages.splice(i, 1);
-      didDelete = true;
+      // update timestamps
+      const firstPage = this.pages[0];
+      const lastPage = this.pages[this.pages.length - 1];
+      this.newTS = firstPage?.[0]?.timeMs;
+      this.oldTS = lastPage?.[lastPage.length - 1]?.timeMs;
+      // if I have deleted the latest message, update maxTS
+      if (index === 0 && i === 0) this.maxTS = this.newTS;
+      this.rerender();
       break;
     }
-
-    if (!didDelete) return;
-    // update timestamps
-    const firstPage = this.pages[0];
-    const lastPage = this.pages[this.pages.length - 1];
-    this.newTS = firstPage?.[0]?.timeMs;
-    this.oldTS = lastPage?.[lastPage.length - 1]?.timeMs;
-    this.rerender();
   }
 
   /**
@@ -197,9 +205,11 @@ export class RtkPaginatedList {
   componentDidLoad() {
     // initial load
     this.loadPrevPage();
-
     if (this.$containerRef) {
       this.$containerRef.onscrollend = async () => {
+        // do not do anything if we are scrolling to bottom
+        if (this.shouldScrollToBottom) return;
+        // handle top and bottom scroll
         if (this.isInView(this.$bottomRef)) {
           await this.loadNextPage();
         } else if (this.isInView(this.$topRef)) {
@@ -254,63 +264,59 @@ export class RtkPaginatedList {
   }
 
   private async loadNextPage() {
-    if (this.isLoading) return;
+    if (this.isLoading) return [];
 
     // Do nothing. New timestamp needs to be assigned by loadPrevPage method
     if (!this.newTS) {
       this.showNewMessagesCTR = false;
-      this.shouldScrollToBottom = false;
-      return;
+      return [];
     }
-
-    // for autoscroll or scroll to bottom button
-    const maxAutoLoads = 200;
-    let loads = 0;
-    let prevNewTS = this.newTS;
 
     this.isLoading = true;
     this.isLoadingBottom = true;
 
-    while (loads < maxAutoLoads) {
-      const scrollAnchor = this.getScrollAnchor('bottom');
+    const scrollAnchor = this.getScrollAnchor('bottom');
 
-      const data = await this.fetchData(this.newTS + 1, this.pageSize, false);
-      this.isLoading = false;
-      this.isLoadingBottom = false;
+    const data = await this.fetchData(this.newTS + 1, this.pageSize, false);
+    this.isLoading = false;
+    this.isLoadingBottom = false;
 
-      // no more new messages to load
-      if (!data.length) {
-        this.maxTS = this.newTS;
-        this.showNewMessagesCTR = false;
-        this.shouldScrollToBottom = false;
-        break;
-      }
-
-      // load new messages and append to the start
-      this.pages.unshift(data.reverse());
-
-      // remove pages if out of bounds
-      if (this.pages.length > this.pagesAllowed) this.pages.pop();
-
-      // update timestamps
-      const lastPage = this.pages[this.pages.length - 1];
-      this.oldTS = (lastPage[lastPage.length - 1] as any).timeMs;
-      this.newTS = this.pages[0][0].timeMs;
-
-      this.rerender();
-      this.pendingScrollAnchor = scrollAnchor;
-
-      if (!this.shouldScrollToBottom) break;
-      // if should scroll to bottom then retrigger
-      await this.waitForNextFrame();
-      this.scrollToBottom();
-      await this.waitForNextFrame();
-
-      // if no new messages, break
-      if (this.newTS === prevNewTS) break;
-      prevNewTS = this.newTS;
-      loads++;
+    // no more new messages to load
+    if (!data.length) {
+      this.maxTS = this.newTS;
+      this.showNewMessagesCTR = false;
+      return [];
     }
+
+    // load new messages and append to the start
+    const incoming = [...data].reverse();
+
+    if (this.pages.length === 0) this.pages.unshift([]);
+
+    const firstPage = this.pages[0];
+    const spaceInFirstPage = this.pageSize - firstPage.length;
+
+    if (spaceInFirstPage > 0) {
+      const toFill = incoming.splice(0, spaceInFirstPage);
+      firstPage.unshift(...toFill);
+    }
+
+    while (incoming.length > 0) {
+      this.pages.unshift(incoming.splice(0, this.pageSize));
+    }
+
+    // remove pages if out of bounds
+    if (this.pages.length > this.pagesAllowed) this.pages.pop();
+
+    // update timestamps
+    const lastPage = this.pages[this.pages.length - 1];
+    this.oldTS = (lastPage[lastPage.length - 1] as any).timeMs;
+    this.newTS = this.pages[0][0].timeMs;
+
+    this.rerender();
+    this.pendingScrollAnchor = scrollAnchor;
+
+    return data;
   }
 
   // Find the element that is closest to the top/bottom of the container
@@ -377,12 +383,13 @@ export class RtkPaginatedList {
   };
 
   // this method is called recursively based on shouldScrollToBottom (see loadNextPage)
-  private scrollToBottom() {
-    this.$bottomRef.scrollIntoView({ behavior: 'smooth' });
-  }
-
-  private waitForNextFrame() {
-    return new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+  private async scrollToBottom() {
+    this.shouldScrollToBottom = true;
+    while (this.shouldScrollToBottom) {
+      const response = await this.loadNextPage();
+      this.$bottomRef.scrollIntoView({ behavior: 'smooth' });
+      if (response.length === 0) this.shouldScrollToBottom = false;
+    }
   }
 
   private rerender() {
@@ -403,7 +410,6 @@ export class RtkPaginatedList {
               variant="secondary"
               part="show-new-messages"
               onClick={() => {
-                this.shouldScrollToBottom = true;
                 this.scrollToBottom();
               }}
             >
