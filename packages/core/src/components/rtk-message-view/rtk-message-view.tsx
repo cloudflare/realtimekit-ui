@@ -2,6 +2,7 @@ import { Component, Event, EventEmitter, Host, Prop, h } from '@stencil/core';
 import { elapsedDuration, formatDateTime } from '../../utils/date';
 import { SyncWithStore } from '../../utils/sync-with-store';
 import { IconPack, defaultIconPack } from '../../exports';
+import { Message } from '@cloudflare/realtimekit';
 
 export interface MessageAction {
   id: string;
@@ -17,6 +18,12 @@ export interface MessageAction {
 export class RtkMessageView {
   /** List of actions to show in menu */
   @Prop() actions: MessageAction[] = [];
+
+  /** Type of message */
+  @Prop() messageType: Message['type'];
+
+  /** Has the message been edited */
+  @Prop() isEdited: boolean;
 
   /** Appearance */
   @Prop() variant: 'plain' | 'bubble' = 'bubble';
@@ -63,15 +70,18 @@ export class RtkMessageView {
           <rtk-icon icon={this.iconPack.chevron_down} />
         </button>
         <rtk-menu-list menuVariant={this.isSelf ? 'primary' : 'secondary'}>
-          {this.actions.map((action) => (
-            <rtk-menu-item
-              menuVariant={this.isSelf ? 'primary' : 'secondary'}
-              onClick={() => this.onAction.emit(action.id)}
-            >
-              {action.icon && <rtk-icon icon={action.icon} slot="start" />}
-              {action.label}
-            </rtk-menu-item>
-          ))}
+          {this.actions.map((action) => {
+            if (action.id === 'edit_message' && this.messageType !== 'text') return;
+            return (
+              <rtk-menu-item
+                menuVariant={this.isSelf ? 'primary' : 'secondary'}
+                onClick={() => this.onAction.emit(action.id)}
+              >
+                {action.icon && <rtk-icon icon={action.icon} slot="start" />}
+                {action.label}
+              </rtk-menu-item>
+            );
+          })}
         </rtk-menu-list>
       </rtk-menu>
     );
@@ -99,7 +109,16 @@ export class RtkMessageView {
               <slot></slot>
               {!this.hideMetadata && !!this.time && (
                 <div class="metadata" title={formatDateTime(this.time)}>
-                  {this.pinned && <rtk-icon icon={this.iconPack.pin} size="sm" />}
+                  {this.pinned && (
+                    <span class="metadata-content">
+                      <rtk-icon icon={this.iconPack.pin} size="sm" /> •
+                    </span>
+                  )}
+                  {this.isEdited && (
+                    <span class="metadata-content">
+                      <span>Edited</span> •
+                    </span>
+                  )}
                   {elapsedDuration(this.time, new Date(Date.now()))}
                 </div>
               )}

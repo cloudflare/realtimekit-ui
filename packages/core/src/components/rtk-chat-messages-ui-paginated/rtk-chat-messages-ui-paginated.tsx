@@ -231,7 +231,9 @@ export class RtkChatMessagesUiPaginated {
       <div>
         <div class="message-wrapper" id={message.id}>
           <rtk-message-view
+            messageType={message.type}
             pinned={message.pinned}
+            isEdited={message.isEdited}
             time={message.time}
             actions={this.getMessageActions(message)}
             authorName={message.displayName}

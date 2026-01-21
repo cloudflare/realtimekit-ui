@@ -125,7 +125,7 @@ rtk-chat-composer-view {
 
 .pinned-messages-content {
   @apply bg-background-1000 border-background-600;
-  @apply absolute left-0 top-full z-50 w-full;
+  @apply absolute left-0 top-full z-50 max-h-[30vh] w-full overflow-auto;
 }
 
 .pinned-message {

@@ -53,11 +53,14 @@ export class RtkPaginatedList {
 
   private $bottomRef: HTMLDivElement;
 
-  private oldTS;
+  // Timestamp pertaining to the oldest stored message
+  private oldestPaginatedTimestamp: number | null = null;
 
-  private newTS;
+  // Timestamp pertaining to the latest stored message
+  private latestPaginatedTimestamp: number | null = null;
 
-  private maxTS;
+  // Timestamp pertaining to the latest message stored in backend
+  private latestMessageTimestamp: number | null = null;
 
   // the length of pages will always be pageSize + 2
   private pages: any[][] = [];
@@ -119,29 +122,29 @@ export class RtkPaginatedList {
   async onNewNode(node: DataNode) {
     // if there are no pages, append to the first page
     if (this.pages.length < 1) {
-      this.oldTS = node.timeMs;
+      this.oldestPaginatedTimestamp = node.timeMs;
       this.pages.unshift([node]);
-      this.newTS = node.timeMs;
-      this.maxTS = node.timeMs;
+      this.latestPaginatedTimestamp = node.timeMs;
+      this.latestMessageTimestamp = node.timeMs;
       this.rerender();
       if (this.autoScroll) this.$bottomRef.scrollIntoView({ behavior: 'smooth' });
-    } else if (this.maxTS === this.newTS) {
-      this.maxTS = node.timeMs;
+    } else if (this.latestMessageTimestamp === this.latestPaginatedTimestamp) {
       // append messages to the page if page has not reached full capacity
       if (this.pages[0].length < this.pageSize) {
         this.pages[0].unshift(node);
-        this.newTS = node.timeMs;
+        this.latestPaginatedTimestamp = node.timeMs;
+        this.latestMessageTimestamp = node.timeMs;
         this.rerender();
       } else {
         // if page is at full capacity, load next page
         this.pages.unshift([node]);
-        this.newTS = node.timeMs;
+        this.latestPaginatedTimestamp = node.timeMs;
+        this.latestMessageTimestamp = node.timeMs;
         // remove pages if out of bounds
         if (this.pages.length > this.pagesAllowed) this.pages.pop();
         // update timestamps
         const lastPage = this.pages[this.pages.length - 1];
-        this.oldTS = (lastPage[lastPage.length - 1] as any).timeMs;
-        this.newTS = this.pages[0][0].timeMs;
+        this.oldestPaginatedTimestamp = (lastPage[lastPage.length - 1] as any).timeMs;
         this.rerender();
       }
       if (this.autoScroll) this.$bottomRef.scrollIntoView({ behavior: 'smooth' });
@@ -168,10 +171,10 @@ export class RtkPaginatedList {
       // update timestamps
       const firstPage = this.pages[0];
       const lastPage = this.pages[this.pages.length - 1];
-      this.newTS = firstPage?.[0]?.timeMs;
-      this.oldTS = lastPage?.[lastPage.length - 1]?.timeMs;
-      // if I have deleted the latest message, update maxTS
-      if (index === 0 && i === 0) this.maxTS = this.newTS;
+      this.latestPaginatedTimestamp = firstPage?.[0]?.timeMs;
+      this.oldestPaginatedTimestamp = lastPage?.[lastPage.length - 1]?.timeMs;
+      // if I have deleted the latest message, update latestMessageTimestamp
+      if (index === 0 && i === 0) this.latestMessageTimestamp = this.latestPaginatedTimestamp;
       this.rerender();
       break;
     }
@@ -210,7 +213,10 @@ export class RtkPaginatedList {
         // do not do anything if we are scrolling to bottom
         if (this.shouldScrollToBottom) return;
         // handle top and bottom scroll
-        if (this.isInView(this.$bottomRef)) {
+        if (
+          this.isInView(this.$bottomRef) &&
+          this.latestMessageTimestamp > this.latestPaginatedTimestamp
+        ) {
           await this.loadNextPage();
         } else if (this.isInView(this.$topRef)) {
           this.showNewMessagesCTR = true;
@@ -233,12 +239,12 @@ export class RtkPaginatedList {
     const scrollAnchor = this.getScrollAnchor('top');
 
     // if no old timestamp, it means we are at initial state
-    if (!this.oldTS) this.oldTS = new Date().getTime();
+    if (!this.oldestPaginatedTimestamp) this.oldestPaginatedTimestamp = new Date().getTime();
 
     // load data
     this.isLoading = true;
     this.isLoadingTop = true;
-    const data = await this.fetchData(this.oldTS - 1, this.pageSize, true);
+    const data = await this.fetchData(this.oldestPaginatedTimestamp - 1, this.pageSize, true);
     this.isLoading = false;
     this.isLoadingTop = false;
 
@@ -253,9 +259,9 @@ export class RtkPaginatedList {
 
     // update timestamps
     const lastPage = this.pages[this.pages.length - 1];
-    this.oldTS = (lastPage[lastPage.length - 1] as any).timeMs;
-    this.newTS = this.pages[0][0].timeMs;
-    if (!this.maxTS) this.maxTS = this.newTS;
+    this.oldestPaginatedTimestamp = (lastPage[lastPage.length - 1] as any).timeMs;
+    this.latestPaginatedTimestamp = this.pages[0][0].timeMs;
+    if (!this.latestMessageTimestamp) this.latestMessageTimestamp = this.latestPaginatedTimestamp;
 
     this.rerender();
 
@@ -267,7 +273,7 @@ export class RtkPaginatedList {
     if (this.isLoading) return [];
 
     // Do nothing. New timestamp needs to be assigned by loadPrevPage method
-    if (!this.newTS) {
+    if (!this.latestPaginatedTimestamp) {
       this.showNewMessagesCTR = false;
       return [];
     }
@@ -277,13 +283,13 @@ export class RtkPaginatedList {
 
     const scrollAnchor = this.getScrollAnchor('bottom');
 
-    const data = await this.fetchData(this.newTS + 1, this.pageSize, false);
+    const data = await this.fetchData(this.latestPaginatedTimestamp + 1, this.pageSize, false);
     this.isLoading = false;
     this.isLoadingBottom = false;
 
     // no more new messages to load
     if (!data.length) {
-      this.maxTS = this.newTS;
+      this.latestMessageTimestamp = this.latestPaginatedTimestamp;
       this.showNewMessagesCTR = false;
       return [];
     }
@@ -310,8 +316,8 @@ export class RtkPaginatedList {
 
     // update timestamps
     const lastPage = this.pages[this.pages.length - 1];
-    this.oldTS = (lastPage[lastPage.length - 1] as any).timeMs;
-    this.newTS = this.pages[0][0].timeMs;
+    this.oldestPaginatedTimestamp = (lastPage[lastPage.length - 1] as any).timeMs;
+    this.latestPaginatedTimestamp = this.pages[0][0].timeMs;
 
     this.rerender();
     this.pendingScrollAnchor = scrollAnchor;
@@ -413,7 +419,11 @@ export class RtkPaginatedList {
                 this.scrollToBottom();
               }}
             >
-              <rtk-icon icon={this.iconPack.chevron_down} />
+              {this.shouldScrollToBottom ? (
+                <rtk-spinner size="sm" />
+              ) : (
+                <rtk-icon icon={this.iconPack.chevron_down} />
+              )}
             </rtk-button>
           </div>
           <div
