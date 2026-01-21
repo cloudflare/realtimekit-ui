@@ -1,3 +1,13 @@
+# [1.1.0-staging.9](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.1.0-staging.8...@cloudflare/realtimekit-ui-v1.1.0-staging.9) (2026-01-21)
+
+
+### Bug Fixes
+
+* ensure all pages are filled when you scroll while a spam of messages is incoming ([2bab76a](https://github.com/cloudflare/realtimekit-ui/commit/2bab76a923094c48b0d3075daf53176b1ad464e4))
+* update maxTS when a message is deleted ([c016487](https://github.com/cloudflare/realtimekit-ui/commit/c016487b041bad5f2af27ba4db8833d5ff1c740f))
+* update oldTS when a new message is added ([1bdb804](https://github.com/cloudflare/realtimekit-ui/commit/1bdb8043e51f3841fa4448d54d638b1fa6055ab8))
+* update ux when new nodes are added ([b727e90](https://github.com/cloudflare/realtimekit-ui/commit/b727e909980043429ec0f27e49ce685b4c0ecf0e))
+
 # [1.1.0-staging.8](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.1.0-staging.7...@cloudflare/realtimekit-ui-v1.1.0-staging.8) (2026-01-20)
 
 
