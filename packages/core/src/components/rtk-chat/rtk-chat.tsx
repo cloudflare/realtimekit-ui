@@ -148,6 +148,8 @@ export class RtkChat {
 
   @State() creatingChannel = false;
 
+  @State() isSendingMessage = false;
+
   @State() showPinnedMessages: boolean = false;
 
   /** Emits updated state data */
@@ -529,16 +531,26 @@ export class RtkChat {
 
   private onNewMessageHandler = async (e: CustomEvent<NewMessageEvent>) => {
     const message = e.detail;
-    this.meeting.chat.sendMessage(message, this.getRecipientPeerIds());
+    this.isSendingMessage = true;
+    try {
+      await this.meeting.chat.sendMessage(message, this.getRecipientPeerIds());
+    } finally {
+      this.isSendingMessage = false;
+    }
   };
 
   private onEditMessageHandler = async (e: CustomEvent<string>) => {
-    await this.meeting?.chat?.editTextMessage(
-      this.editingMessage.id,
-      e.detail,
-      this.editingMessage.channelId
-    );
-    this.editingMessage = null;
+    this.isSendingMessage = true;
+    try {
+      await this.meeting?.chat?.editTextMessage(
+        this.editingMessage.id,
+        e.detail,
+        this.editingMessage.channelId
+      );
+    } finally {
+      this.isSendingMessage = false;
+      this.editingMessage = null;
+    }
   };
 
   private onEditCancel = () => {
@@ -556,6 +568,26 @@ export class RtkChat {
 
   private onDeleteMessage = (event: CustomEvent<Message>) => {
     const message = event.detail;
+
+    if (this.editingMessage?.id === message.id) {
+      this.editingMessage = null;
+    }
+
+    try {
+      if (typeof localStorage !== 'undefined') {
+        const keysToRemove: string[] = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && key.startsWith('rtk-chat-edit-') && key.endsWith(`-${message.id}`)) {
+            keysToRemove.push(key);
+          }
+        }
+        keysToRemove.forEach((key) => localStorage.removeItem(key));
+      }
+    } catch {
+      // ignore storage access errors
+    }
+
     this.meeting.chat.deleteMessage(message.id);
   };
 
@@ -592,6 +624,7 @@ export class RtkChat {
         storageKey={storageKey}
         quotedMessage={quotedMessage}
         isEditing={!!this.editingMessage}
+        isSending={this.isSendingMessage}
         canSendTextMessage={this.isTextMessagingAllowed()}
         canSendFiles={this.isFileMessagingAllowed()}
         disableEmojiPicker={this.overrides.disableEmojiPicker}
@@ -659,7 +692,7 @@ export class RtkChat {
           />
         </div>
         {this.showPinnedMessages && (
-          <div class="pinned-messages-content">
+          <div class="pinned-messages-content scrollbar">
             {this.meeting.chat.pinned.map((message) => {
               const label = this.getPinnedMessageLabel(message as Message);
               return (

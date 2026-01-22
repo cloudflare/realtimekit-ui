@@ -765,6 +765,7 @@ export namespace Components {
           * Sets composer to edit mode
          */
         "isEditing": boolean;
+        "isSending": boolean;
         /**
           * Max length for text input
          */
@@ -2150,9 +2151,17 @@ export namespace Components {
          */
         "iconPack": IconPack1;
         /**
+          * Has the message been edited
+         */
+        "isEdited": boolean;
+        /**
           * Is the message sent by the current user
          */
         "isSelf": boolean;
+        /**
+          * Type of message
+         */
+        "messageType": Message['type'];
         /**
           * Is message pinned
          */
@@ -7437,6 +7446,7 @@ declare namespace LocalJSX {
           * Sets composer to edit mode
          */
         "isEditing"?: boolean;
+        "isSending"?: boolean;
         /**
           * Max length for text input
          */
@@ -8999,9 +9009,17 @@ declare namespace LocalJSX {
          */
         "iconPack"?: IconPack1;
         /**
+          * Has the message been edited
+         */
+        "isEdited"?: boolean;
+        /**
           * Is the message sent by the current user
          */
         "isSelf"?: boolean;
+        /**
+          * Type of message
+         */
+        "messageType"?: Message['type'];
         /**
           * action event
          */

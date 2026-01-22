@@ -670,14 +670,14 @@ export declare interface RtkChatComposerUi extends Components.RtkChatComposerUi 
 
 
 @ProxyCmp({
-  inputs: ['canSendFiles', 'canSendTextMessage', 'disableEmojiPicker', 'iconPack', 'inputTextPlaceholder', 'isEditing', 'maxLength', 'message', 'quotedMessage', 'rateLimits', 'storageKey', 't']
+  inputs: ['canSendFiles', 'canSendTextMessage', 'disableEmojiPicker', 'iconPack', 'inputTextPlaceholder', 'isEditing', 'isSending', 'maxLength', 'message', 'quotedMessage', 'rateLimits', 'storageKey', 't']
 })
 @Component({
   selector: 'rtk-chat-composer-view',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: '<ng-content></ng-content>',
   // eslint-disable-next-line @angular-eslint/no-inputs-metadata-property
-  inputs: ['canSendFiles', 'canSendTextMessage', 'disableEmojiPicker', 'iconPack', 'inputTextPlaceholder', 'isEditing', 'maxLength', 'message', 'quotedMessage', 'rateLimits', 'storageKey', 't'],
+  inputs: ['canSendFiles', 'canSendTextMessage', 'disableEmojiPicker', 'iconPack', 'inputTextPlaceholder', 'isEditing', 'isSending', 'maxLength', 'message', 'quotedMessage', 'rateLimits', 'storageKey', 't'],
 })
 export class RtkChatComposerView {
   protected el: HTMLRtkChatComposerViewElement;
@@ -2076,14 +2076,14 @@ export declare interface RtkMessageListView extends Components.RtkMessageListVie
 
 
 @ProxyCmp({
-  inputs: ['actions', 'authorName', 'avatarUrl', 'hideAuthorName', 'hideAvatar', 'hideMetadata', 'iconPack', 'isSelf', 'pinned', 'time', 'variant', 'viewType']
+  inputs: ['actions', 'authorName', 'avatarUrl', 'hideAuthorName', 'hideAvatar', 'hideMetadata', 'iconPack', 'isEdited', 'isSelf', 'messageType', 'pinned', 'time', 'variant', 'viewType']
 })
 @Component({
   selector: 'rtk-message-view',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: '<ng-content></ng-content>',
   // eslint-disable-next-line @angular-eslint/no-inputs-metadata-property
-  inputs: ['actions', 'authorName', 'avatarUrl', 'hideAuthorName', 'hideAvatar', 'hideMetadata', 'iconPack', 'isSelf', 'pinned', 'time', 'variant', 'viewType'],
+  inputs: ['actions', 'authorName', 'avatarUrl', 'hideAuthorName', 'hideAvatar', 'hideMetadata', 'iconPack', 'isEdited', 'isSelf', 'messageType', 'pinned', 'time', 'variant', 'viewType'],
 })
 export class RtkMessageView {
   protected el: HTMLRtkMessageViewElement;
