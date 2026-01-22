@@ -1,3 +1,11 @@
+# [1.1.0-staging.10](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.1.0-staging.9...@cloudflare/realtimekit-ui-v1.1.0-staging.10) (2026-01-22)
+
+
+### Bug Fixes
+
+* remove draft if a message being edited is deleted ([b7ba971](https://github.com/cloudflare/realtimekit-ui/commit/b7ba971c3369457624fbe864680cc63711102f47))
+* ui nuances in chat messages ([4a5087d](https://github.com/cloudflare/realtimekit-ui/commit/4a5087dde065c97b6e2c4071240096214c288a6c))
+
 # [1.1.0-staging.9](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.1.0-staging.8...@cloudflare/realtimekit-ui-v1.1.0-staging.9) (2026-01-21)
 
 
