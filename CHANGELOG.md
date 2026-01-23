@@ -1,3 +1,10 @@
+# [1.1.0-staging.11](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.1.0-staging.10...@cloudflare/realtimekit-ui-v1.1.0-staging.11) (2026-01-23)
+
+
+### Bug Fixes
+
+* **components:** remove discontinued channel ui components ([b7a5c93](https://github.com/cloudflare/realtimekit-ui/commit/b7a5c938882f5141bd28e0b5cd65412fdd4f3f16))
+
 # [1.1.0-staging.10](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.1.0-staging.9...@cloudflare/realtimekit-ui-v1.1.0-staging.10) (2026-01-22)
 
 
