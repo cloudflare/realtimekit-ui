@@ -13,7 +13,7 @@ import {
 import { defaultIconPack, IconPack } from '../../lib/icons';
 import { RtkI18n, useLanguage } from '../../lib/lang';
 import { Meeting } from '../../types/rtk-client';
-import { ChatChannel, Size, States } from '../../types/props';
+import { Size, States } from '../../types/props';
 import { SyncWithStore } from '../../utils/sync-with-store';
 
 @Component({
@@ -30,16 +30,6 @@ export class RtkChatMessagesUiPaginated {
   @SyncWithStore()
   @Prop()
   meeting: Meeting;
-
-  /**
-   * Selected channel
-   */
-  @Prop() selectedChannel?: ChatChannel;
-
-  /**
-   * Selected channel id
-   */
-  @Prop() selectedChannelId?: string;
 
   /** Size */
   @Prop({ reflect: true }) size: Size;
@@ -81,8 +71,6 @@ export class RtkChatMessagesUiPaginated {
 
   private pageSize: number = 25;
 
-  private lastReadMessageIndex = -1;
-
   componentDidLoad() {
     const slotted = this.host.shadowRoot.querySelector('slot') as HTMLSlotElement;
     if (!slotted) return;
@@ -108,34 +96,16 @@ export class RtkChatMessagesUiPaginated {
     this.permissionsUpdateListener();
   }
 
-  @Watch('selectedChannelId')
-  channelChanged() {
-    this.lastReadMessageIndex = -1;
-  }
-
   private permissionsUpdateListener = () => {
     this.permissionsChanged = !this.permissionsChanged;
   };
 
-  private maybeMarkChannelAsRead = (messages: Message[]) => {
-    if (!this.selectedChannelId) return;
-    if (messages.length === 0) return;
-    if (this.lastReadMessageIndex !== -1) return;
-    const latestMsg = messages.at(0).time > messages.at(-1).time ? messages.at(0) : messages.at(-1);
-    if (!latestMsg.channelIndex) return;
-    this.lastReadMessageIndex = parseInt(latestMsg.channelIndex, 10);
-    this.meeting.chat.markLastReadMessage(this.selectedChannelId, latestMsg);
-  };
+  // TODO: Implement the logic to mark messages as read. Old usages have been kept as-is.
+  private maybeMarkChatAsRead = (_messages: Message[]) => {};
 
   private getChatMessages = async (timestamp: number, size: number, reversed: boolean) => {
-    const { messages } = await this.meeting.chat.getMessages(
-      timestamp,
-      size,
-      reversed,
-      undefined,
-      this.selectedChannelId
-    );
-    this.maybeMarkChannelAsRead(messages);
+    const { messages } = await this.meeting.chat.getMessages(timestamp, size, reversed, undefined);
+    this.maybeMarkChatAsRead(messages);
 
     return messages;
   };
@@ -275,12 +245,9 @@ export class RtkChatMessagesUiPaginated {
   };
 
   private chatUpdateListener = (data: ChatUpdateParams) => {
-    if (this.selectedChannelId && data.message.channelId !== this.selectedChannelId) return;
-
     if (data.action === 'add') {
       this.$paginatedListRef.onNewNode(data.message);
-      this.lastReadMessageIndex = -1;
-      this.maybeMarkChannelAsRead([data.message as Message]);
+      this.maybeMarkChatAsRead([data.message as Message]);
     } else if (data.action === 'delete') {
       this.$paginatedListRef.onNodeDelete(data.message.id);
     } else if (data.action === 'edit') {
@@ -297,8 +264,7 @@ export class RtkChatMessagesUiPaginated {
           pagesAllowed={3}
           fetchData={this.getChatMessages}
           createNodes={this.createChatNodes}
-          selectedItemId={this.selectedChannelId}
-          emptyListLabel={this.t('chat.empty_channel')}
+          emptyListLabel={this.t('chat.empty_chat')}
         >
           <slot></slot>
         </rtk-paginated-list>
