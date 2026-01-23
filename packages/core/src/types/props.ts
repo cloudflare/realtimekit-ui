@@ -2,7 +2,6 @@ import type { ImageMessage, Message } from '@cloudflare/realtimekit';
 import { ButtonVariant } from '../components/rtk-button/rtk-button';
 import { RoomLeftState } from './rtk-client';
 import { LangDict } from '../exports';
-import type { ChatChannel as ChatChannelWebCore } from '@cloudflare/realtimekit';
 import { RtkSidebarSection } from '../components/rtk-sidebar/rtk-sidebar';
 import { IconVariant } from '../components/rtk-icon/rtk-icon';
 import { ParticipantsTabId } from '../components/rtk-participants/rtk-participants';
@@ -78,8 +77,6 @@ export interface States {
     destinationMeetingId?: string;
   };
   activeJoinStage?: boolean;
-  /** @deprecated `activeChannelCreator` is deprecated and will be removed soon. */
-  activeChannelCreator?: boolean;
   image?: ImageMessage;
   prefs?: UserPreferences;
   sidebar?: RtkSidebarSection;
@@ -194,8 +191,6 @@ export type ConnectedMeetingState = {
     participants: ConnectedMeetingParticipant[];
   }[];
 };
-
-export type ChatChannel = ChatChannelWebCore;
 
 export interface Middlewares {
   speech?: any;

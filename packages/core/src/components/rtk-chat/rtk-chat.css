@@ -40,9 +40,6 @@ rtk-chat-composer-view {
 }
 
 @container chatcontainer (height < 360px) {
-  rtk-channel-selector-view {
-    @apply h-8 min-h-[24px];
-  }
 }
 
 .chat {
@@ -52,24 +49,6 @@ rtk-chat-composer-view {
 .banner {
   @apply h-full w-full;
   @apply flex flex-col items-center justify-center;
-
-  .welcome-new-channel {
-    @apply w-48;
-  }
-  .create-channel-illustration {
-    @apply h-40 w-40;
-  }
-}
-
-.channel-selector-header {
-  @apply box-border;
-  @apply h-16 p-4;
-  @apply flex justify-between;
-  border-bottom: theme('borderWidth.sm') solid theme('colors.background.700');
-
-  .channel-create-btn {
-    @apply hover:text-brand-300 w-8 justify-center;
-  }
 }
 
 .view-chats-btn {
@@ -94,11 +73,6 @@ rtk-chat-composer-view {
   @apply absolute inset-0;
   @apply bg-background-1000/60;
   @apply flex;
-
-  rtk-channel-selector-view {
-    @apply max-w-96;
-    animation: 0.3s swipe-in;
-  }
 
   .mobile-close-btn {
     @apply my-4 mx-6 block;

@@ -11,23 +11,18 @@ import {
   EventEmitter,
 } from '@stencil/core';
 import { Meeting, Peer } from '../../types/rtk-client';
-import { Chat, ChatChannel, Size } from '../../types/props';
+import { Chat, Size } from '../../types/props';
 import { defaultIconPack, IconPack } from '../../lib/icons';
 import type { Message, TextMessage } from '@cloudflare/realtimekit';
 import { RtkI18n, useLanguage } from '../../lib/lang';
 import {
-  TEMPORARY_CHANNEL_PREFIX,
-  alphabeticalSorter,
-  getDMComparator,
   generateChatGroupKey,
   handleFilesDataTransfer,
-  isDirectMessageChannel,
   parseMessageForTarget,
 } from '../../utils/chat';
 import { chatUnreadTimestamps } from '../../utils/user-prefs';
 import { FlagsmithFeatureFlags } from '../../utils/flags';
 import { States, UIConfig, createDefaultConfig } from '../../exports';
-import { ChannelItem } from '../rtk-channel-selector-view/rtk-channel-selector-view';
 import { SyncWithStore } from '../../utils/sync-with-store';
 import { NewMessageEvent } from '../rtk-chat-composer-view/rtk-chat-composer-view';
 import { Overrides, defaultOverrides } from '../../lib/overrides';
@@ -44,7 +39,6 @@ export type ChatFilter = (message: Message) => boolean;
 })
 export class RtkChat {
   private chatUpdateListener = ({ message }) => {
-    if (message.channelId) return;
     if (!this.displayFilter || this.displayFilter(message)) {
       this.addToChatGroup(message as Message);
       // shallow copy to trigger render
@@ -134,10 +128,6 @@ export class RtkChat {
 
   @State() selectedParticipant: Peer;
 
-  @State() channels: ChatChannel[] = [];
-
-  @State() selectedChannelId: string;
-
   @State() editingMessage: TextMessage | null = null;
 
   @State() replyMessage: TextMessage | null = null;
@@ -146,16 +136,12 @@ export class RtkChat {
 
   @State() selectorState: 'desktop' | 'hide' | 'mobile' = 'hide';
 
-  @State() creatingChannel = false;
-
   @State() isSendingMessage = false;
 
   @State() showPinnedMessages: boolean = false;
 
   /** Emits updated state data */
   @Event({ eventName: 'rtkStateUpdate' }) stateUpdate: EventEmitter<States>;
-
-  private channelMap: Map<string, ChatChannel> = new Map();
 
   private resizeObserver: ResizeObserver;
 
@@ -223,10 +209,6 @@ export class RtkChat {
       meeting?.participants.joined.removeListener('participantLeft', this.onParticipantUpdate);
     }
     meeting?.chat?.removeListener('chatUpdate', this.chatUpdateListener);
-    meeting?.chat?.removeListener('channelCreate', this.onChannelCreateOrUpdate);
-    meeting?.chat?.removeListener('channelUpdate', this.onChannelCreateOrUpdate);
-    meeting?.chat?.removeListener('channelMessageUpdate', this.onChannelCreateOrUpdate);
-    meeting?.participants?.all?.removeListener('participantsUpdate', this.onChannelCreateOrUpdate);
     meeting.self.permissions.removeListener('*', this.chatPermissionUpdateListener);
   };
 
@@ -273,11 +255,6 @@ export class RtkChat {
       }
     }
   }
-
-  private getFilteredParticipants = () => {
-    if (this.privatePresetFilter.length === 0) return this.participants;
-    return this.participants.filter((p: Peer) => this.privatePresetFilter.includes(p.presetName));
-  };
 
   private onParticipantUpdate = () => {
     this.participants = this.meeting.participants.joined
@@ -391,22 +368,6 @@ export class RtkChat {
     return this.canPrivateMessage && !this.disablePrivateChat;
   };
 
-  private updateRecipients = (event: CustomEvent<ChannelItem>) => {
-    const { id } = event.detail;
-    this.chatRecipientId = id;
-    this.selectedParticipant = this.participants.find((p) => p.userId === id);
-
-    if (this.chatRecipientId !== 'everyone') {
-      const allParticipants = [this.chatRecipientId, this.meeting.self.userId];
-      const targetKey = generateChatGroupKey(allParticipants);
-      this.selectedGroup = targetKey;
-    } else {
-      this.selectedGroup = 'everyone';
-    }
-
-    this.updateUnreadCountGroups({ [this.selectedGroup]: 0 });
-  };
-
   private isTextMessagingAllowed = () => {
     if (this.chatRecipientId === 'everyone') {
       // public chat
@@ -427,106 +388,8 @@ export class RtkChat {
     return this.canPrivateMessage && this.canSendPrivateFiles;
   };
 
-  @Listen('switchChannel')
-  channelSwitchListener(e: CustomEvent) {
-    this.onChannelChanged(e);
-  }
-
-  private onChannelChanged = (e: CustomEvent<ChannelItem>) => {
-    const channel = e.detail;
-    if (channel.id.includes(TEMPORARY_CHANNEL_PREFIX)) {
-      this.createDMChannel(channel.id.replace(TEMPORARY_CHANNEL_PREFIX, ''));
-    } else {
-      this.selectedChannelId = channel.id;
-    }
-    this.cleanup();
-    if (this.selectorState !== 'desktop') {
-      this.selectorState = 'hide';
-    }
-  };
-
-  private createDMChannel = async (memberId: string) => {
-    this.creatingChannel = true;
-    const newChannel = await this.meeting.chat.createChannel('Direct Message', [memberId], {
-      visibility: 'private',
-      isDirectMessage: true,
-    });
-    this.creatingChannel = false;
-    this.selectedChannelId = newChannel.id;
-  };
-
-  private cleanup = () => {
-    this.editingMessage = null;
-    this.replyMessage = null;
-    this.searchQuery = '';
-  };
-
   private onQuotedMessageDismiss = () => {
     this.replyMessage = null;
-  };
-
-  private onChannelCreateOrUpdate = (channel?: ChatChannel) => {
-    if (channel) {
-      this.channelMap.set(channel.id, channel);
-    } else {
-      this.meeting.chat.channels.forEach((chan) => this.channelMap.set(chan.id, chan));
-    }
-    const allChannels = Array.from(this.channelMap.values());
-    const channels = allChannels
-      .filter((channel) => !isDirectMessageChannel(channel))
-      .sort((a, b) => alphabeticalSorter(a.displayName, b.displayName));
-
-    const membersWithChannel = allChannels.filter(isDirectMessageChannel).map((channel) => {
-      return {
-        ...channel,
-        displayName: this.getMemberDisplayName(channel),
-      } as ChatChannel;
-    });
-
-    const membersWithoutChannel = this.meeting.participants.all
-      .toArray()
-      .filter((member) => {
-        if (member.userId === this.meeting.self.userId) return false;
-        const matcher = getDMComparator([this.meeting.self.userId, member.userId]);
-        return membersWithChannel.every(
-          (channel) => getDMComparator(channel.memberIds) !== matcher
-        );
-      })
-      .map((member) => {
-        return {
-          id: `${TEMPORARY_CHANNEL_PREFIX}${member.userId}`,
-          displayName: member.name,
-          displayPictureUrl: member.picture,
-          isDirectMessage: true,
-          unreadCount: 0,
-        } as ChatChannel;
-      });
-
-    const dms = [...membersWithChannel, ...membersWithoutChannel].sort((a, b) =>
-      alphabeticalSorter(a.displayName, b.displayName)
-    );
-    this.channels = [...channels, ...dms];
-
-    // select channel only if it is created in db
-    const nonTemporaryChannel = [...channels, ...membersWithChannel];
-    if (!this.selectedChannelId && nonTemporaryChannel.length !== 0) {
-      this.selectedChannelId = nonTemporaryChannel[0].id;
-    }
-  };
-
-  private getMemberDisplayName = (channel: ChatChannel) => {
-    let id: string;
-    if (channel.memberIds.length === 1) {
-      // channel with self
-      id = channel.memberIds[0];
-    } else {
-      id =
-        channel.memberIds[0] === this.meeting.self.userId
-          ? channel.memberIds[1]
-          : channel.memberIds[0];
-    }
-    const member = this.meeting.participants.all.toArray().find((member) => member.userId === id);
-    return member?.name ?? id;
   };
 
   private onNewMessageHandler = async (e: CustomEvent<NewMessageEvent>) => {
@@ -542,11 +405,7 @@ export class RtkChat {
   private onEditMessageHandler = async (e: CustomEvent<string>) => {
     this.isSendingMessage = true;
     try {
-      await this.meeting?.chat?.editTextMessage(
-        this.editingMessage.id,
-        e.detail,
-        this.editingMessage.channelId
-      );
+      await this.meeting?.chat?.editTextMessage(this.editingMessage.id, e.detail);
     } finally {
       this.isSendingMessage = false;
       this.editingMessage = null;
@@ -610,11 +469,9 @@ export class RtkChat {
     const message = this.editingMessage ? this.editingMessage.message : '';
     const quotedMessage = this.replyMessage ? this.replyMessage.message : '';
 
-    const draftStorageKey = this.selectedChannelId
-      ? `rtk-chat-draft-${this.selectedChannelId}`
-      : 'rtk-chat-draft';
+    const draftStorageKey = 'rtk-chat-draft';
     const editStorageKey = this.editingMessage
-      ? `rtk-chat-edit-${this.selectedChannelId ?? 'no-channel'}-${this.editingMessage.id}`
+      ? `rtk-chat-edit-${'no-channel'}-${this.editingMessage.id}`
       : 'rtk-chat-edit';
     const storageKey = this.editingMessage ? editStorageKey : draftStorageKey;
 
@@ -641,26 +498,6 @@ export class RtkChat {
       </rtk-chat-composer-view>
     );
   }
-
-  private getPrivateChatRecipients = () => {
-    const participants = this.getFilteredParticipants().map((participant) => {
-      const key = generateChatGroupKey([participant.userId, this.meeting.self.userId]);
-      const result: ChannelItem = {
-        id: participant.userId,
-        name: participant.name,
-        avatarUrl: participant.picture,
-        unreadCount: this.unreadCountGroups[key],
-      };
-      return result;
-    });
-    const everyone: ChannelItem = {
-      id: 'everyone',
-      name: this.t('chat.everyone'),
-      icon: 'participants',
-      unreadCount: this.unreadCountGroups['everyone'],
-    };
-    return [everyone, ...participants];
-  };
 
   private getPinnedMessageLabel = (message: Message) => {
     if (message.type === 'text') return message.message;
@@ -728,15 +565,6 @@ export class RtkChat {
               </div>
             )}
             {this.renderPinnedMessagesHeader()}
-            {this.isPrivateChatSupported() && (
-              <rtk-channel-selector-view
-                channels={this.getPrivateChatRecipients()}
-                selectedChannelId={this.selectedParticipant?.userId || 'everyone'}
-                onChannelChange={this.updateRecipients}
-                t={this.t}
-                viewAs="dropdown"
-              />
-            )}
             <rtk-chat-messages-ui-paginated
               meeting={this.meeting}
               onPinMessage={this.onPinMessage}

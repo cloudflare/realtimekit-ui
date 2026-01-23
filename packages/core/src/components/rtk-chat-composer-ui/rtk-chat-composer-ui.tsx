@@ -1,14 +1,4 @@
-import {
-  Component,
-  Host,
-  h,
-  Prop,
-  Event,
-  EventEmitter,
-  State,
-  writeTask,
-  Watch,
-} from '@stencil/core';
+import { Component, Host, h, Prop, Event, EventEmitter, State, writeTask } from '@stencil/core';
 import { defaultIconPack, IconPack, Size } from '../../exports';
 import { RtkI18n, useLanguage } from '../../lib/lang';
 import {
@@ -81,9 +71,6 @@ export class RtkChatComposerUi {
   /** list of members that can be mentioned */
   @Prop() members?: RTKBasicParticipant[] = [];
 
-  /** channel id */
-  @Prop() channelId?: string;
-
   @State() emojiPickerActive = false;
 
   @State() mentionQuery: string = '';
@@ -99,7 +86,6 @@ export class RtkChatComposerUi {
   @Event({ eventName: 'rtkEditMessage' }) onEditMessage: EventEmitter<{
     id: string;
     message: string;
-    channelId?: string;
   }>;
 
   /** Event emitted when message editing is cancelled */
@@ -119,15 +105,6 @@ export class RtkChatComposerUi {
     // this.fileReader.onloadend = () => {};
   }
 
-  @Watch('channelId')
-  onChannelChanged() {
-    this.mentionQuery = '';
-    this.focusedMemberIndex = 0;
-    const message = gracefulStorage.getItem(this.storageKey) || '';
-    this.$textArea.value = message;
-    this.emojiPickerActive = false;
-  }
-
   componentDidRender() {
     if (this.prefill.editMessage || this.prefill.replyMessage) {
       writeTask(() => this.$textArea.focus());
@@ -135,9 +112,6 @@ export class RtkChatComposerUi {
   }
 
   get storageKey() {
-    if (this.channelId) {
-      return `rtk-text-message-${this.channelId}`;
-    }
     return 'rtk-text-message';
   }
 
@@ -277,7 +251,6 @@ export class RtkChatComposerUi {
     this.onEditMessage.emit({
       id: this.prefill.editMessage.id,
       message: editedMessage,
-      channelId: this.prefill.editMessage.channelId,
     });
     this.cleanup();
   };
