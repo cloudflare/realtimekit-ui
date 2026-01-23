@@ -5,6 +5,24 @@
   flex: 1;
 }
 
+:host(.chat-selector-paginated-list) {
+  .container {
+    @apply box-border flex flex-col p-2;
+    flex: 1 0 0px;
+    overflow-y: scroll;
+  }
+  .private-chat-label {
+    @apply flex w-full cursor-pointer flex-row items-center justify-start gap-2 py-3;
+
+    rtk-avatar {
+      @apply h-6 w-6;
+    }
+  }
+  .show-new-messages-ctr.active {
+    @apply hidden;
+  }
+}
+
 .container {
   @apply box-border flex flex-col-reverse py-4 px-2;
   flex: 1 0 0px;

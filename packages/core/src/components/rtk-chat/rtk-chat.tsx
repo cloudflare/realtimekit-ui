@@ -10,7 +10,7 @@ import {
   Event,
   EventEmitter,
 } from '@stencil/core';
-import { Meeting, Peer } from '../../types/rtk-client';
+import { Meeting, Peer, Participant } from '../../types/rtk-client';
 import { Chat, Size } from '../../types/props';
 import { defaultIconPack, IconPack } from '../../lib/icons';
 import type { Message, TextMessage } from '@cloudflare/realtimekit';
@@ -201,6 +201,21 @@ export class RtkChat {
     } else if (event.detail.flags.isEdit) {
       this.editingMessage = event.detail.payload;
     }
+  }
+
+  @Listen('rtkChatSelectorChange')
+  onChatSelectorChange(event: CustomEvent<{ selectedUser?: Participant }>) {
+    const selectedUser = event.detail?.selectedUser;
+
+    // Everyone
+    if (!selectedUser) {
+      this.selectedParticipant = null;
+      this.chatRecipientId = this.selectedGroup = 'everyone';
+      return;
+    }
+
+    this.selectedParticipant = selectedUser;
+    this.chatRecipientId = this.selectedGroup = selectedUser.userId;
   }
 
   private disconnectMeeting = (meeting: Meeting) => {
@@ -564,7 +579,8 @@ export class RtkChat {
                 <p>{this.t('chat.send_attachment')}</p>
               </div>
             )}
-            {this.renderPinnedMessagesHeader()}
+            <rtk-chat-header></rtk-chat-header>
+            {/* {this.renderPinnedMessagesHeader()} */}
             <rtk-chat-messages-ui-paginated
               meeting={this.meeting}
               onPinMessage={this.onPinMessage}

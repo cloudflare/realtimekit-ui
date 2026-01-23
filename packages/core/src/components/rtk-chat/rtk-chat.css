@@ -4,7 +4,7 @@
 :host {
   @apply flex h-full w-full flex-col;
   @apply text-text-md;
-  @apply text-text-1000 relative;
+  @apply text-text-1000 relative box-border;
 }
 
 h3 {
@@ -43,7 +43,7 @@ rtk-chat-composer-view {
 }
 
 .chat {
-  @apply flex flex-1 flex-col;
+  @apply box-border flex flex-1 flex-col;
 }
 
 .banner {

@@ -54,7 +54,7 @@ export class RtkPaginatedList {
   private $bottomRef: HTMLDivElement;
 
   // Timestamp pertaining to the oldest stored message
-  private oldestPaginatedTimestamp: number | null = null;
+  private oldestPaginatedTimestamp: number | null = 0;
 
   // Timestamp pertaining to the latest stored message
   private latestPaginatedTimestamp: number | null = null;
@@ -162,6 +162,7 @@ export class RtkPaginatedList {
   async onNodeDelete(id: string) {
     for (let i = this.pages.length - 1; i >= 0; i--) {
       const index = this.pages[i].findIndex((node) => node.id === id);
+      console.log(index);
       // if message not found, move on
       if (index === -1) continue;
       // delete message
@@ -238,8 +239,8 @@ export class RtkPaginatedList {
 
     const scrollAnchor = this.getScrollAnchor('top');
 
-    // if no old timestamp, it means we are at initial state
-    if (!this.oldestPaginatedTimestamp) this.oldestPaginatedTimestamp = new Date().getTime();
+    // if old timestamp is 0, it means we are at initial state
+    if (this.oldestPaginatedTimestamp === 0) this.oldestPaginatedTimestamp = new Date().getTime();
 
     // load data
     this.isLoading = true;
