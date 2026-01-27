@@ -2427,13 +2427,9 @@ export namespace Components {
          */
         "pagesAllowed": number;
         /**
-          * Resets the paginated list
+          * Resets the paginated list to a given timestamp
          */
-        "reset": () => Promise<void>;
-        /**
-          * Item id
-         */
-        "selectedItemId"?: string;
+        "reset": (timestamp?: number) => Promise<void>;
         /**
           * Language
          */
@@ -2833,6 +2829,14 @@ export namespace Components {
           * Icon pack
          */
         "iconPack": IconPack;
+        /**
+          * Meeting object
+         */
+        "meeting": Meeting;
+        /**
+          * Language
+         */
+        "t": RtkI18n;
     }
     interface RtkPipToggle {
         /**
@@ -5666,6 +5670,7 @@ declare global {
     };
     interface HTMLRtkPinnedMessageSelectorElementEventMap {
         "rtkDropdownToggle": { open: boolean };
+        "rtkPinnedMessageSelect": Message;
     }
     interface HTMLRtkPinnedMessageSelectorElement extends Components.RtkPinnedMessageSelector, HTMLStencilElement {
         addEventListener<K extends keyof HTMLRtkPinnedMessageSelectorElementEventMap>(type: K, listener: (this: HTMLRtkPinnedMessageSelectorElement, ev: RtkPinnedMessageSelectorCustomEvent<HTMLRtkPinnedMessageSelectorElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
@@ -9094,10 +9099,6 @@ declare namespace LocalJSX {
          */
         "pagesAllowed"?: number;
         /**
-          * Item id
-         */
-        "selectedItemId"?: string;
-        /**
           * Language
          */
         "t"?: RtkI18n;
@@ -9526,7 +9527,19 @@ declare namespace LocalJSX {
           * Icon pack
          */
         "iconPack"?: IconPack;
+        /**
+          * Meeting object
+         */
+        "meeting"?: Meeting;
         "onRtkDropdownToggle"?: (event: RtkPinnedMessageSelectorCustomEvent<{ open: boolean }>) => void;
+        /**
+          * Emits when a pinned message is selected
+         */
+        "onRtkPinnedMessageSelect"?: (event: RtkPinnedMessageSelectorCustomEvent<Message>) => void;
+        /**
+          * Language
+         */
+        "t"?: RtkI18n;
     }
     interface RtkPipToggle {
         /**

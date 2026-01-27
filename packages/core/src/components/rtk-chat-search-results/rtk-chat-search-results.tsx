@@ -61,7 +61,6 @@ export class RtkChatSearchResults {
           pagesAllowed={3}
           fetchData={this.searchMessages}
           createNodes={this.nodeRenderer}
-          selectedItemId={this.query}
         />
       </Host>
     );

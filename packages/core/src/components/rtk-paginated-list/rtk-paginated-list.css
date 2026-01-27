@@ -23,6 +23,39 @@
   }
 }
 
+:host(.pinned-message-selector-paginated-list) {
+  .container {
+    @apply box-border flex flex-col-reverse p-2;
+    flex: 1 0 0px;
+    overflow-y: scroll;
+  }
+
+  .page {
+    @apply relative box-border;
+  }
+
+  .pinned-message {
+    @apply flex w-full cursor-pointer flex-row items-start gap-2 rounded-sm py-2;
+    @apply hover:bg-background-800;
+  }
+
+  .pinned-message-content {
+    @apply flex min-w-0 flex-1 flex-col;
+  }
+
+  .pinned-message-time {
+    @apply text-text-sm text-text-700;
+  }
+
+  .pinned-message-preview {
+    @apply text-text-1000 line-clamp-2 mb-2 break-all;
+  }
+
+  rtk-avatar {
+    @apply h-6 w-6;
+  }
+}
+
 .container {
   @apply box-border flex flex-col-reverse py-4 px-2;
   flex: 1 0 0px;

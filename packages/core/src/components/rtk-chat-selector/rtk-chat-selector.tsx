@@ -92,6 +92,7 @@ export class RtkChatSelector {
 
   @Watch('overrides')
   overridesChanged(overrides) {
+    if (!this.meeting || this.meeting.self) return;
     this.showPrivateChat =
       !!(
         this.meeting.self.permissions.chatPrivate?.canSend ||
@@ -183,7 +184,11 @@ export class RtkChatSelector {
 
   private createPaticipantNodes = (data: Participant[]) => {
     return data.map((participant) => (
-      <div class="private-chat-label" onClick={() => this.selectUser(participant)}>
+      <div
+        class="private-chat-label"
+        id={participant.id}
+        onClick={() => this.selectUser(participant)}
+      >
         <rtk-avatar size="sm" participant={participant} />
         <span>{participant.name}</span>
       </div>
@@ -221,7 +226,6 @@ export class RtkChatSelector {
             pagesAllowed={3}
             fetchData={this.getParticipants}
             createNodes={this.createPaticipantNodes}
-            selectedItemId={this.selectedUser?.id || ''}
             emptyListLabel={this.t('participants.empty_list')}
           >
             <slot></slot>

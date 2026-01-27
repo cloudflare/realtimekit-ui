@@ -9,6 +9,7 @@ import {
   State,
   Prop,
   Watch,
+  Listen,
 } from '@stencil/core';
 import { defaultIconPack, IconPack } from '../../lib/icons';
 import { RtkI18n, useLanguage } from '../../lib/lang';
@@ -79,6 +80,13 @@ export class RtkChatMessagesUiPaginated {
 
   connectedCallback() {
     this.meetingChanged(this.meeting);
+  }
+
+  @Listen('rtkPinnedMessageSelect', { target: 'window' })
+  async onPinnedMessageSelect(event: CustomEvent<Message>) {
+    const message = event.detail;
+    if (!message) return;
+    await this.$paginatedListRef?.reset?.(message.timeMs + 1);
   }
 
   disconnectedCallback() {
