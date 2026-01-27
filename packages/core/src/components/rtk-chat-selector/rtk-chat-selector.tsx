@@ -197,7 +197,7 @@ export class RtkChatSelector {
         <div class="chat-header" onClick={this.toggle}>
           <div class="chat-header-label">
             <rtk-icon icon={this.iconPack.participants} size="sm" />
-            {!this.selectedUser ? 'Everyone' : this.selectedUser.name}
+            {!this.selectedUser ? this.t('chat.everyone') : this.selectedUser.name}
           </div>
           <div class="chevron">
             <rtk-icon
@@ -212,7 +212,7 @@ export class RtkChatSelector {
             <div class="public-chat-icon">
               <rtk-icon icon={this.iconPack.participants} size="sm" />
             </div>
-            Everyone
+            {this.t('chat.everyone')}
           </div>
           <rtk-paginated-list
             class="chat-selector-paginated-list"
