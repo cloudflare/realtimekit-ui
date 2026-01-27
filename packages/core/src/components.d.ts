@@ -18,8 +18,7 @@ import { AvatarVariant } from "./components/rtk-avatar/rtk-avatar";
 import { DraftMeeting } from "./utils/breakout-rooms-manager";
 import { ButtonKind, ButtonVariant } from "./components/rtk-button/rtk-button";
 import { Overrides } from "./lib/overrides";
-import { ChatFilter } from "./components/rtk-chat/rtk-chat";
-import { FileMessage, ImageMessage, Message, RTKBasicParticipant, RTKPermissionsPreset, RTKPlugin, TextMessage } from "@cloudflare/realtimekit";
+import { FileMessage, ImageMessage, Message, BasicParticipant as RTKBasicParticipant, RTKPermissionsPreset, RTKPlugin, TextMessage } from "@cloudflare/realtimekit";
 import { RtkNewMessageEvent } from "./components/rtk-chat-composer-ui/rtk-chat-composer-ui";
 import { NewMessageEvent } from "./components/rtk-chat-composer-view/rtk-chat-composer-view";
 import { ChatGroup, ChatGroupChangedType } from "./components/rtk-chat-selector-ui/rtk-chat-selector-ui";
@@ -59,8 +58,7 @@ export { AvatarVariant } from "./components/rtk-avatar/rtk-avatar";
 export { DraftMeeting } from "./utils/breakout-rooms-manager";
 export { ButtonKind, ButtonVariant } from "./components/rtk-button/rtk-button";
 export { Overrides } from "./lib/overrides";
-export { ChatFilter } from "./components/rtk-chat/rtk-chat";
-export { FileMessage, ImageMessage, Message, RTKBasicParticipant, RTKPermissionsPreset, RTKPlugin, TextMessage } from "@cloudflare/realtimekit";
+export { FileMessage, ImageMessage, Message, BasicParticipant as RTKBasicParticipant, RTKPermissionsPreset, RTKPlugin, TextMessage } from "@cloudflare/realtimekit";
 export { RtkNewMessageEvent } from "./components/rtk-chat-composer-ui/rtk-chat-composer-ui";
 export { NewMessageEvent } from "./components/rtk-chat-composer-view/rtk-chat-composer-view";
 export { ChatGroup, ChatGroupChangedType } from "./components/rtk-chat-selector-ui/rtk-chat-selector-ui";
@@ -537,14 +535,6 @@ export namespace Components {
          */
         "config": UIConfig1;
         /**
-          * disables private chat
-         */
-        "disablePrivateChat": boolean;
-        /**
-          * @deprecated Beta API, will change in future A filter function for messages to be displayed
-         */
-        "displayFilter": ChatFilter;
-        /**
           * Icon pack
          */
         "iconPack": IconPack;
@@ -556,10 +546,6 @@ export namespace Components {
           * UI Overrides
          */
         "overrides": Overrides;
-        /**
-          * @deprecated Beta API, will change in future List of target presets allowed as private chat recipient
-         */
-        "privatePresetFilter": String[];
         /**
           * Size
          */
@@ -778,13 +764,13 @@ export namespace Components {
          */
         "iconPack": IconPack;
         /**
-          * Whether to align chat bubbles to the left
-         */
-        "leftAlign": boolean;
-        /**
           * Meeting object
          */
         "meeting": Meeting;
+        /**
+          * Selected recipient for private chat; when unset, messages are loaded for public chat (Everyone).
+         */
+        "privateChatRecipient": Participant | null;
         /**
           * Size
          */
@@ -833,6 +819,10 @@ export namespace Components {
           * Meeting object
          */
         "meeting": Meeting;
+        /**
+          * UI Overrides
+         */
+        "overrides": Overrides1;
         /**
           * Size
          */
@@ -2436,6 +2426,10 @@ export namespace Components {
           * Number of pages allowed to be shown
          */
         "pagesAllowed": number;
+        /**
+          * Resets the paginated list
+         */
+        "reset": () => Promise<void>;
         /**
           * Item id
          */
@@ -6999,14 +6993,6 @@ declare namespace LocalJSX {
          */
         "config"?: UIConfig1;
         /**
-          * disables private chat
-         */
-        "disablePrivateChat"?: boolean;
-        /**
-          * @deprecated Beta API, will change in future A filter function for messages to be displayed
-         */
-        "displayFilter"?: ChatFilter;
-        /**
           * Icon pack
          */
         "iconPack"?: IconPack;
@@ -7022,10 +7008,6 @@ declare namespace LocalJSX {
           * UI Overrides
          */
         "overrides"?: Overrides;
-        /**
-          * @deprecated Beta API, will change in future List of target presets allowed as private chat recipient
-         */
-        "privatePresetFilter"?: String[];
         /**
           * Size
          */
@@ -7299,10 +7281,6 @@ declare namespace LocalJSX {
          */
         "iconPack"?: IconPack;
         /**
-          * Whether to align chat bubbles to the left
-         */
-        "leftAlign"?: boolean;
-        /**
           * Meeting object
          */
         "meeting"?: Meeting;
@@ -7329,6 +7307,10 @@ declare namespace LocalJSX {
           * Emits updated state data
          */
         "onRtkStateUpdate"?: (event: RtkChatMessagesUiPaginatedCustomEvent<States>) => void;
+        /**
+          * Selected recipient for private chat; when unset, messages are loaded for public chat (Everyone).
+         */
+        "privateChatRecipient"?: Participant | null;
         /**
           * Size
          */
@@ -7378,6 +7360,10 @@ declare namespace LocalJSX {
         "meeting"?: Meeting;
         "onRtkChatSelectorChange"?: (event: RtkChatSelectorCustomEvent<{ selectedUser?: Participant | undefined }>) => void;
         "onRtkDropdownToggle"?: (event: RtkChatSelectorCustomEvent<{ open: boolean }>) => void;
+        /**
+          * UI Overrides
+         */
+        "overrides"?: Overrides1;
         /**
           * Size
          */

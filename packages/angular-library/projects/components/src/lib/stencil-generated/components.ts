@@ -452,14 +452,14 @@ export declare interface RtkCaptionToggle extends Components.RtkCaptionToggle {
 
 
 @ProxyCmp({
-  inputs: ['config', 'disablePrivateChat', 'displayFilter', 'iconPack', 'meeting', 'overrides', 'privatePresetFilter', 'size', 't']
+  inputs: ['config', 'iconPack', 'meeting', 'overrides', 'size', 't']
 })
 @Component({
   selector: 'rtk-chat',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: '<ng-content></ng-content>',
   // eslint-disable-next-line @angular-eslint/no-inputs-metadata-property
-  inputs: ['config', 'disablePrivateChat', 'displayFilter', 'iconPack', 'meeting', 'overrides', 'privatePresetFilter', 'size', 't'],
+  inputs: ['config', 'iconPack', 'meeting', 'overrides', 'size', 't'],
 })
 export class RtkChat {
   protected el: HTMLRtkChatElement;
@@ -660,14 +660,14 @@ export declare interface RtkChatMessagesUi extends Components.RtkChatMessagesUi 
 
 
 @ProxyCmp({
-  inputs: ['iconPack', 'leftAlign', 'meeting', 'size', 't']
+  inputs: ['iconPack', 'meeting', 'privateChatRecipient', 'size', 't']
 })
 @Component({
   selector: 'rtk-chat-messages-ui-paginated',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: '<ng-content></ng-content>',
   // eslint-disable-next-line @angular-eslint/no-inputs-metadata-property
-  inputs: ['iconPack', 'leftAlign', 'meeting', 'size', 't'],
+  inputs: ['iconPack', 'meeting', 'privateChatRecipient', 'size', 't'],
 })
 export class RtkChatMessagesUiPaginated {
   protected el: HTMLRtkChatMessagesUiPaginatedElement;
@@ -730,7 +730,7 @@ export declare interface RtkChatSearchResults extends Components.RtkChatSearchRe
 
 
 @ProxyCmp({
-  inputs: ['config', 'iconPack', 'meeting', 'size', 'states', 't'],
+  inputs: ['config', 'iconPack', 'meeting', 'overrides', 'size', 'states', 't'],
   methods: ['close']
 })
 @Component({
@@ -738,7 +738,7 @@ export declare interface RtkChatSearchResults extends Components.RtkChatSearchRe
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: '<ng-content></ng-content>',
   // eslint-disable-next-line @angular-eslint/no-inputs-metadata-property
-  inputs: ['config', 'iconPack', 'meeting', 'size', 'states', 't'],
+  inputs: ['config', 'iconPack', 'meeting', 'overrides', 'size', 'states', 't'],
 })
 export class RtkChatSelector {
   protected el: HTMLRtkChatSelectorElement;
@@ -2295,7 +2295,7 @@ export declare interface RtkOverlayModal extends Components.RtkOverlayModal {
 
 @ProxyCmp({
   inputs: ['autoScroll', 'createNodes', 'emptyListLabel', 'fetchData', 'iconPack', 'pageSize', 'pagesAllowed', 'selectedItemId', 't'],
-  methods: ['onNewNode', 'onNodeDelete', 'onNodeUpdate']
+  methods: ['onNewNode', 'onNodeDelete', 'onNodeUpdate', 'reset']
 })
 @Component({
   selector: 'rtk-paginated-list',

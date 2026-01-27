@@ -2,7 +2,7 @@ import { Component, Event, EventEmitter, Method, h, Host, Prop, State, Watch } f
 import { SyncWithStore } from '../../utils/sync-with-store';
 import { Meeting, Participant } from '../../types/rtk-client';
 import { Size } from '../../types/props';
-import { States, UIConfig, createDefaultConfig } from '../../exports';
+import { Overrides, States, UIConfig, createDefaultConfig, defaultOverrides } from '../../exports';
 import { IconPack, defaultIconPack } from '../../lib/icons';
 import { RtkI18n, useLanguage } from '../../lib/lang';
 
@@ -39,6 +39,11 @@ export class RtkChatSelector {
   @Prop()
   t: RtkI18n = useLanguage();
 
+  /** UI Overrides */
+  @SyncWithStore()
+  @Prop()
+  overrides: Overrides = defaultOverrides;
+
   /** Size */
   @Prop({ reflect: true }) size: Size;
 
@@ -74,6 +79,7 @@ export class RtkChatSelector {
 
   connectedCallback() {
     this.meetingChanged(this.meeting);
+    this.overridesChanged(this.overrides);
   }
 
   disconnectedCallback() {
@@ -84,17 +90,36 @@ export class RtkChatSelector {
     participants?.joined?.off('participantLeft', this.participantLeftListener);
   }
 
+  @Watch('overrides')
+  overridesChanged(overrides) {
+    this.showPrivateChat =
+      !!(
+        this.meeting.self.permissions.chatPrivate?.canSend ||
+        this.meeting.self.permissions.chatPrivate?.canReceive
+      ) && !overrides.disablePrivateChat;
+  }
+
   @Watch('meeting')
-  meetingChanged(meeting: Meeting) {
-    if (!meeting || !this.meeting.chat) return;
-    this.showPrivateChat = !!(
-      meeting.self.permissions.chatPrivate?.canSend ||
-      meeting.self.permissions.chatPrivate?.canReceive
-    );
+  meetingChanged(meeting: Meeting, oldMeeting?: Meeting) {
+    if (oldMeeting) this.disconnectMeeting(oldMeeting);
+    if (!meeting || !meeting.chat) return;
+    this.showPrivateChat =
+      !!(
+        meeting.self.permissions.chatPrivate?.canSend ||
+        meeting.self.permissions.chatPrivate?.canReceive
+      ) && !this.overrides.disablePrivateChat;
+    this.onParticipantUpdate();
     meeting.self.permissions.on('*', this.chatPermissionUpdateListener);
     meeting?.participants?.joined?.on('participantJoined', this.participantJoinedListener);
     meeting?.participants?.joined?.on('participantLeft', this.participantLeftListener);
   }
+
+  private disconnectMeeting = (meeting: Meeting) => {
+    const { self, participants } = meeting || {};
+    self?.permissions?.off('*', this.chatPermissionUpdateListener);
+    participants?.joined?.off('participantJoined', this.participantJoinedListener);
+    participants?.joined?.off('participantLeft', this.participantLeftListener);
+  };
 
   private toggle = (e: MouseEvent) => {
     e.preventDefault();
@@ -114,6 +139,19 @@ export class RtkChatSelector {
       this.meeting.self.permissions.chatPrivate?.canSend ||
       this.meeting.self.permissions.chatPrivate?.canReceive
     );
+    if (!this.showPrivateChat) {
+      this.selectedUser = undefined;
+      this.chatSelectorChange.emit({ selectedUser: undefined });
+    }
+  };
+
+  private onParticipantUpdate = () => {
+    if (!this.selectedUser) return;
+    const participants = this.meeting?.participants?.joined?.toArray?.() || [];
+    if (!participants.some((p) => p.id === this.selectedUser?.id)) {
+      this.selectedUser = undefined;
+      this.chatSelectorChange.emit({ selectedUser: undefined });
+    }
   };
 
   private participantJoinedListener = (data) => {
@@ -122,6 +160,7 @@ export class RtkChatSelector {
 
   private participantLeftListener = (data) => {
     this.$paginatedListRef.onNodeDelete(data.id);
+    this.onParticipantUpdate();
   };
 
   private getParticipants = async (timestamp: number, size: number, reversed: boolean) => {

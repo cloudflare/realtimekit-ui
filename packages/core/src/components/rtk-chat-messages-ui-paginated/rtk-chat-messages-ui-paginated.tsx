@@ -12,7 +12,7 @@ import {
 } from '@stencil/core';
 import { defaultIconPack, IconPack } from '../../lib/icons';
 import { RtkI18n, useLanguage } from '../../lib/lang';
-import { Meeting } from '../../types/rtk-client';
+import { Meeting, Participant } from '../../types/rtk-client';
 import { Size, States } from '../../types/props';
 import { SyncWithStore } from '../../utils/sync-with-store';
 
@@ -44,6 +44,9 @@ export class RtkChatMessagesUiPaginated {
   @Prop()
   t: RtkI18n = useLanguage();
 
+  /** Selected recipient for private chat; when unset, messages are loaded for public chat (Everyone). */
+  @Prop() privateChatRecipient: Participant | null;
+
   /** Event for editing a message */
   @Event({ bubbles: true, composed: true }) editMessageInit: EventEmitter<{
     payload: TextMessage;
@@ -64,9 +67,6 @@ export class RtkChatMessagesUiPaginated {
 
   @State() children: HTMLElement;
 
-  /** Whether to align chat bubbles to the left */
-  @Prop() leftAlign = false;
-
   @State() permissionsChanged = false;
 
   private pageSize: number = 25;
@@ -85,6 +85,11 @@ export class RtkChatMessagesUiPaginated {
     this.disconnectMeeting(this.meeting);
   }
 
+  @Watch('privateChatRecipient')
+  privateChatRecipientChanged() {
+    this.$paginatedListRef?.reset();
+  }
+
   @Watch('meeting')
   meetingChanged(meeting: Meeting, oldMeeting?: Meeting) {
     if (oldMeeting != undefined) this.disconnectMeeting(oldMeeting);
@@ -100,14 +105,32 @@ export class RtkChatMessagesUiPaginated {
     this.permissionsChanged = !this.permissionsChanged;
   };
 
-  // TODO: Implement the logic to mark messages as read. Old usages have been kept as-is.
-  private maybeMarkChatAsRead = (_messages: Message[]) => {};
-
   private getChatMessages = async (timestamp: number, size: number, reversed: boolean) => {
-    const { messages } = await this.meeting.chat.getMessages(timestamp, size, reversed, undefined);
-    this.maybeMarkChatAsRead(messages);
-
-    return messages;
+    if (this.privateChatRecipient) {
+      try {
+        const messages = await this.meeting.chat.fetchPrivateMessages({
+          timestamp,
+          offset: 0,
+          limit: size,
+          direction: reversed ? 'before' : 'after',
+          userId: this.privateChatRecipient.id,
+        });
+        return messages;
+      } catch (err) {
+        return [];
+      }
+    }
+    try {
+      const messages = await this.meeting.chat.fetchMessages({
+        timestamp,
+        offset: 0,
+        limit: size,
+        direction: reversed ? 'before' : 'after',
+      });
+      return messages;
+    } catch (err) {
+      return [];
+    }
   };
 
   private createChatNodes = (data: Message[]) => {
@@ -174,8 +197,6 @@ export class RtkChatMessagesUiPaginated {
   };
 
   private createChatNode = (message: Message, isContinued: boolean) => {
-    if (message.targetUserIds.length !== 0) return null; // don't render private messages
-
     let displayPicture: string;
 
     if (this.meeting.meta.viewType === 'CHAT') {
@@ -245,9 +266,17 @@ export class RtkChatMessagesUiPaginated {
   };
 
   private chatUpdateListener = (data: ChatUpdateParams) => {
+    if (
+      this.privateChatRecipient &&
+      data.message.targetUserIds?.length > 0 &&
+      !data.message.targetUserIds.includes(this.privateChatRecipient.id)
+    ) {
+      // private chat is selected and this event is not related to it
+      return;
+    }
+
     if (data.action === 'add') {
       this.$paginatedListRef.onNewNode(data.message);
-      this.maybeMarkChatAsRead([data.message as Message]);
     } else if (data.action === 'delete') {
       this.$paginatedListRef.onNodeDelete(data.message.id);
     } else if (data.action === 'edit') {

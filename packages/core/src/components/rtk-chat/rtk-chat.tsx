@@ -11,17 +11,11 @@ import {
   EventEmitter,
 } from '@stencil/core';
 import { Meeting, Peer, Participant } from '../../types/rtk-client';
-import { Chat, Size } from '../../types/props';
+import { Size } from '../../types/props';
 import { defaultIconPack, IconPack } from '../../lib/icons';
 import type { Message, TextMessage } from '@cloudflare/realtimekit';
 import { RtkI18n, useLanguage } from '../../lib/lang';
-import {
-  generateChatGroupKey,
-  handleFilesDataTransfer,
-  parseMessageForTarget,
-} from '../../utils/chat';
-import { chatUnreadTimestamps } from '../../utils/user-prefs';
-import { FlagsmithFeatureFlags } from '../../utils/flags';
+import { handleFilesDataTransfer } from '../../utils/chat';
 import { States, UIConfig, createDefaultConfig } from '../../exports';
 import { SyncWithStore } from '../../utils/sync-with-store';
 import { NewMessageEvent } from '../rtk-chat-composer-view/rtk-chat-composer-view';
@@ -38,14 +32,6 @@ export type ChatFilter = (message: Message) => boolean;
   shadow: true,
 })
 export class RtkChat {
-  private chatUpdateListener = ({ message }) => {
-    if (!this.displayFilter || this.displayFilter(message)) {
-      this.addToChatGroup(message as Message);
-      // shallow copy to trigger render
-      this.chatGroups = { ...this.chatGroups };
-    }
-  };
-
   private chatPermissionUpdateListener = () => {
     this.canSend = this.meeting.self.permissions.chatPublic.canSend;
     this.canSendTextMessage = this.meeting.self.permissions.chatPublic.text;
@@ -82,30 +68,8 @@ export class RtkChat {
   @Prop()
   overrides: Overrides = defaultOverrides;
 
-  /** disables private chat */
-  @Prop() disablePrivateChat: boolean = false;
-
   /** Can current user pin/unpin messages */
   @State() canPinMessages: boolean = false;
-
-  /**
-   * @deprecated
-   * Beta API, will change in future
-   * List of target presets allowed as private chat recipient
-   */
-  @Prop() privatePresetFilter: String[] = [];
-
-  /**
-   * @deprecated
-   * Beta API, will change in future
-   * A filter function for messages to be displayed
-   */
-  @Prop() displayFilter: ChatFilter = undefined;
-
-  @State() unreadCountGroups: Record<string, number> = {};
-
-  @State() chatGroups: Record<string, Chat[]> = { everyone: [] };
-  @State() selectedGroup: string = 'everyone';
 
   @State() now: Date = new Date();
 
@@ -121,8 +85,6 @@ export class RtkChat {
   @State() canSendPrivateFiles: boolean = false;
 
   @State() emojiPickerEnabled: boolean = false;
-
-  @State() chatRecipientId: string = 'everyone';
 
   @State() participants: Peer[] = [];
 
@@ -206,24 +168,15 @@ export class RtkChat {
   @Listen('rtkChatSelectorChange')
   onChatSelectorChange(event: CustomEvent<{ selectedUser?: Participant }>) {
     const selectedUser = event.detail?.selectedUser;
-
     // Everyone
     if (!selectedUser) {
       this.selectedParticipant = null;
-      this.chatRecipientId = this.selectedGroup = 'everyone';
       return;
     }
-
     this.selectedParticipant = selectedUser;
-    this.chatRecipientId = this.selectedGroup = selectedUser.userId;
   }
 
   private disconnectMeeting = (meeting: Meeting) => {
-    if (this.isPrivateChatSupported()) {
-      meeting?.participants.joined.removeListener('participantJoined', this.onParticipantUpdate);
-      meeting?.participants.joined.removeListener('participantLeft', this.onParticipantUpdate);
-    }
-    meeting?.chat?.removeListener('chatUpdate', this.chatUpdateListener);
     meeting.self.permissions.removeListener('*', this.chatPermissionUpdateListener);
   };
 
@@ -250,141 +203,18 @@ export class RtkChat {
       );
       this.canSendPrivateTexts = !!meeting.self.permissions.chatPrivate?.text;
       this.canSendPrivateFiles = !!meeting.self.permissions.chatPrivate?.files;
-      this.canPinMessages =
-        meeting?.__internals__?.features.hasFeature(FlagsmithFeatureFlags.PINNED_MESSAGES) &&
-        meeting.self.permissions.pinParticipant;
-
-      this.initializeChatGroups();
-      // shallow copy to trigger render
-      this.chatGroups = { ...this.chatGroups };
 
       meeting.self.permissions.on('*', this.chatPermissionUpdateListener);
-
-      this.onParticipantUpdate();
-
-      meeting.chat?.addListener('chatUpdate', this.chatUpdateListener);
-
-      if (this.isPrivateChatSupported()) {
-        meeting.participants.joined.addListener('participantJoined', this.onParticipantUpdate);
-        meeting.participants.joined.addListener('participantLeft', this.onParticipantUpdate);
-      }
     }
-  }
-
-  private onParticipantUpdate = () => {
-    this.participants = this.meeting.participants.joined
-      .toArray()
-      .filter(
-        (p: Peer) =>
-          this.privatePresetFilter.length === 0 || this.privatePresetFilter.includes(p.presetName)
-      );
-
-    // if selected participant leaves, reset state to everyone
-    if (this.selectedParticipant && !this.participants.includes(this.selectedParticipant)) {
-      this.selectedParticipant = null;
-      this.chatRecipientId = this.selectedGroup = 'everyone';
-    }
-  };
-
-  @Watch('chatGroups')
-  chatGroupsChanged(chatGroups: Record<string, Chat[]>) {
-    if (!this.isPrivateChatSupported()) {
-      return;
-    }
-
-    const unreadCounts = {};
-
-    for (const key in chatGroups) {
-      const lastReadTimestamp = chatUnreadTimestamps[key] ?? 0;
-
-      unreadCounts[key] = chatGroups[key].filter(
-        (c) =>
-          c.type == 'chat' &&
-          c.message.time > lastReadTimestamp &&
-          c.message.userId !== this.meeting.self.userId
-      ).length;
-
-      if (
-        key ===
-          generateChatGroupKey([this.meeting.self.userId, this.selectedParticipant?.userId]) ||
-        (key === 'everyone' && this.selectedParticipant === null)
-      ) {
-        unreadCounts[key] = 0;
-        chatUnreadTimestamps[key] = new Date();
-      }
-    }
-
-    this.updateUnreadCountGroups(unreadCounts);
-  }
-
-  private updateUnreadCountGroups = (obj: typeof this.unreadCountGroups) => {
-    this.unreadCountGroups = {
-      ...this.unreadCountGroups,
-      ...obj,
-    };
-  };
-
-  private initializeChatGroups() {
-    this.meeting.chat?.messages.forEach((message) => {
-      if (!this.displayFilter || this.displayFilter(message)) {
-        this.addToChatGroup(message);
-      }
-    });
-  }
-
-  @Watch('displayFilter')
-  // @ts-ignore
-  private onDisplayFilterChanged(newFilter: ChatFilter, oldFilter: ChatFilter) {
-    if (newFilter !== oldFilter) {
-      this.chatGroups = {};
-      this.initializeChatGroups();
-    }
-  }
-
-  private addToChatGroup(message: Message) {
-    const parsedMessage = parseMessageForTarget(message);
-    let key = 'everyone';
-    if (parsedMessage.targetUserIds?.length > 0) {
-      const allParticipants = new Set<string>([
-        parsedMessage.userId,
-        ...parsedMessage.targetUserIds,
-      ]);
-      key = generateChatGroupKey(Array.from(allParticipants));
-    }
-    if (this.chatGroups[key] === undefined) this.chatGroups[key] = [];
-
-    let isEditedMessage = false;
-    let messages = [];
-    this.chatGroups[key].forEach((chat) => {
-      if (chat.type === 'chat' && chat.message.id === message.id) {
-        isEditedMessage = true;
-        messages.push({ type: 'chat' as const, message: parsedMessage });
-      } else {
-        messages.push(chat);
-      }
-    });
-
-    if (!isEditedMessage) {
-      messages.push({ type: 'chat' as const, message: parsedMessage });
-    }
-
-    this.chatGroups[key] = messages;
   }
 
   private getRecipientPeerIds() {
-    let peerIds = [];
-    if (this.chatRecipientId !== 'everyone') {
-      peerIds = [this.selectedParticipant.id];
-    }
-    return peerIds;
+    if (!this.selectedParticipant) return [];
+    return [this.selectedParticipant.id];
   }
 
-  private isPrivateChatSupported = () => {
-    return this.canPrivateMessage && !this.disablePrivateChat;
-  };
-
   private isTextMessagingAllowed = () => {
-    if (this.chatRecipientId === 'everyone') {
+    if (!this.selectedParticipant) {
       // public chat
       return this.canSend && this.canSendTextMessage;
     }
@@ -394,7 +224,7 @@ export class RtkChat {
   };
 
   private isFileMessagingAllowed = () => {
-    if (this.chatRecipientId === 'everyone') {
+    if (!this.selectedParticipant) {
       // public chat
       return this.canSend && this.canSendFiles;
     }
@@ -474,7 +304,7 @@ export class RtkChat {
   };
 
   private renderComposerUI() {
-    if (this.chatRecipientId === 'everyone') {
+    if (!this.selectedParticipant) {
       if (!this.canSendTextMessage && !this.canSendFiles) return null;
     } else {
       if (!this.canSendPrivateTexts && !this.canSendPrivateFiles) return null;
@@ -514,56 +344,6 @@ export class RtkChat {
     );
   }
 
-  private getPinnedMessageLabel = (message: Message) => {
-    if (message.type === 'text') return message.message;
-    if (message.type === 'image') return 'Image';
-    if (message.type === 'file') return 'File';
-    return '';
-  };
-
-  private renderPinnedMessagesHeader = () => {
-    if (this.meeting.chat.pinned.length === 0) return null;
-
-    /**
-     * We do not display a picture against the avatar because the chatMessage API does not provide it.
-     */
-    return (
-      <div class="pinned-messages">
-        <div
-          class="pinned-messages-header"
-          onClick={() => (this.showPinnedMessages = !this.showPinnedMessages)}
-        >
-          <div>
-            <rtk-icon icon={this.iconPack.pin} size="sm" />
-            {this.t('chat.pinned_msgs')}
-            {` (${this.meeting.chat.pinned.length})`}
-          </div>
-          <rtk-icon
-            icon={this.showPinnedMessages ? this.iconPack.chevron_up : this.iconPack.chevron_down}
-            size="sm"
-          />
-        </div>
-        {this.showPinnedMessages && (
-          <div class="pinned-messages-content scrollbar">
-            {this.meeting.chat.pinned.map((message) => {
-              const label = this.getPinnedMessageLabel(message as Message);
-              return (
-                <div class="pinned-message">
-                  <rtk-avatar
-                    class="pinned-message-avatar"
-                    participant={{ name: message.displayName, picture: '' }}
-                    size="sm"
-                  />
-                  <span>{label.length > 20 ? `${label.substring(0, 20)}...` : label}</span>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
-    );
-  };
-
   render() {
     if (!this.meeting) {
       return null;
@@ -580,9 +360,9 @@ export class RtkChat {
               </div>
             )}
             <rtk-chat-header></rtk-chat-header>
-            {/* {this.renderPinnedMessagesHeader()} */}
             <rtk-chat-messages-ui-paginated
               meeting={this.meeting}
+              privateChatRecipient={this.selectedParticipant}
               onPinMessage={this.onPinMessage}
               onEditMessage={this.onMessageEdit}
               onDeleteMessage={this.onDeleteMessage}

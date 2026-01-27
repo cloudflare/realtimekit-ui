@@ -162,7 +162,6 @@ export class RtkPaginatedList {
   async onNodeDelete(id: string) {
     for (let i = this.pages.length - 1; i >= 0; i--) {
       const index = this.pages[i].findIndex((node) => node.id === id);
-      console.log(index);
       // if message not found, move on
       if (index === -1) continue;
       // delete message
@@ -197,6 +196,25 @@ export class RtkPaginatedList {
       this.rerender();
       break;
     }
+  }
+
+  /**
+   * Resets the paginated list
+   */
+  @Method()
+  async reset() {
+    this.oldestPaginatedTimestamp = 0;
+    this.latestPaginatedTimestamp = null;
+    this.latestMessageTimestamp = null;
+    this.pages = [];
+    this.shouldScrollToBottom = false;
+    this.showNewMessagesCTR = false;
+    this.pendingScrollAnchor = null;
+    this.isLoading = false;
+    this.isLoadingTop = false;
+    this.isLoadingBottom = false;
+    this.rerender();
+    await this.loadPrevPage();
   }
 
   // Tells us if we need to scroll to a specific anchor after a rerender
