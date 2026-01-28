@@ -120,7 +120,7 @@ export class RtkChatMessagesUiPaginated {
           timestamp,
           limit: size,
           direction: reversed ? 'before' : 'after',
-          userId: this.privateChatRecipient.id,
+          userId: this.privateChatRecipient.userId,
         });
         return messages;
       } catch (err) {
@@ -146,6 +146,8 @@ export class RtkChatMessagesUiPaginated {
      */
     return data.map((message, idx) => {
       const isContinued = message.userId === data[idx - 1]?.userId;
+      // FIXME(ikabra): Socket sends private messages sent to the recipient as a part of public messages
+      if (!this.privateChatRecipient && message.targetUserIds?.length > 0) return;
       return this.createChatNode(message, isContinued);
     });
   };
@@ -276,12 +278,16 @@ export class RtkChatMessagesUiPaginated {
   };
 
   private chatUpdateListener = (data: ChatUpdateParams) => {
+    // if private message and not for privateChatRecipient, ignore
+    // if private message and public chat selected, ignore
     if (
-      this.privateChatRecipient &&
       data.message.targetUserIds?.length > 0 &&
-      !data.message.targetUserIds.includes(this.privateChatRecipient.id)
-    ) {
-      // private chat is selected and this event is not related to it
+      !data.message.targetUserIds.includes(this.privateChatRecipient?.userId)
+    )
+      return;
+
+    // if public message and private chat selected, ignore
+    if (this.privateChatRecipient && data.message.targetUserIds?.length === 0) {
       return;
     }
 
