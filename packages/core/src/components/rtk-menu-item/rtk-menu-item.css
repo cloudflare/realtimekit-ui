@@ -20,7 +20,7 @@
 }
 
 :host(.primary:hover) {
-  @apply bg-brand-300;
+  @apply bg-brand-400;
 }
 
 :host(.red) {

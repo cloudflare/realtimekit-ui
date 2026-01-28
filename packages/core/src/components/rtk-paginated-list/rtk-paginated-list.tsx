@@ -189,7 +189,10 @@ export class RtkPaginatedList {
       // if message not found, move on
       if (index === -1) continue;
       // edit message
-      this.pages[i][index] = node;
+      this.pages[i][index] = {
+        ...this.pages[i][index],
+        ...node,
+      };
       this.rerender();
       break;
     }

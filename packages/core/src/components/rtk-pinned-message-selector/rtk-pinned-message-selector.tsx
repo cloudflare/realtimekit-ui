@@ -1,9 +1,20 @@
-import { Component, Event, EventEmitter, Method, Watch, h, Host, Prop, State } from '@stencil/core';
+import {
+  Component,
+  Event,
+  EventEmitter,
+  Method,
+  Watch,
+  h,
+  Host,
+  Prop,
+  State,
+  Listen,
+} from '@stencil/core';
 import { SyncWithStore } from '../../utils/sync-with-store';
 import { IconPack, defaultIconPack } from '../../lib/icons';
 import { RtkI18n, useLanguage } from '../../lib/lang';
-import { Message } from '@cloudflare/realtimekit';
-import type { Meeting } from '../../types/rtk-client';
+import { ChatUpdateParams, Message } from '@cloudflare/realtimekit';
+import type { Meeting, Participant } from '../../types/rtk-client';
 import { elapsedDuration } from '../../utils/date';
 
 @Component({
@@ -41,12 +52,30 @@ export class RtkPinnedMessageSelector {
 
   @State() pagesAllowed = 3;
 
-  connectedCallback() {}
+  @State() showPinnedMessages = true;
+
+  connectedCallback() {
+    this.meetingChanged(this.meeting);
+  }
+
+  disconnectedCallback() {
+    this.disconnectMeeting(this.meeting);
+  }
+
+  private disconnectMeeting(meeting: Meeting) {
+    meeting.chat?.removeListener('pinMessage', this.pinChatListener);
+    meeting.chat?.removeListener('unpinMessage', this.unpinChatListener);
+    meeting.chat?.removeListener('chatUpdate', this.chatUpdateListener);
+  }
 
   @Watch('meeting')
-  meetingChanged(meeting: Meeting) {
+  meetingChanged(meeting: Meeting, oldMeeting?: Meeting) {
+    if (oldMeeting) this.disconnectMeeting(oldMeeting);
     if (!meeting) return;
     this.$paginatedListRef?.reset();
+    meeting.chat?.addListener('pinMessage', this.pinChatListener);
+    meeting.chat?.addListener('unpinMessage', this.unpinChatListener);
+    meeting.chat?.addListener('chatUpdate', this.chatUpdateListener);
   }
 
   /** */
@@ -55,6 +84,17 @@ export class RtkPinnedMessageSelector {
     if (!this.isOpen) return;
     this.isOpen = false;
     this.dropdownToggle.emit({ open: false });
+  }
+
+  @Listen('rtkChatSelectorChange', { target: 'window' })
+  async onChatSelectorChange(event: CustomEvent<{ selectedUser?: Participant }>) {
+    const selectedUser = event.detail?.selectedUser;
+    // Everyone
+    if (!selectedUser) {
+      this.showPinnedMessages = true;
+    } else {
+      this.showPinnedMessages = false;
+    }
   }
 
   private toggle = (e: MouseEvent) => {
@@ -72,7 +112,6 @@ export class RtkPinnedMessageSelector {
     try {
       const messages = await localMeeting.chat.fetchPinnedMessages({
         timestamp,
-        offset: 0,
         limit: size,
         direction: reversed ? 'before' : 'after',
       });
@@ -124,7 +163,29 @@ export class RtkPinnedMessageSelector {
     });
   };
 
+  private pinChatListener = (data: ChatUpdateParams) => {
+    if (data.message.targetUserIds?.length > 0) {
+      // pinned messages are not supported for private chat
+      return;
+    }
+    this.$paginatedListRef?.onNewNode(data.message);
+  };
+
+  private unpinChatListener = async (data: ChatUpdateParams) => {
+    if (data.message.targetUserIds?.length > 0) {
+      // pinned messages are not supported for private chat
+      return;
+    }
+    this.$paginatedListRef?.onNodeDelete(data.message.id);
+  };
+
+  private chatUpdateListener = async (data: ChatUpdateParams) => {
+    if (data.action !== 'delete') return;
+    this.unpinChatListener(data);
+  };
+
   render() {
+    if (!this.showPinnedMessages) return null;
     return (
       <Host>
         <div class="chat-header" onClick={this.toggle}>

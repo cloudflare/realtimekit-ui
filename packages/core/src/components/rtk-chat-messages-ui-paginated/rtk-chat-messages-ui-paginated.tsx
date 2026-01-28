@@ -118,7 +118,6 @@ export class RtkChatMessagesUiPaginated {
       try {
         const messages = await this.meeting.chat.fetchPrivateMessages({
           timestamp,
-          offset: 0,
           limit: size,
           direction: reversed ? 'before' : 'after',
           userId: this.privateChatRecipient.id,
@@ -131,7 +130,6 @@ export class RtkChatMessagesUiPaginated {
     try {
       const messages = await this.meeting.chat.fetchMessages({
         timestamp,
-        offset: 0,
         limit: size,
         direction: reversed ? 'before' : 'after',
       });
@@ -165,11 +163,15 @@ export class RtkChatMessagesUiPaginated {
 
     const messageBelongsToSelf = message.userId === this.meeting.self.userId;
 
-    actions.push({
-      id: 'pin_message',
-      label: message.pinned ? this.t('unpin') : this.t('pin'),
-      icon: this.iconPack.pin,
-    });
+    const isPrivateMessage = message.targetUserIds?.length > 0;
+
+    if (!isPrivateMessage) {
+      actions.push({
+        id: 'pin_message',
+        label: message.pinned ? this.t('unpin') : this.t('pin'),
+        icon: this.iconPack.pin,
+      });
+    }
 
     if (messageBelongsToSelf) {
       actions.push({

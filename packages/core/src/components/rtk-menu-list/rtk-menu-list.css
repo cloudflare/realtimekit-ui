@@ -10,5 +10,5 @@
 }
 
 :host(.primary) {
-  @apply bg-brand-300/30 border-brand-600;
+  @apply bg-brand-300 border-brand-600;
 }

@@ -41,7 +41,8 @@
     "semantic-release-monorepo": "^7.0.5",
     "typedoc": "^0.28.15",
     "typedoc-plugin-markdown": "^4.9.0",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "@cloudflare/realtimekit": "../realtimekit/core"
   },
   "commitlint": {
     "extends": [
