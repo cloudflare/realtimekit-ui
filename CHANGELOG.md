@@ -1,3 +1,18 @@
+# [1.1.0-staging.12](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.1.0-staging.11...@cloudflare/realtimekit-ui-v1.1.0-staging.12) (2026-01-29)
+
+
+### Bug Fixes
+
+* addd I18n support to chat selector text ([1e2df4a](https://github.com/cloudflare/realtimekit-ui/commit/1e2df4a4a85de4cc5eaa3f97cf25a2b6d4c7af23))
+* **build:** build was crashing ([a90ee33](https://github.com/cloudflare/realtimekit-ui/commit/a90ee33445df82c3c53bfa18114c5be788ca0ab5))
+* bump version manually ([1c94935](https://github.com/cloudflare/realtimekit-ui/commit/1c94935999b889994f93ae9c160f0259e3925ede))
+* hack to not render duplicate pinned messages ([dcf0567](https://github.com/cloudflare/realtimekit-ui/commit/dcf0567b46f59b715acdb81019d7816726331f21))
+* render paginated list for private messages ([8366b25](https://github.com/cloudflare/realtimekit-ui/commit/8366b25c4f51536d24a67ad8742c41d2e5ca3fb4))
+* scroll to pinned message on click ([9a65e19](https://github.com/cloudflare/realtimekit-ui/commit/9a65e1920ba1d246529b1e801db3ce4eacf938e4))
+* socket sends private messages sent to a user as a part of public messages for that user ([27ffd7c](https://github.com/cloudflare/realtimekit-ui/commit/27ffd7c29844bf192de537d4db92000d5ea8ebe4))
+* update pinned messages in realtime ([0261351](https://github.com/cloudflare/realtimekit-ui/commit/0261351d786df2196572151f71b41bad009d1b47))
+* **WIP:** render paginated list for private chat ([2914ae9](https://github.com/cloudflare/realtimekit-ui/commit/2914ae99e3621129fc4de834d4f517b8da6193a9))
+
 # [1.1.0-staging.11](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.1.0-staging.10...@cloudflare/realtimekit-ui-v1.1.0-staging.11) (2026-01-23)
 
 
