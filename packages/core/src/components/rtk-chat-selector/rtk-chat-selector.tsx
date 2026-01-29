@@ -164,6 +164,7 @@ export class RtkChatSelector {
     this.onParticipantUpdate();
   };
 
+  // @ts-ignore - unused params
   private getParticipants = async (timestamp: number, size: number, reversed: boolean) => {
     const meeting = this.meeting;
     if (!meeting) return [];
