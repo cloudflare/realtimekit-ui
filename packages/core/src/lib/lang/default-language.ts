@@ -347,7 +347,7 @@ export const defaultLanguage = {
   'chat.empty_chat': 'Send a message to get started',
   'chat.cancel_upload': 'Cancel upload',
   'chat.view_chats': 'View chats',
-  'chat.everyone': 'everyone',
+  'chat.everyone': 'Everyone',
   'chat.pinned_msgs': 'Pinned messages',
   'chat.toggle_pinned_msgs': 'Toggle pinned messages',
   'date.today': 'Today',

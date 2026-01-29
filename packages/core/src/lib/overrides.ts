@@ -9,6 +9,11 @@ export interface Overrides {
    * When true, users cannot insert emojis into chat messages.
    */
   disableEmojiPicker?: boolean;
+  /**
+   * Disables private chat even when allowed by the preset.
+   * Recommended: Disable private chat via preset.
+   */
+  disablePrivateChat?: boolean;
 }
 
 /**
@@ -16,4 +21,5 @@ export interface Overrides {
  */
 export const defaultOverrides: Overrides = {
   disableEmojiPicker: false,
+  disablePrivateChat: false,
 };

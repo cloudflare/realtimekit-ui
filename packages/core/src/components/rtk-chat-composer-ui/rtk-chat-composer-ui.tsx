@@ -31,6 +31,8 @@ interface RtkFile {
 export type RtkNewMessageEvent = RtkText | RtkImage | RtkFile;
 
 const MENTION_CHAR = '@';
+
+/** @deprecated. This component is deprecated, please use rtk-chat-composer-view instead. */
 @Component({
   tag: 'rtk-chat-composer-ui',
   styleUrl: 'rtk-chat-composer-ui.css',

@@ -54,7 +54,7 @@ export class RtkPaginatedList {
   private $bottomRef: HTMLDivElement;
 
   // Timestamp pertaining to the oldest stored message
-  private oldestPaginatedTimestamp: number | null = null;
+  private oldestPaginatedTimestamp: number | null = 0;
 
   // Timestamp pertaining to the latest stored message
   private latestPaginatedTimestamp: number | null = null;
@@ -198,6 +198,25 @@ export class RtkPaginatedList {
     }
   }
 
+  /**
+   * Resets the paginated list
+   */
+  @Method()
+  async reset() {
+    this.oldestPaginatedTimestamp = 0;
+    this.latestPaginatedTimestamp = null;
+    this.latestMessageTimestamp = null;
+    this.pages = [];
+    this.shouldScrollToBottom = false;
+    this.showNewMessagesCTR = false;
+    this.pendingScrollAnchor = null;
+    this.isLoading = false;
+    this.isLoadingTop = false;
+    this.isLoadingBottom = false;
+    this.rerender();
+    await this.loadPrevPage();
+  }
+
   // Tells us if we need to scroll to a specific anchor after a rerender
   private pendingScrollAnchor: ScrollAnchor | null = null;
 
@@ -238,8 +257,8 @@ export class RtkPaginatedList {
 
     const scrollAnchor = this.getScrollAnchor('top');
 
-    // if no old timestamp, it means we are at initial state
-    if (!this.oldestPaginatedTimestamp) this.oldestPaginatedTimestamp = new Date().getTime();
+    // if old timestamp is 0, it means we are at initial state
+    if (this.oldestPaginatedTimestamp === 0) this.oldestPaginatedTimestamp = new Date().getTime();
 
     // load data
     this.isLoading = true;
