@@ -1,3 +1,11 @@
+# [1.1.0-staging.13](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.1.0-staging.12...@cloudflare/realtimekit-ui-v1.1.0-staging.13) (2026-01-29)
+
+
+### Bug Fixes
+
+* ux issues for chat message visibility ([277d965](https://github.com/cloudflare/realtimekit-ui/commit/277d965295014bfd6ce6d05f9528bbf34206c04d))
+* visibility for dropdown ([62e4a9b](https://github.com/cloudflare/realtimekit-ui/commit/62e4a9be8ed3f929541f0ce5d820d89805049ade))
+
 # [1.1.0-staging.12](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.1.0-staging.11...@cloudflare/realtimekit-ui-v1.1.0-staging.12) (2026-01-29)
 
 
