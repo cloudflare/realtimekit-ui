@@ -92,6 +92,7 @@ export class RtkChatSelector {
 
   @Watch('overrides')
   overridesChanged(overrides) {
+    if (!this.meeting || this.meeting.self) return;
     this.showPrivateChat =
       !!(
         this.meeting.self.permissions.chatPrivate?.canSend ||
@@ -173,17 +174,16 @@ export class RtkChatSelector {
      */
     if (!timestamp) return [];
     const participants = meeting.participants.joined.toArray();
-    /**
-     * TODO:
-     * 1. filter and only show participants that can receive private chat messages
-     * 2. show private chat when a user is selected
-     */
     return participants;
   };
 
   private createPaticipantNodes = (data: Participant[]) => {
     return data.map((participant) => (
-      <div class="private-chat-label" onClick={() => this.selectUser(participant)}>
+      <div
+        class="private-chat-label"
+        id={participant.id}
+        onClick={() => this.selectUser(participant)}
+      >
         <rtk-avatar size="sm" participant={participant} />
         <span>{participant.name}</span>
       </div>
@@ -221,7 +221,6 @@ export class RtkChatSelector {
             pagesAllowed={3}
             fetchData={this.getParticipants}
             createNodes={this.createPaticipantNodes}
-            selectedItemId={this.selectedUser?.id || ''}
             emptyListLabel={this.t('participants.empty_list')}
           >
             <slot></slot>

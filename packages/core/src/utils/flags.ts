@@ -7,7 +7,6 @@ export const FlagsmithFeatureFlags = {
   DISABLE_KICKING: 'disable_kicking',
   ADMIN_CANTREMOVE_ADMIN: 'admin_cantremove_admin',
   CANTINVITE_VIEWER: 'cantinvite_viewer',
-  PINNED_MESSAGES: 'pinned_msgs',
 };
 
 export const isBreakoutRoomsEnabled = (meeting: RealtimeKitClient) =>

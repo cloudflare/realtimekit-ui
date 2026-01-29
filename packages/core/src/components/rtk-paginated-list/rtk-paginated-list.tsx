@@ -88,9 +88,6 @@ export class RtkPaginatedList {
   /** Create nodes */
   @Prop() createNodes: (data: unknown[]) => VNode[];
 
-  /** Item id */
-  @Prop() selectedItemId?: string;
-
   /** auto scroll list to bottom */
   @Prop() autoScroll: boolean;
 
@@ -192,20 +189,22 @@ export class RtkPaginatedList {
       // if message not found, move on
       if (index === -1) continue;
       // edit message
-      this.pages[i][index] = node;
+      this.pages[i][index] = {
+        ...this.pages[i][index],
+        ...node,
+      };
       this.rerender();
       break;
     }
   }
 
   /**
-   * Resets the paginated list
+   * Resets the paginated list to a given timestamp
    */
   @Method()
-  async reset() {
-    this.oldestPaginatedTimestamp = 0;
+  async reset(timestamp = 0) {
+    this.oldestPaginatedTimestamp = timestamp;
     this.latestPaginatedTimestamp = null;
-    this.latestMessageTimestamp = null;
     this.pages = [];
     this.shouldScrollToBottom = false;
     this.showNewMessagesCTR = false;
@@ -213,6 +212,10 @@ export class RtkPaginatedList {
     this.isLoading = false;
     this.isLoadingTop = false;
     this.isLoadingBottom = false;
+    if (timestamp === 0) {
+      // preserve latestMessageTimestamp if reseting to a particular message
+      this.latestMessageTimestamp = null;
+    }
     this.rerender();
     await this.loadPrevPage();
   }
@@ -455,7 +458,7 @@ export class RtkPaginatedList {
           {/* Initial data loader */}
           {this.isLoading && this.pages.length < 1 && <rtk-spinner size="lg" />}
           {!this.isLoading && this.pages.flat().length === 0 ? (
-            <div class="empty-list">{this.t('list.empty')}</div>
+            <div class="empty-list">{this.emptyListLabel ?? this.t('list.empty')}</div>
           ) : (
             <div class="page-wrapper">
               {this.pages.map((page, pageIndex) => (

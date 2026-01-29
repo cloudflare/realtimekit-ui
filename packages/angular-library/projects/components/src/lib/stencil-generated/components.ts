@@ -2294,7 +2294,7 @@ export declare interface RtkOverlayModal extends Components.RtkOverlayModal {
 
 
 @ProxyCmp({
-  inputs: ['autoScroll', 'createNodes', 'emptyListLabel', 'fetchData', 'iconPack', 'pageSize', 'pagesAllowed', 'selectedItemId', 't'],
+  inputs: ['autoScroll', 'createNodes', 'emptyListLabel', 'fetchData', 'iconPack', 'pageSize', 'pagesAllowed', 't'],
   methods: ['onNewNode', 'onNodeDelete', 'onNodeUpdate', 'reset']
 })
 @Component({
@@ -2302,7 +2302,7 @@ export declare interface RtkOverlayModal extends Components.RtkOverlayModal {
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: '<ng-content></ng-content>',
   // eslint-disable-next-line @angular-eslint/no-inputs-metadata-property
-  inputs: ['autoScroll', 'createNodes', 'emptyListLabel', 'fetchData', 'iconPack', 'pageSize', 'pagesAllowed', 'selectedItemId', 't'],
+  inputs: ['autoScroll', 'createNodes', 'emptyListLabel', 'fetchData', 'iconPack', 'pageSize', 'pagesAllowed', 't'],
 })
 export class RtkPaginatedList {
   protected el: HTMLRtkPaginatedListElement;
@@ -2629,7 +2629,7 @@ export declare interface RtkPermissionsMessage extends Components.RtkPermissions
 
 
 @ProxyCmp({
-  inputs: ['iconPack'],
+  inputs: ['iconPack', 'meeting', 't'],
   methods: ['close']
 })
 @Component({
@@ -2637,21 +2637,27 @@ export declare interface RtkPermissionsMessage extends Components.RtkPermissions
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: '<ng-content></ng-content>',
   // eslint-disable-next-line @angular-eslint/no-inputs-metadata-property
-  inputs: ['iconPack'],
+  inputs: ['iconPack', 'meeting', 't'],
 })
 export class RtkPinnedMessageSelector {
   protected el: HTMLRtkPinnedMessageSelectorElement;
   constructor(c: ChangeDetectorRef, r: ElementRef, protected z: NgZone) {
     c.detach();
     this.el = r.nativeElement;
-    proxyOutputs(this, this.el, ['rtkDropdownToggle']);
+    proxyOutputs(this, this.el, ['rtkDropdownToggle', 'rtkPinnedMessageSelect']);
   }
 }
 
 
+import type { Message as IRtkPinnedMessageSelectorMessage } from '@cloudflare/realtimekit-ui';
+
 export declare interface RtkPinnedMessageSelector extends Components.RtkPinnedMessageSelector {
 
   rtkDropdownToggle: EventEmitter<CustomEvent<{ open: boolean }>>;
+  /**
+   * Emits when a pinned message is selected
+   */
+  rtkPinnedMessageSelect: EventEmitter<CustomEvent<IRtkPinnedMessageSelectorMessage>>;
 }
 
 

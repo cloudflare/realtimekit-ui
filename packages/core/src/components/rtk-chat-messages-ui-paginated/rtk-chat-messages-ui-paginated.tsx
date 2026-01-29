@@ -9,6 +9,7 @@ import {
   State,
   Prop,
   Watch,
+  Listen,
 } from '@stencil/core';
 import { defaultIconPack, IconPack } from '../../lib/icons';
 import { RtkI18n, useLanguage } from '../../lib/lang';
@@ -81,6 +82,13 @@ export class RtkChatMessagesUiPaginated {
     this.meetingChanged(this.meeting);
   }
 
+  @Listen('rtkPinnedMessageSelect', { target: 'window' })
+  async onPinnedMessageSelect(event: CustomEvent<Message>) {
+    const message = event.detail;
+    if (!message) return;
+    await this.$paginatedListRef?.reset?.(message.timeMs + 1);
+  }
+
   disconnectedCallback() {
     this.disconnectMeeting(this.meeting);
   }
@@ -110,10 +118,9 @@ export class RtkChatMessagesUiPaginated {
       try {
         const messages = await this.meeting.chat.fetchPrivateMessages({
           timestamp,
-          offset: 0,
           limit: size,
           direction: reversed ? 'before' : 'after',
-          userId: this.privateChatRecipient.id,
+          userId: this.privateChatRecipient.userId,
         });
         return messages;
       } catch (err) {
@@ -123,7 +130,6 @@ export class RtkChatMessagesUiPaginated {
     try {
       const messages = await this.meeting.chat.fetchMessages({
         timestamp,
-        offset: 0,
         limit: size,
         direction: reversed ? 'before' : 'after',
       });
@@ -140,6 +146,8 @@ export class RtkChatMessagesUiPaginated {
      */
     return data.map((message, idx) => {
       const isContinued = message.userId === data[idx - 1]?.userId;
+      // FIXME(ikabra): Socket sends private messages sent to the recipient as a part of public messages
+      if (!this.privateChatRecipient && message.targetUserIds?.length > 0) return;
       return this.createChatNode(message, isContinued);
     });
   };
@@ -157,11 +165,15 @@ export class RtkChatMessagesUiPaginated {
 
     const messageBelongsToSelf = message.userId === this.meeting.self.userId;
 
-    actions.push({
-      id: 'pin_message',
-      label: message.pinned ? this.t('unpin') : this.t('pin'),
-      icon: this.iconPack.pin,
-    });
+    const isPrivateMessage = message.targetUserIds?.length > 0;
+
+    if (!isPrivateMessage) {
+      actions.push({
+        id: 'pin_message',
+        label: message.pinned ? this.t('unpin') : this.t('pin'),
+        icon: this.iconPack.pin,
+      });
+    }
 
     if (messageBelongsToSelf) {
       actions.push({
@@ -266,12 +278,16 @@ export class RtkChatMessagesUiPaginated {
   };
 
   private chatUpdateListener = (data: ChatUpdateParams) => {
+    // if private message and not for privateChatRecipient, ignore
+    // if private message and public chat selected, ignore
     if (
-      this.privateChatRecipient &&
       data.message.targetUserIds?.length > 0 &&
-      !data.message.targetUserIds.includes(this.privateChatRecipient.id)
-    ) {
-      // private chat is selected and this event is not related to it
+      !data.message.targetUserIds.includes(this.privateChatRecipient?.userId)
+    )
+      return;
+
+    // if public message and private chat selected, ignore
+    if (this.privateChatRecipient && data.message.targetUserIds?.length === 0) {
       return;
     }
 

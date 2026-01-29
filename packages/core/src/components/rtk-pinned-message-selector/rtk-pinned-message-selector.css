@@ -35,7 +35,11 @@
 
 .dropdown.open {
   @apply max-h-[50vh] opacity-100;
-  @apply overflow-auto p-4;
+  @apply overflow-auto;
   @apply pointer-events-auto;
   @apply border-background-600 border-t-none border-[1px] border-solid;
+}
+
+.dropdown rtk-paginated-list {
+  @apply box-border flex max-h-[50vh] min-h-[30vh] flex-col;
 }
