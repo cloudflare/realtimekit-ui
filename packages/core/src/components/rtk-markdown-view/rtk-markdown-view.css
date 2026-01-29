@@ -17,4 +17,5 @@ blockquote {
 
 pre {
   white-space: pre-wrap;
+  width: 300px;
 }
