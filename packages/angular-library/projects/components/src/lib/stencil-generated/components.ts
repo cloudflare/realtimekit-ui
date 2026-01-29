@@ -2295,7 +2295,7 @@ export declare interface RtkOverlayModal extends Components.RtkOverlayModal {
 
 @ProxyCmp({
   inputs: ['autoScroll', 'createNodes', 'emptyListLabel', 'fetchData', 'iconPack', 'pageSize', 'pagesAllowed', 't'],
-  methods: ['onNewNode', 'onNodeDelete', 'onNodeUpdate', 'reset']
+  methods: ['rerenderList', 'onNewNode', 'onNodeDelete', 'onNodeUpdate', 'reset']
 })
 @Component({
   selector: 'rtk-paginated-list',

@@ -112,6 +112,14 @@ export class RtkPaginatedList {
   @State() isLoadingBottom: boolean = false;
 
   /**
+   * Rerender paginated list
+   */
+  @Method()
+  async rerenderList() {
+    this.rerenderBoolean = !this.rerenderBoolean;
+  }
+
+  /**
    * Adds a new node to the beginning of the paginated list
    * @param {DataNode} node - The data node to add to the beginning of the list
    */

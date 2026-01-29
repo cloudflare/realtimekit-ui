@@ -21,7 +21,7 @@
 .dropdown {
   @apply absolute top-full;
   @apply z-10 p-0;
-  @apply bg-background-900;
+  @apply bg-background-1000;
   @apply max-h-0 opacity-0;
   @apply overflow-hidden;
   @apply pointer-events-none;

@@ -5,6 +5,7 @@ import { Size } from '../../types/props';
 import { Overrides, States, UIConfig, createDefaultConfig, defaultOverrides } from '../../exports';
 import { IconPack, defaultIconPack } from '../../lib/icons';
 import { RtkI18n, useLanguage } from '../../lib/lang';
+import { ChatUpdateParams } from '@cloudflare/realtimekit';
 
 @Component({
   tag: 'rtk-chat-selector',
@@ -58,6 +59,8 @@ export class RtkChatSelector {
 
   @State() pagesAllowed = 3;
 
+  @State() unreadMap: Map<string, boolean> = new Map();
+
   /** */
   @Event({ eventName: 'rtkDropdownToggle' }) dropdownToggle: EventEmitter<{ open: boolean }>;
 
@@ -110,6 +113,7 @@ export class RtkChatSelector {
         meeting.self.permissions.chatPrivate?.canReceive
       ) && !this.overrides.disablePrivateChat;
     this.onParticipantUpdate();
+    meeting.chat?.on('chatUpdate', this.chatUpdateListener);
     meeting.self.permissions.on('*', this.chatPermissionUpdateListener);
     meeting?.participants?.joined?.on('participantJoined', this.participantJoinedListener);
     meeting?.participants?.joined?.on('participantLeft', this.participantLeftListener);
@@ -117,6 +121,7 @@ export class RtkChatSelector {
 
   private disconnectMeeting = (meeting: Meeting) => {
     const { self, participants } = meeting || {};
+    meeting.chat?.off('chatUpdate', this.chatUpdateListener);
     self?.permissions?.off('*', this.chatPermissionUpdateListener);
     participants?.joined?.off('participantJoined', this.participantJoinedListener);
     participants?.joined?.off('participantLeft', this.participantLeftListener);
@@ -130,6 +135,10 @@ export class RtkChatSelector {
   };
 
   private selectUser = async (user?: Participant) => {
+    if (user?.userId) {
+      this.unreadMap.set(user.userId, false);
+      this.$paginatedListRef.rerenderList();
+    }
     this.selectedUser = user;
     this.chatSelectorChange.emit({ selectedUser: user });
     await this.close();
@@ -186,9 +195,24 @@ export class RtkChatSelector {
         onClick={() => this.selectUser(participant)}
       >
         <rtk-avatar size="sm" participant={participant} />
-        <span>{participant.name}</span>
+        <span>{participant.name ?? this.t('participant')}</span>
+        {this.unreadMap.get(participant.userId) ? (
+          <div class="private-chat-unread-badge"></div>
+        ) : null}
       </div>
     ));
+  };
+
+  private chatUpdateListener = (data: ChatUpdateParams) => {
+    if (data.action !== 'add') return;
+
+    if (!data.message.targetUserIds?.length) return;
+
+    const selfUserId = this.meeting.self.userId;
+    const otherUserId = data.message.targetUserIds.find((id) => id !== selfUserId);
+    if (!otherUserId) return;
+    this.unreadMap.set(otherUserId, true);
+    this.$paginatedListRef.rerenderList();
   };
 
   render() {

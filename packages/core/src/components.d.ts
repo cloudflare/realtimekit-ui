@@ -2427,6 +2427,10 @@ export namespace Components {
          */
         "pagesAllowed": number;
         /**
+          * Rerender paginated list
+         */
+        "rerenderList": () => Promise<void>;
+        /**
           * Resets the paginated list to a given timestamp
          */
         "reset": (timestamp?: number) => Promise<void>;
