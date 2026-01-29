@@ -174,11 +174,6 @@ export class RtkChatSelector {
      */
     if (!timestamp) return [];
     const participants = meeting.participants.joined.toArray();
-    /**
-     * TODO:
-     * 1. filter and only show participants that can receive private chat messages
-     * 2. show private chat when a user is selected
-     */
     return participants;
   };
 

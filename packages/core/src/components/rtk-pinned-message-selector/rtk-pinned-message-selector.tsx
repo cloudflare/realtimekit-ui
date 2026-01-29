@@ -168,7 +168,12 @@ export class RtkPinnedMessageSelector {
       // pinned messages are not supported for private chat
       return;
     }
-    this.$paginatedListRef?.onNewNode(data.message);
+    /**
+     * FIXME(ikabra): This is a temporary hack to refresh the list when a new message is pinned.
+     * This is done to avoid duplicate messages in the list.
+     * Fix is being implemented by socket where they are updating the `updatedAt` timestamp when the message is pinned.
+     */
+    this.$paginatedListRef?.reset();
   };
 
   private unpinChatListener = async (data: ChatUpdateParams) => {
