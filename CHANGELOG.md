@@ -1,3 +1,10 @@
+# [1.1.0-staging.15](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.1.0-staging.14...@cloudflare/realtimekit-ui-v1.1.0-staging.15) (2026-01-30)
+
+
+### Bug Fixes
+
+* update realtimekit version ([1f44a7d](https://github.com/cloudflare/realtimekit-ui/commit/1f44a7d10d819f9f87e04907b01e81f09b077a3a))
+
 # [1.1.0-staging.14](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.1.0-staging.13...@cloudflare/realtimekit-ui-v1.1.0-staging.14) (2026-01-30)
 
 
