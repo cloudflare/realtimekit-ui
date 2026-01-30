@@ -89,7 +89,7 @@ export class RtkChatToggle {
   private async setUnreadMessageCount() {
     const chat = this.meeting.chat;
     if (!chat) return;
-    const messages = await chat.fetchMessages({
+    const messages = await chat.fetchPublicMessages({
       timestamp: new Date().getTime(),
       limit: this.pageSize,
       direction: 'before',
