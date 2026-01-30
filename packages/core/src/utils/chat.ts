@@ -1,6 +1,6 @@
 import type { Message } from '@cloudflare/realtimekit';
 import { Peer } from '../types/rtk-client';
-import { ChatChannel, ChatMessage } from '../types/props';
+import { ChatMessage } from '../types/props';
 import { chatUnreadTimestamps } from './user-prefs';
 
 export const parseMessageForTarget = (message) => {
@@ -28,7 +28,7 @@ export function alphabeticalSorter(a: string, b: string) {
 }
 
 /**
- * Generate a unique chat group key used in `<rtk-chat-messages-ui />`
+ * Generate a unique chat group key used in `<rtk-chat /> and <rtk-chat-selector-ui />`
  * @param ids An array of user ids
  * @returns A unique key from the user ids
  */
@@ -137,12 +137,6 @@ export function getParticipantUserId({
   selfUserId: string;
 }) {
   return groupId.split('_').find((id) => id != selfUserId);
-}
-
-export const TEMPORARY_CHANNEL_PREFIX = 'dm__';
-
-export function isDirectMessageChannel(channel: ChatChannel) {
-  return channel.isDirectMessage;
 }
 
 export function getDMComparator(memberIds: string[]) {

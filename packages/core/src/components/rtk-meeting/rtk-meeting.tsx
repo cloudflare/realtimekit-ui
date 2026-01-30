@@ -17,6 +17,7 @@ import {
   uiStore as legacyGlobalUIStore,
   type RtkUiStoreExtended,
 } from '../../utils/sync-with-store/ui-store';
+import { Overrides, defaultOverrides } from '../../lib/overrides';
 
 export type MeetingMode = 'fixed' | 'fill';
 
@@ -119,6 +120,10 @@ export class RtkMeeting {
   @Prop()
   iconPack: IconPack = defaultIconPack;
 
+  /** UI Kit Overrides */
+  @Prop()
+  overrides: Overrides = defaultOverrides;
+
   /**
    * Emits `rtkStatesUpdate` so that developers can listen to onRtkStatesUpdate and update their own stores
    * Do not confuse this with `rtkStateUpdate` that other components emit
@@ -150,6 +155,7 @@ export class RtkMeeting {
     this.iconPackChanged(this.iconPack);
     this.tChanged(this.t);
     this.configChanged(this.config);
+    this.overridesChanged(this.overrides);
 
     this.resizeObserver = new ResizeObserver(() => this.handleResize());
     this.resizeObserver.observe(this.host);
@@ -251,6 +257,7 @@ export class RtkMeeting {
         iconPack: this.iconPack,
         t: this.t,
         providerId: this.providerId,
+        overrides: deepMerge({ ...defaultOverrides }, this.overrides) as Overrides,
       }) as RtkUiStoreExtended;
 
       // Notify components that peer specific store is now available
@@ -353,6 +360,13 @@ export class RtkMeeting {
       (this.peerStore || legacyGlobalUIStore).state.states.activeDebugger !== true
     ) {
       provideRtkDesignSystem(document.documentElement, config.designTokens);
+    }
+  }
+
+  @Watch('overrides')
+  overridesChanged(overrides: Overrides) {
+    if (this.peerStore) {
+      this.peerStore.state.overrides = deepMerge({ ...defaultOverrides }, overrides) as Overrides;
     }
   }
 

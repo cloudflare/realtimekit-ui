@@ -274,22 +274,6 @@ export class RtkDialogManager {
           </rtk-dialog>
         </Host>
       );
-    } else if (states?.activeChannelCreator) {
-      return (
-        <Host>
-          <rtk-dialog
-            open
-            onRtkDialogClose={() => {
-              this.updateStoreState('activeChannelCreator', false);
-            }}
-            iconPack={this.iconPack}
-            t={this.t}
-          >
-            <rtk-channel-creator {...defaults} />
-          </rtk-dialog>
-        </Host>
-      );
     }
-    return null;
   }
 }

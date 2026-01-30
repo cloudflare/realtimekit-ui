@@ -205,74 +205,13 @@ export const RtkCaptionToggle = /*@__PURE__*/ defineContainer<JSX.RtkCaptionTogg
 ]);
 
 
-export const RtkChannelCreator = /*@__PURE__*/ defineContainer<JSX.RtkChannelCreator>('rtk-channel-creator', undefined, [
-  'meeting',
-  't',
-  'iconPack',
-  'rtkStateUpdate',
-  'switchChannel'
-], [
-  'rtkStateUpdate',
-  'switchChannel'
-]);
-
-
-export const RtkChannelDetails = /*@__PURE__*/ defineContainer<JSX.RtkChannelDetails>('rtk-channel-details', undefined, [
-  'channel',
-  't',
-  'iconPack',
-  'members'
-]);
-
-
-export const RtkChannelHeader = /*@__PURE__*/ defineContainer<JSX.RtkChannelHeader>('rtk-channel-header', undefined, [
-  'meeting',
-  'channel',
-  'iconPack',
-  't',
-  'showBackButton',
-  'search',
-  'searchDismissed',
-  'back'
-], [
-  'search',
-  'searchDismissed',
-  'back'
-]);
-
-
-export const RtkChannelSelectorUi = /*@__PURE__*/ defineContainer<JSX.RtkChannelSelectorUi>('rtk-channel-selector-ui', undefined, [
-  'channels',
-  'selectedChannelId',
-  'iconPack',
-  't',
-  'showRecentMessage',
-  'channelChanged'
-], [
-  'channelChanged'
-]);
-
-
-export const RtkChannelSelectorView = /*@__PURE__*/ defineContainer<JSX.RtkChannelSelectorView>('rtk-channel-selector-view', undefined, [
-  'channels',
-  'selectedChannelId',
-  'disableSearch',
-  'hideAvatar',
-  'iconPack',
-  't',
-  'viewAs',
-  'channelChange'
-], [
-  'channelChange'
-]);
-
-
 export const RtkChat = /*@__PURE__*/ defineContainer<JSX.RtkChat>('rtk-chat', undefined, [
   'meeting',
   'config',
   'size',
   'iconPack',
   't',
+  'overrides',
   'disablePrivateChat',
   'privatePresetFilter',
   'displayFilter',
@@ -291,7 +230,6 @@ export const RtkChatComposerUi = /*@__PURE__*/ defineContainer<JSX.RtkChatCompos
   'disableEmojiPicker',
   'prefill',
   'members',
-  'channelId',
   'rtkNewMessage',
   'rtkEditMessage',
   'rtkEditCancelled'
@@ -304,6 +242,7 @@ export const RtkChatComposerUi = /*@__PURE__*/ defineContainer<JSX.RtkChatCompos
 
 export const RtkChatComposerView = /*@__PURE__*/ defineContainer<JSX.RtkChatComposerView>('rtk-chat-composer-view', undefined, [
   'canSendTextMessage',
+  'isSending',
   'canSendFiles',
   'message',
   'quotedMessage',
@@ -375,19 +314,19 @@ export const RtkChatMessagesUi = /*@__PURE__*/ defineContainer<JSX.RtkChatMessag
 
 export const RtkChatMessagesUiPaginated = /*@__PURE__*/ defineContainer<JSX.RtkChatMessagesUiPaginated>('rtk-chat-messages-ui-paginated', undefined, [
   'meeting',
-  'selectedChannel',
-  'selectedChannelId',
   'size',
   'iconPack',
   't',
   'leftAlign',
   'editMessageInit',
   'pinMessage',
+  'editMessage',
   'deleteMessage',
   'rtkStateUpdate'
 ], [
   'editMessageInit',
   'pinMessage',
+  'editMessage',
   'deleteMessage',
   'rtkStateUpdate'
 ]);
@@ -430,7 +369,8 @@ export const RtkChatToggle = /*@__PURE__*/ defineContainer<JSX.RtkChatToggle>('r
 
 export const RtkClock = /*@__PURE__*/ defineContainer<JSX.RtkClock>('rtk-clock', undefined, [
   'meeting',
-  'iconPack'
+  'iconPack',
+  'size'
 ]);
 
 
@@ -857,6 +797,7 @@ export const RtkMeeting = /*@__PURE__*/ defineContainer<JSX.RtkMeeting>('rtk-mee
   'size',
   'gridLayout',
   'iconPack',
+  'overrides',
   'rtkStatesUpdate'
 ], [
   'rtkStatesUpdate'
@@ -881,6 +822,7 @@ export const RtkMenu = /*@__PURE__*/ defineContainer<JSX.RtkMenu>('rtk-menu', un
 
 export const RtkMenuItem = /*@__PURE__*/ defineContainer<JSX.RtkMenuItem>('rtk-menu-item', undefined, [
   'size',
+  'menuVariant',
   'iconPack',
   't'
 ]);
@@ -888,6 +830,7 @@ export const RtkMenuItem = /*@__PURE__*/ defineContainer<JSX.RtkMenuItem>('rtk-m
 
 export const RtkMenuList = /*@__PURE__*/ defineContainer<JSX.RtkMenuList>('rtk-menu-list', undefined, [
   'iconPack',
+  'menuVariant',
   't'
 ]);
 
@@ -904,11 +847,15 @@ export const RtkMessageListView = /*@__PURE__*/ defineContainer<JSX.RtkMessageLi
 
 export const RtkMessageView = /*@__PURE__*/ defineContainer<JSX.RtkMessageView>('rtk-message-view', undefined, [
   'actions',
+  'messageType',
+  'isEdited',
   'variant',
+  'pinned',
   'viewType',
   'avatarUrl',
   'hideAvatar',
   'authorName',
+  'isSelf',
   'hideAuthorName',
   'hideMetadata',
   'time',
@@ -1048,13 +995,13 @@ export const RtkOverlayModal = /*@__PURE__*/ defineContainer<JSX.RtkOverlayModal
 export const RtkPaginatedList = /*@__PURE__*/ defineContainer<JSX.RtkPaginatedList>('rtk-paginated-list', undefined, [
   'pageSize',
   'pagesAllowed',
+  'emptyListLabel',
   'fetchData',
   'createNodes',
   'selectedItemId',
   'autoScroll',
   'iconPack',
-  't',
-  'emptyListLabel'
+  't'
 ]);
 
 
@@ -1614,9 +1561,9 @@ export const RtkUiProvider = /*@__PURE__*/ defineContainer<JSX.RtkUiProvider>('r
   'iconPack',
   't',
   'config',
-  'size',
+  'mode',
   'showSetupScreen',
-  'noRenderUntilMeeting',
+  'overrides',
   'rtkStatesUpdate'
 ], [
   'rtkStatesUpdate'

@@ -2,6 +2,7 @@ import { Component, Event, EventEmitter, Host, Prop, h } from '@stencil/core';
 import { elapsedDuration, formatDateTime } from '../../utils/date';
 import { SyncWithStore } from '../../utils/sync-with-store';
 import { IconPack, defaultIconPack } from '../../exports';
+import { Message } from '@cloudflare/realtimekit';
 
 export interface MessageAction {
   id: string;
@@ -18,8 +19,17 @@ export class RtkMessageView {
   /** List of actions to show in menu */
   @Prop() actions: MessageAction[] = [];
 
+  /** Type of message */
+  @Prop() messageType: Message['type'];
+
+  /** Has the message been edited */
+  @Prop() isEdited: boolean;
+
   /** Appearance */
   @Prop() variant: 'plain' | 'bubble' = 'bubble';
+
+  /** Is message pinned */
+  @Prop() pinned: boolean = false;
 
   /** Render */
   @Prop() viewType: 'incoming' | 'outgoing' = 'outgoing';
@@ -32,6 +42,9 @@ export class RtkMessageView {
 
   /** Author display label */
   @Prop() authorName: string;
+
+  /** Is the message sent by the current user */
+  @Prop() isSelf: boolean = false;
 
   /** Hides author display label */
   @Prop() hideAuthorName: boolean = false;
@@ -52,17 +65,23 @@ export class RtkMessageView {
 
   private renderActions() {
     return (
-      <rtk-menu placement="top-end" offset={1}>
+      <rtk-menu placement={this.isSelf ? 'bottom-start' : 'bottom-end'} offset={1}>
         <button slot="trigger" class="actions">
           <rtk-icon icon={this.iconPack.chevron_down} />
         </button>
-        <rtk-menu-list>
-          {this.actions.map((action) => (
-            <rtk-menu-item onClick={() => this.onAction.emit(action.id)}>
-              {action.icon && <rtk-icon icon={action.icon} slot="start" />}
-              {action.label}
-            </rtk-menu-item>
-          ))}
+        <rtk-menu-list menuVariant={this.isSelf ? 'primary' : 'secondary'}>
+          {this.actions.map((action) => {
+            if (action.id === 'edit_message' && this.messageType !== 'text') return;
+            return (
+              <rtk-menu-item
+                menuVariant={this.isSelf ? 'primary' : 'secondary'}
+                onClick={() => this.onAction.emit(action.id)}
+              >
+                {action.icon && <rtk-icon icon={action.icon} slot="start" />}
+                {action.label}
+              </rtk-menu-item>
+            );
+          })}
         </rtk-menu-list>
       </rtk-menu>
     );
@@ -81,11 +100,25 @@ export class RtkMessageView {
             </aside>
           )}
           <div class="message" part="message">
-            {!this.hideAuthorName && <div class="header">{this.authorName}</div>}
+            {!this.hideAuthorName && (
+              <div class="header">
+                {this.authorName} {this.isSelf ? ' (You)' : ''}
+              </div>
+            )}
             <div class={{ body: true, bubble: this.variant === 'bubble' }}>
               <slot></slot>
               {!this.hideMetadata && !!this.time && (
                 <div class="metadata" title={formatDateTime(this.time)}>
+                  {this.pinned && (
+                    <span class="metadata-content">
+                      <rtk-icon icon={this.iconPack.pin} size="sm" /> •
+                    </span>
+                  )}
+                  {this.isEdited && (
+                    <span class="metadata-content">
+                      <span>Edited</span> •
+                    </span>
+                  )}
                   {elapsedDuration(this.time, new Date(Date.now()))}
                 </div>
               )}

@@ -17,4 +17,10 @@ blockquote {
 
 pre {
   white-space: pre-wrap;
+  width: 300px;
+  @apply mr-2;
+}
+
+.markdown-message {
+  @apply box-border;
 }

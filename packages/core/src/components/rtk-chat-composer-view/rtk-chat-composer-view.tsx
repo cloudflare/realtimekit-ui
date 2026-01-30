@@ -35,6 +35,8 @@ export class RtkChatComposerView {
   /** Whether user can send text messages */
   @Prop() canSendTextMessage = true;
 
+  @Prop() isSending: boolean = false;
+
   /** Whether user can send file messages */
   @Prop() canSendFiles = true;
 
@@ -154,15 +156,7 @@ export class RtkChatComposerView {
     this.checkRateLimitBreached(currentTime);
 
     if (message.length > 0) {
-      if (this.quotedMessage.length !== 0) {
-        this.onNewMessage.emit({
-          type: 'text',
-          message,
-        });
-      } else {
-        this.onNewMessage.emit({ type: 'text', message });
-      }
-
+      this.onNewMessage.emit({ type: 'text', message });
       this.cleanup();
     }
   };
@@ -328,11 +322,15 @@ export class RtkChatComposerView {
                 <rtk-tooltip variant="primary" label={this.t('chat.send_msg')} delay={2000}>
                   <rtk-button
                     kind="icon"
-                    disabled={this.disableSendButton}
+                    disabled={this.disableSendButton || this.isSending}
                     onClick={() => this.handleSendMessage()}
                     title={this.t('chat.send_msg')}
                   >
-                    <rtk-icon icon={this.iconPack.send} />
+                    {this.isSending ? (
+                      <rtk-spinner size="sm" />
+                    ) : (
+                      <rtk-icon icon={this.iconPack.send} />
+                    )}
                   </rtk-button>
                 </rtk-tooltip>
               )}
@@ -354,7 +352,11 @@ export class RtkChatComposerView {
                       onClick={() => this.handleEditMessage()}
                       title={this.t('chat.send_msg')}
                     >
-                      <rtk-icon icon={this.iconPack.checkmark} />
+                      {this.isSending ? (
+                        <rtk-spinner size="sm" />
+                      ) : (
+                        <rtk-icon icon={this.iconPack.checkmark} />
+                      )}
                     </rtk-button>
                   </rtk-tooltip>
                 </div>

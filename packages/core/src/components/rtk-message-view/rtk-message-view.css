@@ -4,21 +4,27 @@
   @apply max-w-96;
 }
 .message-wrapper {
-  @apply flex flex-row-reverse gap-2;
+  @apply flex flex-row-reverse items-start gap-2;
   &.incoming {
     @apply flex-row;
   }
 }
 .message {
-  @apply flex flex-col;
-}
-.header {
-  @apply mb-1;
-  @apply self-end;
-  @apply text-text-900;
-  @apply text-text-md font-semibold;
+  @apply flex flex-col items-end;
 }
 
+.incoming {
+  .message {
+    @apply flex flex-col items-start;
+  }
+}
+
+.header {
+  @apply my-1;
+  @apply self-end;
+  @apply text-text-900;
+  @apply text-text-sm font-semibold;
+}
 .incoming {
   .header {
     @apply self-start;
@@ -31,24 +37,35 @@
   @apply text-text-900 font-sans;
   @apply text-text-md leading-snug;
   @apply relative;
-
-  .metadata {
-    @apply mt-2;
-    @apply self-end;
-    @apply text-text-xs;
-  }
 }
 
 .bubble {
-  @apply max-w-96 p-2;
-  @apply bg-brand-300 text-text-on-brand;
+  @apply max-w-[90%] p-2;
+  @apply bg-brand-500 text-text-on-brand border-brand-600 border-[1px] border-solid;
   @apply rounded-md;
 }
 
 .incoming {
   .bubble {
-    @apply bg-background-800 text-text-900 w-fit;
+    @apply bg-background-800 text-text-900 border-background-600;
   }
+}
+
+.metadata {
+  @apply mt-2 flex flex-row items-center gap-1;
+  @apply self-end;
+  @apply text-text-on-brand text-[11px];
+}
+
+.incoming {
+  .metadata {
+    @apply mt-2 flex flex-row items-center gap-1;
+    @apply self-end;
+    @apply text-text-800 text-[11px];
+  }
+}
+.metadata-content {
+  @apply flex flex-row items-center gap-1;
 }
 
 .avatar {
@@ -56,41 +73,29 @@
 }
 
 rtk-menu {
-  @apply absolute right-0 top-0 rounded-lg;
+  @apply absolute right-1 top-1 rounded-lg;
 
   rtk-icon {
     @apply h-4 w-4;
     @apply cursor-pointer;
   }
 }
+
 .actions {
-  @apply flex items-center justify-center pl-2 pb-2 pt-1 pr-1;
+  @apply bg-brand-300 border-brand-600 flex items-center justify-center border-[1px] border-solid p-1;
   @apply rounded-md border-none;
-  background: radial-gradient(
-    at top right,
-    theme(colors.brand.300) 60%,
-    rgba(255, 255, 255, 0) 80%
-  );
   rtk-icon {
     @apply h-4 w-4;
     @apply text-text-on-brand;
   }
 }
+
 .incoming {
-  .actions {
-    background: radial-gradient(
-      at top right,
-      theme(colors.background.800) 60%,
-      rgba(255, 255, 255, 0) 80%
-    );
-
-    rtk-icon {
-      @apply text-text-900;
-    }
-  }
-
   rtk-avatar {
     @apply bg-background-600 text-text-900;
+  }
+  .actions {
+    @apply bg-background-1000 border-background-700;
   }
 }
 

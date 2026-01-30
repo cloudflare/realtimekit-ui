@@ -5,11 +5,69 @@
   flex: 1;
 }
 
+:host(.chat-selector-paginated-list) {
+  .container {
+    @apply box-border flex flex-col p-2;
+    flex: 1 0 0px;
+    overflow-y: scroll;
+  }
+  .private-chat-label {
+    @apply flex w-full cursor-pointer flex-row items-center justify-start gap-2 py-3;
+
+    rtk-avatar {
+      @apply h-6 w-6;
+    }
+  }
+  .show-new-messages-ctr.active {
+    @apply hidden;
+  }
+}
+
+.private-chat-unread-badge {
+  @apply bg-brand-500 h-2 w-2 rounded-full;
+}
+
+:host(.pinned-message-selector-paginated-list) {
+  .container {
+    @apply box-border flex flex-col-reverse p-2;
+    flex: 1 0 0px;
+    overflow-y: scroll;
+  }
+
+  .page {
+    @apply relative box-border;
+  }
+
+  .pinned-message {
+    @apply box-border flex w-full cursor-pointer flex-row overflow-hidden rounded-sm;
+    @apply hover:bg-background-800;
+  }
+
+  .pinned-message-container {
+    @apply flex w-full flex-row items-start p-2;
+  }
+
+  .pinned-message-content {
+    @apply mx-2 flex min-w-0 flex-1 flex-col;
+  }
+
+  .pinned-message-time {
+    @apply text-text-sm text-text-700;
+  }
+
+  .pinned-message-preview {
+    @apply text-text-1000 line-clamp-2 mb-2 break-all;
+  }
+
+  rtk-avatar {
+    @apply h-6 w-6;
+  }
+}
+
 .container {
-  @apply box-border flex flex-col-reverse py-4;
+  @apply box-border flex flex-col-reverse py-4 px-2;
   flex: 1 0 0px;
   overflow-y: scroll;
-  /* overflow-anchor: none; */
 }
 .file-picker {
   @apply hidden;
@@ -144,8 +202,9 @@ rtk-text-message[is-continued] {
 #top-scroll {
   transform: translateY(20vh);
 }
-#bottom-scroll {
-  transform: translateY(-20vh);
+
+#top-scroll {
+  transform: translateY(20px);
 }
 
 a {
@@ -153,13 +212,13 @@ a {
 }
 
 .show-new-messages-ctr {
-  @apply pointer-events-none absolute bottom-2 right-4;
+  @apply absolute bottom-4 right-4;
   @apply z-10 -mt-14;
   @apply translate-y-28 opacity-0 transition;
 }
 
 .show-new-messages-ctr.active {
-  @apply translate-y-0 opacity-100;
+  @apply translate-y-0 cursor-pointer opacity-100;
 }
 
 .show-new-messages {
@@ -179,6 +238,8 @@ rtk-spinner,
 
 .page-wrapper {
   @apply mx-1;
+  display: flex;
+  flex-direction: column-reverse;
 }
 
 .message-wrapper {
@@ -198,5 +259,20 @@ rtk-spinner,
   rtk-message-view {
     @apply bg-background-700;
     @apply py-1;
+  }
+}
+
+.load-more-on-top-container {
+  @apply pointer-events-none absolute top-2 right-4;
+  @apply z-10;
+}
+
+.load-more-icon {
+  @apply pointer-events-auto;
+  @apply rounded-full;
+
+  &:hover {
+    @apply ring-background-600 ring-2;
+    @apply bg-background-600;
   }
 }

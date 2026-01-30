@@ -8,6 +8,7 @@ import { SyncWithStore } from '../../utils/sync-with-store';
 import { TextMessageView } from './components/TextMessage';
 
 /**
+ * @deprecated `rtk-text-message` is deprecated and will be removed soon. Use `rtk-text-message-view` instead.
  * A component which renders a text message from chat.
  */
 @Component({

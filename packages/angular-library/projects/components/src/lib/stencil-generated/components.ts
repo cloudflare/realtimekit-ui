@@ -452,164 +452,14 @@ export declare interface RtkCaptionToggle extends Components.RtkCaptionToggle {
 
 
 @ProxyCmp({
-  inputs: ['iconPack', 'meeting', 't']
-})
-@Component({
-  selector: 'rtk-channel-creator',
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  template: '<ng-content></ng-content>',
-  // eslint-disable-next-line @angular-eslint/no-inputs-metadata-property
-  inputs: ['iconPack', 'meeting', 't'],
-})
-export class RtkChannelCreator {
-  protected el: HTMLRtkChannelCreatorElement;
-  constructor(c: ChangeDetectorRef, r: ElementRef, protected z: NgZone) {
-    c.detach();
-    this.el = r.nativeElement;
-    proxyOutputs(this, this.el, ['rtkStateUpdate', 'switchChannel']);
-  }
-}
-
-
-import type { States as IRtkChannelCreatorStates } from '@cloudflare/realtimekit-ui';
-
-export declare interface RtkChannelCreator extends Components.RtkChannelCreator {
-  /**
-   * Emits updated state data
-   */
-  rtkStateUpdate: EventEmitter<CustomEvent<IRtkChannelCreatorStates>>;
-  /**
-   * Emits event to switch channel
-   */
-  switchChannel: EventEmitter<CustomEvent<string>>;
-}
-
-
-@ProxyCmp({
-  inputs: ['channel', 'iconPack', 'members', 't']
-})
-@Component({
-  selector: 'rtk-channel-details',
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  template: '<ng-content></ng-content>',
-  // eslint-disable-next-line @angular-eslint/no-inputs-metadata-property
-  inputs: ['channel', 'iconPack', 'members', 't'],
-})
-export class RtkChannelDetails {
-  protected el: HTMLRtkChannelDetailsElement;
-  constructor(c: ChangeDetectorRef, r: ElementRef, protected z: NgZone) {
-    c.detach();
-    this.el = r.nativeElement;
-  }
-}
-
-
-export declare interface RtkChannelDetails extends Components.RtkChannelDetails {}
-
-
-@ProxyCmp({
-  inputs: ['channel', 'iconPack', 'meeting', 'showBackButton', 't']
-})
-@Component({
-  selector: 'rtk-channel-header',
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  template: '<ng-content></ng-content>',
-  // eslint-disable-next-line @angular-eslint/no-inputs-metadata-property
-  inputs: ['channel', 'iconPack', 'meeting', 'showBackButton', 't'],
-})
-export class RtkChannelHeader {
-  protected el: HTMLRtkChannelHeaderElement;
-  constructor(c: ChangeDetectorRef, r: ElementRef, protected z: NgZone) {
-    c.detach();
-    this.el = r.nativeElement;
-    proxyOutputs(this, this.el, ['search', 'searchDismissed', 'back']);
-  }
-}
-
-
-export declare interface RtkChannelHeader extends Components.RtkChannelHeader {
-  /**
-   * event triggered for search
-   */
-  search: EventEmitter<CustomEvent<string>>;
-  /**
-   * event triggered for search
-   */
-  searchDismissed: EventEmitter<CustomEvent<any>>;
-  /**
-   * Event emitted when back button is clicked
-   */
-  back: EventEmitter<CustomEvent<void>>;
-}
-
-
-@ProxyCmp({
-  inputs: ['channels', 'iconPack', 'selectedChannelId', 'showRecentMessage', 't']
-})
-@Component({
-  selector: 'rtk-channel-selector-ui',
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  template: '<ng-content></ng-content>',
-  // eslint-disable-next-line @angular-eslint/no-inputs-metadata-property
-  inputs: ['channels', 'iconPack', 'selectedChannelId', 'showRecentMessage', 't'],
-})
-export class RtkChannelSelectorUi {
-  protected el: HTMLRtkChannelSelectorUiElement;
-  constructor(c: ChangeDetectorRef, r: ElementRef, protected z: NgZone) {
-    c.detach();
-    this.el = r.nativeElement;
-    proxyOutputs(this, this.el, ['channelChanged']);
-  }
-}
-
-
-export declare interface RtkChannelSelectorUi extends Components.RtkChannelSelectorUi {
-  /**
-   * On channel changed
-   */
-  channelChanged: EventEmitter<CustomEvent<string>>;
-}
-
-
-@ProxyCmp({
-  inputs: ['channels', 'disableSearch', 'hideAvatar', 'iconPack', 'selectedChannelId', 't', 'viewAs']
-})
-@Component({
-  selector: 'rtk-channel-selector-view',
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  template: '<ng-content></ng-content>',
-  // eslint-disable-next-line @angular-eslint/no-inputs-metadata-property
-  inputs: ['channels', 'disableSearch', 'hideAvatar', 'iconPack', 'selectedChannelId', 't', 'viewAs'],
-})
-export class RtkChannelSelectorView {
-  protected el: HTMLRtkChannelSelectorViewElement;
-  constructor(c: ChangeDetectorRef, r: ElementRef, protected z: NgZone) {
-    c.detach();
-    this.el = r.nativeElement;
-    proxyOutputs(this, this.el, ['channelChange']);
-  }
-}
-
-
-import type { IconPack as IRtkChannelSelectorViewIconPack } from '@cloudflare/realtimekit-ui';
-
-export declare interface RtkChannelSelectorView extends Components.RtkChannelSelectorView {
-  /**
-   * Event emitted when selected channel changes
-   */
-  channelChange: EventEmitter<CustomEvent<{ id: string; name: string; avatarUrl?: string; icon?: keyof IRtkChannelSelectorViewIconPack; latestMessage?: string; latestMessageTime?: Date; unreadCount?: number; }>>;
-}
-
-
-@ProxyCmp({
-  inputs: ['config', 'disablePrivateChat', 'displayFilter', 'iconPack', 'meeting', 'privatePresetFilter', 'size', 't']
+  inputs: ['config', 'iconPack', 'meeting', 'overrides', 'size', 't']
 })
 @Component({
   selector: 'rtk-chat',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: '<ng-content></ng-content>',
   // eslint-disable-next-line @angular-eslint/no-inputs-metadata-property
-  inputs: ['config', 'disablePrivateChat', 'displayFilter', 'iconPack', 'meeting', 'privatePresetFilter', 'size', 't'],
+  inputs: ['config', 'iconPack', 'meeting', 'overrides', 'size', 't'],
 })
 export class RtkChat {
   protected el: HTMLRtkChatElement;
@@ -632,14 +482,14 @@ export declare interface RtkChat extends Components.RtkChat {
 
 
 @ProxyCmp({
-  inputs: ['canSendFiles', 'canSendTextMessage', 'channelId', 'disableEmojiPicker', 'iconPack', 'members', 'prefill', 'size', 't']
+  inputs: ['canSendFiles', 'canSendTextMessage', 'disableEmojiPicker', 'iconPack', 'members', 'prefill', 'size', 't']
 })
 @Component({
   selector: 'rtk-chat-composer-ui',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: '<ng-content></ng-content>',
   // eslint-disable-next-line @angular-eslint/no-inputs-metadata-property
-  inputs: ['canSendFiles', 'canSendTextMessage', 'channelId', 'disableEmojiPicker', 'iconPack', 'members', 'prefill', 'size', 't'],
+  inputs: ['canSendFiles', 'canSendTextMessage', 'disableEmojiPicker', 'iconPack', 'members', 'prefill', 'size', 't'],
 })
 export class RtkChatComposerUi {
   protected el: HTMLRtkChatComposerUiElement;
@@ -661,7 +511,7 @@ export declare interface RtkChatComposerUi extends Components.RtkChatComposerUi 
   /**
    * Event emitted when message is edited
    */
-  rtkEditMessage: EventEmitter<CustomEvent<{ id: string; message: string; channelId?: string; }>>;
+  rtkEditMessage: EventEmitter<CustomEvent<{ id: string; message: string; }>>;
   /**
    * Event emitted when message editing is cancelled
    */
@@ -670,14 +520,14 @@ export declare interface RtkChatComposerUi extends Components.RtkChatComposerUi 
 
 
 @ProxyCmp({
-  inputs: ['canSendFiles', 'canSendTextMessage', 'disableEmojiPicker', 'iconPack', 'inputTextPlaceholder', 'isEditing', 'maxLength', 'message', 'quotedMessage', 'rateLimits', 'storageKey', 't']
+  inputs: ['canSendFiles', 'canSendTextMessage', 'disableEmojiPicker', 'iconPack', 'inputTextPlaceholder', 'isEditing', 'isSending', 'maxLength', 'message', 'quotedMessage', 'rateLimits', 'storageKey', 't']
 })
 @Component({
   selector: 'rtk-chat-composer-view',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: '<ng-content></ng-content>',
   // eslint-disable-next-line @angular-eslint/no-inputs-metadata-property
-  inputs: ['canSendFiles', 'canSendTextMessage', 'disableEmojiPicker', 'iconPack', 'inputTextPlaceholder', 'isEditing', 'maxLength', 'message', 'quotedMessage', 'rateLimits', 'storageKey', 't'],
+  inputs: ['canSendFiles', 'canSendTextMessage', 'disableEmojiPicker', 'iconPack', 'inputTextPlaceholder', 'isEditing', 'isSending', 'maxLength', 'message', 'quotedMessage', 'rateLimits', 'storageKey', 't'],
 })
 export class RtkChatComposerView {
   protected el: HTMLRtkChatComposerViewElement;
@@ -709,6 +559,27 @@ export declare interface RtkChatComposerView extends Components.RtkChatComposerV
    */
   quotedMessageDismiss: EventEmitter<CustomEvent<void>>;
 }
+
+
+@ProxyCmp({
+})
+@Component({
+  selector: 'rtk-chat-header',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: '<ng-content></ng-content>',
+  // eslint-disable-next-line @angular-eslint/no-inputs-metadata-property
+  inputs: [],
+})
+export class RtkChatHeader {
+  protected el: HTMLRtkChatHeaderElement;
+  constructor(c: ChangeDetectorRef, r: ElementRef, protected z: NgZone) {
+    c.detach();
+    this.el = r.nativeElement;
+  }
+}
+
+
+export declare interface RtkChatHeader extends Components.RtkChatHeader {}
 
 
 @ProxyCmp({
@@ -789,21 +660,21 @@ export declare interface RtkChatMessagesUi extends Components.RtkChatMessagesUi 
 
 
 @ProxyCmp({
-  inputs: ['iconPack', 'leftAlign', 'meeting', 'selectedChannel', 'selectedChannelId', 'size', 't']
+  inputs: ['iconPack', 'meeting', 'privateChatRecipient', 'size', 't']
 })
 @Component({
   selector: 'rtk-chat-messages-ui-paginated',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: '<ng-content></ng-content>',
   // eslint-disable-next-line @angular-eslint/no-inputs-metadata-property
-  inputs: ['iconPack', 'leftAlign', 'meeting', 'selectedChannel', 'selectedChannelId', 'size', 't'],
+  inputs: ['iconPack', 'meeting', 'privateChatRecipient', 'size', 't'],
 })
 export class RtkChatMessagesUiPaginated {
   protected el: HTMLRtkChatMessagesUiPaginatedElement;
   constructor(c: ChangeDetectorRef, r: ElementRef, protected z: NgZone) {
     c.detach();
     this.el = r.nativeElement;
-    proxyOutputs(this, this.el, ['editMessageInit', 'pinMessage', 'deleteMessage', 'rtkStateUpdate']);
+    proxyOutputs(this, this.el, ['editMessageInit', 'pinMessage', 'editMessage', 'deleteMessage', 'rtkStateUpdate']);
   }
 }
 
@@ -821,6 +692,10 @@ export declare interface RtkChatMessagesUiPaginated extends Components.RtkChatMe
    * Event emitted when a message is pinned or unpinned
    */
   pinMessage: EventEmitter<CustomEvent<IRtkChatMessagesUiPaginatedMessage>>;
+  /**
+   * Event emitted when a message is edited
+   */
+  editMessage: EventEmitter<CustomEvent<IRtkChatMessagesUiPaginatedMessage>>;
   /**
    * Event emitted when a message is deleted
    */
@@ -852,6 +727,37 @@ export class RtkChatSearchResults {
 
 
 export declare interface RtkChatSearchResults extends Components.RtkChatSearchResults {}
+
+
+@ProxyCmp({
+  inputs: ['config', 'iconPack', 'meeting', 'overrides', 'size', 'states', 't'],
+  methods: ['close']
+})
+@Component({
+  selector: 'rtk-chat-selector',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: '<ng-content></ng-content>',
+  // eslint-disable-next-line @angular-eslint/no-inputs-metadata-property
+  inputs: ['config', 'iconPack', 'meeting', 'overrides', 'size', 'states', 't'],
+})
+export class RtkChatSelector {
+  protected el: HTMLRtkChatSelectorElement;
+  constructor(c: ChangeDetectorRef, r: ElementRef, protected z: NgZone) {
+    c.detach();
+    this.el = r.nativeElement;
+    proxyOutputs(this, this.el, ['rtkDropdownToggle', 'rtkChatSelectorChange']);
+  }
+}
+
+
+import type { Participant as IRtkChatSelectorParticipant } from '@cloudflare/realtimekit-ui';
+
+export declare interface RtkChatSelector extends Components.RtkChatSelector {
+
+  rtkDropdownToggle: EventEmitter<CustomEvent<{ open: boolean }>>;
+
+  rtkChatSelectorChange: EventEmitter<CustomEvent<{ selectedUser?: IRtkChatSelectorParticipant | undefined }>>;
+}
 
 
 @ProxyCmp({
@@ -1931,14 +1837,14 @@ export declare interface RtkMarkdownView extends Components.RtkMarkdownView {}
 
 
 @ProxyCmp({
-  inputs: ['applyDesignSystem', 'config', 'gridLayout', 'iconPack', 'leaveOnUnmount', 'loadConfigFromPreset', 'meeting', 'mode', 'showSetupScreen', 'size', 't']
+  inputs: ['applyDesignSystem', 'config', 'gridLayout', 'iconPack', 'leaveOnUnmount', 'loadConfigFromPreset', 'meeting', 'mode', 'overrides', 'showSetupScreen', 'size', 't']
 })
 @Component({
   selector: 'rtk-meeting',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: '<ng-content></ng-content>',
   // eslint-disable-next-line @angular-eslint/no-inputs-metadata-property
-  inputs: ['applyDesignSystem', 'config', 'gridLayout', 'iconPack', 'leaveOnUnmount', 'loadConfigFromPreset', 'meeting', 'mode', 'showSetupScreen', 'size', 't'],
+  inputs: ['applyDesignSystem', 'config', 'gridLayout', 'iconPack', 'leaveOnUnmount', 'loadConfigFromPreset', 'meeting', 'mode', 'overrides', 'showSetupScreen', 'size', 't'],
 })
 export class RtkMeeting {
   protected el: HTMLRtkMeetingElement;
@@ -2006,14 +1912,14 @@ export declare interface RtkMenu extends Components.RtkMenu {}
 
 
 @ProxyCmp({
-  inputs: ['iconPack', 'size', 't']
+  inputs: ['iconPack', 'menuVariant', 'size', 't']
 })
 @Component({
   selector: 'rtk-menu-item',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: '<ng-content></ng-content>',
   // eslint-disable-next-line @angular-eslint/no-inputs-metadata-property
-  inputs: ['iconPack', 'size', 't'],
+  inputs: ['iconPack', 'menuVariant', 'size', 't'],
 })
 export class RtkMenuItem {
   protected el: HTMLRtkMenuItemElement;
@@ -2028,14 +1934,14 @@ export declare interface RtkMenuItem extends Components.RtkMenuItem {}
 
 
 @ProxyCmp({
-  inputs: ['iconPack', 't']
+  inputs: ['iconPack', 'menuVariant', 't']
 })
 @Component({
   selector: 'rtk-menu-list',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: '<ng-content></ng-content>',
   // eslint-disable-next-line @angular-eslint/no-inputs-metadata-property
-  inputs: ['iconPack', 't'],
+  inputs: ['iconPack', 'menuVariant', 't'],
 })
 export class RtkMenuList {
   protected el: HTMLRtkMenuListElement;
@@ -2072,14 +1978,14 @@ export declare interface RtkMessageListView extends Components.RtkMessageListVie
 
 
 @ProxyCmp({
-  inputs: ['actions', 'authorName', 'avatarUrl', 'hideAuthorName', 'hideAvatar', 'hideMetadata', 'iconPack', 'time', 'variant', 'viewType']
+  inputs: ['actions', 'authorName', 'avatarUrl', 'hideAuthorName', 'hideAvatar', 'hideMetadata', 'iconPack', 'isEdited', 'isSelf', 'messageType', 'pinned', 'time', 'variant', 'viewType']
 })
 @Component({
   selector: 'rtk-message-view',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: '<ng-content></ng-content>',
   // eslint-disable-next-line @angular-eslint/no-inputs-metadata-property
-  inputs: ['actions', 'authorName', 'avatarUrl', 'hideAuthorName', 'hideAvatar', 'hideMetadata', 'iconPack', 'time', 'variant', 'viewType'],
+  inputs: ['actions', 'authorName', 'avatarUrl', 'hideAuthorName', 'hideAvatar', 'hideMetadata', 'iconPack', 'isEdited', 'isSelf', 'messageType', 'pinned', 'time', 'variant', 'viewType'],
 })
 export class RtkMessageView {
   protected el: HTMLRtkMessageViewElement;
@@ -2388,15 +2294,15 @@ export declare interface RtkOverlayModal extends Components.RtkOverlayModal {
 
 
 @ProxyCmp({
-  inputs: ['autoScroll', 'createNodes', 'emptyListLabel', 'fetchData', 'iconPack', 'pageSize', 'pagesAllowed', 'selectedItemId', 't'],
-  methods: ['onNewNode', 'onNodeDelete', 'onNodeUpdate']
+  inputs: ['autoScroll', 'createNodes', 'emptyListLabel', 'fetchData', 'iconPack', 'pageSize', 'pagesAllowed', 't'],
+  methods: ['rerenderList', 'onNewNode', 'onNodeDelete', 'onNodeUpdate', 'reset']
 })
 @Component({
   selector: 'rtk-paginated-list',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: '<ng-content></ng-content>',
   // eslint-disable-next-line @angular-eslint/no-inputs-metadata-property
-  inputs: ['autoScroll', 'createNodes', 'emptyListLabel', 'fetchData', 'iconPack', 'pageSize', 'pagesAllowed', 'selectedItemId', 't'],
+  inputs: ['autoScroll', 'createNodes', 'emptyListLabel', 'fetchData', 'iconPack', 'pageSize', 'pagesAllowed', 't'],
 })
 export class RtkPaginatedList {
   protected el: HTMLRtkPaginatedListElement;
@@ -2719,6 +2625,39 @@ export declare interface RtkPermissionsMessage extends Components.RtkPermissions
    * Emits updated state data
    */
   rtkStateUpdate: EventEmitter<CustomEvent<IRtkPermissionsMessageStates>>;
+}
+
+
+@ProxyCmp({
+  inputs: ['iconPack', 'meeting', 't'],
+  methods: ['close']
+})
+@Component({
+  selector: 'rtk-pinned-message-selector',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: '<ng-content></ng-content>',
+  // eslint-disable-next-line @angular-eslint/no-inputs-metadata-property
+  inputs: ['iconPack', 'meeting', 't'],
+})
+export class RtkPinnedMessageSelector {
+  protected el: HTMLRtkPinnedMessageSelectorElement;
+  constructor(c: ChangeDetectorRef, r: ElementRef, protected z: NgZone) {
+    c.detach();
+    this.el = r.nativeElement;
+    proxyOutputs(this, this.el, ['rtkDropdownToggle', 'rtkPinnedMessageSelect']);
+  }
+}
+
+
+import type { Message as IRtkPinnedMessageSelectorMessage } from '@cloudflare/realtimekit-ui';
+
+export declare interface RtkPinnedMessageSelector extends Components.RtkPinnedMessageSelector {
+
+  rtkDropdownToggle: EventEmitter<CustomEvent<{ open: boolean }>>;
+  /**
+   * Emits when a pinned message is selected
+   */
+  rtkPinnedMessageSelect: EventEmitter<CustomEvent<IRtkPinnedMessageSelectorMessage>>;
 }
 
 
@@ -3655,14 +3594,14 @@ export declare interface RtkTranscripts extends Components.RtkTranscripts {}
 
 
 @ProxyCmp({
-  inputs: ['config', 'iconPack', 'meeting', 'mode', 'showSetupScreen', 't']
+  inputs: ['config', 'iconPack', 'meeting', 'mode', 'overrides', 'showSetupScreen', 't']
 })
 @Component({
   selector: 'rtk-ui-provider',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: '<ng-content></ng-content>',
   // eslint-disable-next-line @angular-eslint/no-inputs-metadata-property
-  inputs: ['config', 'iconPack', 'meeting', 'mode', 'showSetupScreen', 't'],
+  inputs: ['config', 'iconPack', 'meeting', 'mode', 'overrides', 'showSetupScreen', 't'],
 })
 export class RtkUiProvider {
   protected el: HTMLRtkUiProviderElement;
