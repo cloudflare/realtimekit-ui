@@ -39,12 +39,16 @@
   }
 
   .pinned-message {
-    @apply flex w-full cursor-pointer flex-row items-start gap-2 rounded-sm py-2;
+    @apply box-border flex w-full cursor-pointer flex-row overflow-hidden rounded-sm;
     @apply hover:bg-background-800;
   }
 
+  .pinned-message-container {
+    @apply flex w-full flex-row items-start p-2;
+  }
+
   .pinned-message-content {
-    @apply flex min-w-0 flex-1 flex-col;
+    @apply mx-2 flex min-w-0 flex-1 flex-col;
   }
 
   .pinned-message-time {

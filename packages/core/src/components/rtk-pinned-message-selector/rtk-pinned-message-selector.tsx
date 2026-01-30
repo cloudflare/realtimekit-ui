@@ -141,21 +141,23 @@ export class RtkPinnedMessageSelector {
             this.close();
           }}
         >
-          <rtk-avatar
-            size="sm"
-            participant={{
-              name: message.displayName,
-              picture: '',
-            }}
-          />
-          <div class="pinned-message-content">
-            <div class="pinned-message-preview" title={preview}>
-              {preview}
-            </div>
-            <div class="pinned-message-meta">
-              <span class="pinned-message-time">
-                {elapsedDuration(message.time, new Date(Date.now()))}
-              </span>
+          <div class="pinned-message-container">
+            <rtk-avatar
+              size="sm"
+              participant={{
+                name: message.displayName,
+                picture: '',
+              }}
+            />
+            <div class="pinned-message-content">
+              <div class="pinned-message-preview" title={preview}>
+                {preview}
+              </div>
+              <div class="pinned-message-meta">
+                <span class="pinned-message-time">
+                  {elapsedDuration(message.time, new Date(Date.now()))}
+                </span>
+              </div>
             </div>
           </div>
         </div>
