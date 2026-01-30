@@ -107,7 +107,7 @@ export class RtkMarkdownView {
     const withoutReply = stripOutReplyBlock(slicedMessage);
 
     return (
-      <p>
+      <p class="markdown-message">
         {withReply.length !== 0 && <blockquote>{this.renderMessage(withReply)}</blockquote>}
         {withoutReply.length !== 0 && this.renderMessage(withoutReply)}
       </p>

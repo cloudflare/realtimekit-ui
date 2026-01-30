@@ -23,7 +23,6 @@
   @apply z-10 p-0;
   @apply bg-background-1000;
   @apply opacity-0;
-  @apply overflow-hidden;
   @apply pointer-events-none;
   /* @apply transition-all duration-200 ease-in-out; */
   @apply rounded-b-sm;
@@ -34,15 +33,13 @@
 }
 
 .dropdown.open {
-  @apply flex flex-col;
-  @apply max-h-[30vh] opacity-100;
-  @apply overflow-hidden;
+  @apply opacity-100;
   @apply pointer-events-auto;
   @apply border-background-600 border-t-none border-[1px] border-solid;
 }
 
 .dropdown rtk-paginated-list {
-  @apply flex max-h-[30vh] min-h-[12vh] flex-col;
+  @apply box-border flex h-[30vh] flex-col;
 }
 
 .public-chat-group-label {
@@ -52,4 +49,8 @@
 .public-chat-icon {
   @apply flex items-center justify-center p-1;
   @apply bg-brand-500 rounded-full;
+
+  rtk-icon {
+    @apply text-text-on-brand;
+  }
 }

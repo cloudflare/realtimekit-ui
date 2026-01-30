@@ -221,7 +221,11 @@ export class RtkChatSelector {
       <Host>
         <div class="chat-header" onClick={this.toggle}>
           <div class="chat-header-label">
-            <rtk-icon icon={this.iconPack.participants} size="sm" />
+            {this.selectedUser ? (
+              <rtk-icon icon={this.iconPack.people} size="sm" />
+            ) : (
+              <rtk-icon icon={this.iconPack.participants} size="sm" />
+            )}
             {!this.selectedUser ? this.t('chat.everyone') : this.selectedUser.name}
           </div>
           <div class="chevron">

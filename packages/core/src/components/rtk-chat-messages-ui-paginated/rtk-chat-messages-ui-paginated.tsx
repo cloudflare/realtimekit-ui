@@ -128,7 +128,7 @@ export class RtkChatMessagesUiPaginated {
       }
     }
     try {
-      const messages = await this.meeting.chat.fetchMessages({
+      const messages = await this.meeting.chat.fetchPublicMessages({
         timestamp,
         limit: size,
         direction: reversed ? 'before' : 'after',

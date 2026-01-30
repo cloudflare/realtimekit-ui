@@ -89,20 +89,13 @@ export class RtkChatToggle {
   private async setUnreadMessageCount() {
     const chat = this.meeting.chat;
     if (!chat) return;
-    const messages = await chat.fetchMessages({
-      timestamp: new Date().getTime(),
-      limit: this.pageSize,
-      direction: 'before',
-    });
-
     const meetingStartedTimeMs = this.meeting.meta?.meetingStartedTimestamp.getTime() ?? 0;
-    const newMessages = messages.filter((m) => m.timeMs > meetingStartedTimeMs);
-    if (newMessages.length === this.pageSize && newMessages.length > 0) {
-      // all messages are new, so we can't know the exact count, but we know there are at least pageSize - 1 new messages
-      this.unreadMessageCount = newMessages.length;
-    } else {
-      this.unreadMessageCount = newMessages.length;
-    }
+    const messages = await chat.fetchPublicMessages({
+      timestamp: meetingStartedTimeMs,
+      limit: this.pageSize,
+      direction: 'after',
+    });
+    this.unreadMessageCount = messages.length;
   }
 
   private onChatUpdate = ({ action, message }) => {
