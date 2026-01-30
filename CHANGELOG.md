@@ -1,3 +1,13 @@
+# [1.1.0-staging.14](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.1.0-staging.13...@cloudflare/realtimekit-ui-v1.1.0-staging.14) (2026-01-30)
+
+
+### Bug Fixes
+
+* add padding to pinned messages ([6051178](https://github.com/cloudflare/realtimekit-ui/commit/6051178f99711259e568f4c8037a8d8f9f3860ec))
+* bump web core version ([0620754](https://github.com/cloudflare/realtimekit-ui/commit/0620754f5a89ae5e80b8741387dee96e1ad7ea49))
+* dropdown width for chat selector ([79ac6ea](https://github.com/cloudflare/realtimekit-ui/commit/79ac6eaa783175801fe74f8cc596041b8d15b78e))
+* unread chat count ([160aa1c](https://github.com/cloudflare/realtimekit-ui/commit/160aa1c916c8b6ecd81f5fe5bf6d279aa3958c4f))
+
 # [1.1.0-staging.13](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.1.0-staging.12...@cloudflare/realtimekit-ui-v1.1.0-staging.13) (2026-01-29)
 
 
