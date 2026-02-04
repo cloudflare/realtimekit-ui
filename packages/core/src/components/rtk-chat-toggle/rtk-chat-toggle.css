@@ -10,7 +10,7 @@
 }
 
 .unread-count {
-  @apply absolute right-3 box-border p-0.5;
+  @apply absolute right-4 box-border p-0.5;
   @apply select-none;
 
   @apply text-text-sm bg-brand-500 text-text-on-brand;

@@ -7,10 +7,9 @@
       content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"
     />
     <title>RealtimeKit UI</title>
-    
+
     <!-- Cloudflare Favicon -->
-    <link rel="icon" type="image/svg+xml" href="https://demo.realtime.cloudflare.com/favicon.ico">
-    
+    <link rel="icon" type="image/svg+xml" href="https://demo.realtime.cloudflare.com/favicon.ico" />
 
     <style>
       html,
@@ -179,11 +178,11 @@
         .form-styles {
           margin-top: 1rem;
         }
-        
+
         .form-group {
           margin-top: 0.75rem;
         }
-        
+
         .options-section {
           margin-top: 0.75rem;
         }
@@ -195,7 +194,7 @@
           height: 2.75rem;
           font-size: 0.875rem;
         }
-        
+
         .label-styles {
           font-size: 0.6875rem;
         }
@@ -231,8 +230,8 @@
       }
 
       .checkbox-styles:checked {
-        background-color: #F6821E;
-        border-color: #F6821E;
+        background-color: #f6821e;
+        border-color: #f6821e;
       }
 
       .checkbox-styles:checked::after {
@@ -263,7 +262,11 @@
       .button-styles {
         display: block;
         border-radius: 0.5rem;
-        background: linear-gradient(to bottom right, #fb923c, #f97316); /* bg-gradient-to-br from-orange-400 to-orange-500 */
+        background: linear-gradient(
+          to bottom right,
+          #fb923c,
+          #f97316
+        ); /* bg-gradient-to-br from-orange-400 to-orange-500 */
         padding: 0.5rem 0;
         color: white;
         border: none;
@@ -272,7 +275,11 @@
 
       .button-styles:disabled {
         cursor: progress;
-        background: linear-gradient(to bottom right, rgba(251, 146, 60, 0.1), rgba(249, 115, 22, 0.1));
+        background: linear-gradient(
+          to bottom right,
+          rgba(251, 146, 60, 0.1),
+          rgba(249, 115, 22, 0.1)
+        );
         color: rgba(254, 215, 170, 0.6);
       }
 
@@ -282,13 +289,13 @@
           height: 2.75rem;
           padding: 0 0.75rem;
         }
-        
+
         .divider {
           margin: 1rem 0;
           padding: 0.75rem;
           font-size: 0.8125rem;
         }
-        
+
         .button-styles {
           padding: 0.625rem 0;
           font-size: 0.9375rem;
@@ -301,17 +308,17 @@
           padding: 0 0.5rem;
           font-size: 0.875rem;
         }
-        
+
         .checkbox-styles {
           width: 16px;
           height: 16px;
         }
-        
+
         .button-styles {
           padding: 0.5rem 0;
           font-size: 0.875rem;
         }
-        
+
         .divider {
           margin: 0.75rem 0;
           padding: 0.5rem;
@@ -325,16 +332,16 @@
           padding: 0.5rem;
           align-items: flex-start;
         }
-        
+
         .form-card {
           padding: 1rem;
           margin: 0.5rem 0;
         }
-        
+
         .form-styles {
           margin-top: 0.75rem;
         }
-        
+
         .form-group {
           margin-top: 0.5rem;
         }
@@ -366,6 +373,7 @@
               video: false,
             },
             addEffectsAddon: false,
+            disableEmojiPickerOverride: false,
           },
           async initialize() {
             const url = new URL(window.location.href);
@@ -395,6 +403,50 @@
               this.handleSubmit();
             }
           },
+          async addAddonsInConfig(meeting) {
+            const RealtimeKitVideoBackground = await import(
+              'https://cdn.jsdelivr.net/npm/@cloudflare/realtimekit-ui-addons@latest/dist/video-background.js'
+            );
+            const { registerAddons } = await import(
+              'https://cdn.jsdelivr.net/npm/@cloudflare/realtimekit-ui@latest/dist/esm/index.js'
+            );
+
+            const videoBackground = await RealtimeKitVideoBackground.default.init({
+              modes: ['blur', 'virtual'],
+              meeting,
+              images: [
+                'https://images.unsplash.com/photo-1487088678257-3a541e6e3922?q=80&w=2874&auto=format&fit=crop&ixlib=rb-4.0.3',
+                'https://images.unsplash.com/photo-1496715976403-7e36dc43f17b?q=80&w=2848&auto=format&fit=crop&ixlib=rb-4.0.3',
+                'https://images.unsplash.com/photo-1600431521340-491eca880813?q=80&w=2938&auto=format&fit=crop&ixlib=rb-4.0.3',
+              ],
+              onVideoBackgroundUpdate: ({ backgroundMode, backgroundURL }) => {
+                console.log('videoBackgroundUpdated => ', { backgroundMode, backgroundURL });
+              }, // Listen to background update action
+            });
+
+            let config = registerAddons([videoBackground], meeting);
+            /**
+             *  config as undefined is accepted,
+             *  if addons are enabled, addon config will be used
+             */
+            this.$refs.meeting.config = config;
+          },
+          async addConnectedMeetingListeners(meeting) {
+            meeting.connectedMeetings.on('meetingChanged', (newMeeting) => {
+              newMeeting.__internals__.logger.info('Showing the next meeting UI for breakout', {
+                connectedMeetings: {
+                  movement: {
+                    destinationMeetingId: newMeeting.meta.meetingId,
+                    sourceMeetingId: meeting.meta.meetingId,
+                  },
+                },
+              });
+              this.addAddonsInConfig(newMeeting);
+              this.attachMeetingObject(newMeeting, true);
+              // In the new meeting, we need to re-attach the listeners
+              this.addConnectedMeetingListeners(newMeeting);
+            });
+          },
           async handleSubmit() {
             if (!this.joining) {
               this.joining = true;
@@ -409,7 +461,8 @@
 
             this.status = 'Getting meeting details...';
 
-            const { roomName, defaults, authToken, addEffectsAddon } = this.data;
+            const { roomName, defaults, authToken, addEffectsAddon, disableEmojiPickerOverride } =
+              this.data;
             const modules = {
               spotlight: true,
               devTools: {
@@ -433,31 +486,6 @@
                 modules,
               });
 
-              let config;
-              // Conditionally load effects addon if enabled
-              if (addEffectsAddon) {
-                const RealtimeKitVideoBackground = await import("https://cdn.jsdelivr.net/npm/@cloudflare/realtimekit-ui-addons@latest/dist/video-background.js");
-                const { registerAddons } = await import("https://cdn.jsdelivr.net/npm/@cloudflare/realtimekit-ui@latest/dist/esm/index.js");
-                
-                const videoBackground = await RealtimeKitVideoBackground.default.init({
-                  modes: ["blur", "virtual"],
-                  meeting,
-                  images: [
-                      "https://images.unsplash.com/photo-1487088678257-3a541e6e3922?q=80&w=2874&auto=format&fit=crop&ixlib=rb-4.0.3",
-                      "https://images.unsplash.com/photo-1496715976403-7e36dc43f17b?q=80&w=2848&auto=format&fit=crop&ixlib=rb-4.0.3",
-                      "https://images.unsplash.com/photo-1600431521340-491eca880813?q=80&w=2938&auto=format&fit=crop&ixlib=rb-4.0.3"
-                  ],
-                  onVideoBackgroundUpdate: ({backgroundMode, backgroundURL}) => { 
-                    console.log('videoBackgroundUpdated => ', {backgroundMode, backgroundURL});
-                  }, // Listen to background update action
-                });
-
-                config = registerAddons([videoBackground], meeting);
-                console.log('Effects addon loaded and configured');
-              } else {
-                console.log('Effects addon disabled - using default meeting config');
-              }
-
               if (!location.href.includes('http://localhost:3333/')) {
                 // set name from localStorage cache
                 const name =
@@ -468,16 +496,15 @@
               }
 
               this.status = 'Connecting...';
+              if (addEffectsAddon) {
+                await this.addAddonsInConfig(meeting);
+              }
+              this.overrides = {
+                disableEmojiPicker: disableEmojiPickerOverride,
+              };
               this.attachMeetingObject(meeting);
-              /**
-               *  config as undefined is accepted,
-               *  if addons are enabled, addon config will be used
-               */
-              this.$refs.meeting.config = config;
-              
-              meeting.connectedMeetings.on('meetingChanged', (newMeeting) =>
-                this.attachMeetingObject(newMeeting, true)
-              );
+              this.$refs.meeting.overrides = this.overrides;
+              this.addConnectedMeetingListeners(meeting);
             } catch (err) {
               console.error(err);
               alert('An error occured, check if the environment is correct.');
@@ -497,15 +524,9 @@
 
   <body class="body-styles">
     <div x-init="initialize" x-data="app()" class="app-container" x-data="app()">
-      <div
-        x-show="!meeting"
-        x-transition
-        class="login-container"
-      >
+      <div x-show="!meeting" x-transition class="login-container">
         <div class="pattern pattern-bg"></div>
-        <div
-          class="form-card"
-        >
+        <div class="form-card">
           <h1 class="header">
             <svg xmlns="http://www.w3.org/2000/svg" width="60" height="27" fill="none" class="">
               <g clip-path="url(#a)">
@@ -537,11 +558,7 @@
             </div>
             <div class="form-group">
               <label for="env" class="label-styles">Environment</label>
-              <select
-                id="env"
-                class="select-styles"
-                x-model="data.env"
-              >
+              <select id="env" class="select-styles" x-model="data.env">
                 <option value="devel">Devel</option>
                 <option value="preprod">Pre-production</option>
                 <option value="prod">Production</option>
@@ -550,10 +567,7 @@
             <div class="options-section">
               <label class="label-styles">Options</label>
               <div class="options-container">
-                <label
-                  for="showSetupScreen"
-                  class="checkbox-label"
-                >
+                <label for="showSetupScreen" class="checkbox-label">
                   <span>Show Setup Screen</span>
                   <input
                     type="checkbox"
@@ -562,10 +576,7 @@
                     x-model="data.showSetupScreen"
                   />
                 </label>
-                <label
-                  for="video"
-                  class="checkbox-label"
-                >
+                <label for="video" class="checkbox-label">
                   <span>Enable Video</span>
                   <input
                     type="checkbox"
@@ -574,10 +585,7 @@
                     x-model="data.defaults.video"
                   />
                 </label>
-                <label
-                  for="audio"
-                  class="checkbox-label"
-                >
+                <label for="audio" class="checkbox-label">
                   <span>Enable Audio</span>
                   <input
                     type="checkbox"
@@ -591,10 +599,7 @@
             <div class="options-section">
               <label class="label-styles">Addons</label>
               <div class="options-container">
-                <label
-                  for="addEffectsAddon"
-                  class="checkbox-label"
-                >
+                <label for="addEffectsAddon" class="checkbox-label">
                   <span>Effects</span>
                   <input
                     type="checkbox"
@@ -605,9 +610,21 @@
                 </label>
               </div>
             </div>
-            <div
-              class="divider"
-            >
+            <div class="options-section">
+              <label class="label-styles">Overrides</label>
+              <div class="options-container">
+                <label for="disableEmojiPickerOverride" class="checkbox-label">
+                  <span>Disable Emoji Picker</span>
+                  <input
+                    type="checkbox"
+                    id="disableEmojiPickerOverride"
+                    class="checkbox-styles"
+                    x-model="data.disableEmojiPickerOverride"
+                  />
+                </label>
+              </div>
+            </div>
+            <div class="divider">
               Load this page with
               <a href="#join" class="link-styles" target="_blank"><code>#join</code></a>
               for faster development!
@@ -626,6 +643,7 @@
       <rtk-meeting
         x-show="meeting"
         x-ref="meeting"
+        x-ref="overrides"
         x-cloak
         id="dm"
         :show-setup-screen="data.showSetupScreen ? 'true' : 'false'"

@@ -1,0 +1,21 @@
+@import '../../styles/reset.css';
+@import '../../styles/scrollbar.css';
+
+:host {
+  @apply flex w-full flex-col gap-2;
+  @apply text-text-md;
+  @apply text-text-1000 z-10 mb-2 box-border;
+}
+
+.chat-header {
+  @apply relative mx-2 gap-2 px-4 py-3;
+  @apply bg-background-800 text-text-600 flex flex-row items-center justify-between;
+  @apply rounded-sm;
+  @apply overflow-hidden;
+  border: theme('borderWidth.sm') solid theme('colors.background.600');
+  @apply cursor-pointer;
+}
+
+.chat-header-label {
+  @apply flex flex-row items-center justify-start gap-2;
+}

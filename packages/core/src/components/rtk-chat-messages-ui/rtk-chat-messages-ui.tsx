@@ -1,5 +1,6 @@
 import type { Message } from '@cloudflare/realtimekit';
 import {
+  Build,
   Component,
   Host,
   h,
@@ -18,6 +19,11 @@ import { smoothScrollToBottom } from '../../utils/scroll';
 import { chatUnreadTimestamps } from '../../utils/user-prefs';
 import { SyncWithStore } from '../../utils/sync-with-store';
 
+let hasShownDeprecationWarning = false;
+
+/**
+ * @deprecated Use `rtk-chat-messages-ui-paginated` instead.
+ */
 @Component({
   tag: 'rtk-chat-messages-ui',
   styleUrl: 'rtk-chat-messages-ui.css',
@@ -72,6 +78,14 @@ export class RtkChatMessagesUi {
   @State() showLatestMessageButton = false;
 
   connectedCallback() {
+    if (Build.isDev && !hasShownDeprecationWarning) {
+      hasShownDeprecationWarning = true;
+      // eslint-disable-next-line no-console
+      console.warn(
+        '[realtimekit-ui] `rtk-chat-messages-ui` is deprecated and will be removed in a future release. Use `rtk-chat-messages-ui-paginated` instead.'
+      );
+    }
+
     this.lastReadTimestamp = chatUnreadTimestamps['everyone'] ?? new Date('0001-01-01T00:00:00Z');
 
     this.intersectionObserver = new IntersectionObserver((entries) => {

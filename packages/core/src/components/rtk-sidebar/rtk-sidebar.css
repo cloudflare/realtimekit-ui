@@ -1,14 +1,14 @@
 @import '../../styles/reset.css';
 
 :host {
-  @apply max-w-96 h-full w-full;
+  @apply max-w-96 mr-0 h-full w-full;
   @apply box-border flex flex-col;
   @apply bg-background-1000;
   @apply border-background-700 border-sm border-solid;
 }
 
 :host([view='sidebar']) {
-  @apply right-2 overflow-clip rounded-lg;
+  @apply right-2 mr-4 overflow-clip rounded-lg;
   @apply shadow-background-900 shadow-2xl;
 }
 

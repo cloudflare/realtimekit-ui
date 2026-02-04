@@ -40,7 +40,7 @@ export class RtkSidebarUi {
   @Prop() iconPack = defaultIconPack;
 
   /** Option to focus close button when opened */
-  @Prop() focusCloseButton = false;
+  @Prop() focusCloseButton = true;
 
   /** Language */
   @SyncWithStore()

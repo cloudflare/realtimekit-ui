@@ -9,11 +9,12 @@ import {
   State,
   Prop,
   Watch,
+  Listen,
 } from '@stencil/core';
 import { defaultIconPack, IconPack } from '../../lib/icons';
 import { RtkI18n, useLanguage } from '../../lib/lang';
-import { Meeting } from '../../types/rtk-client';
-import { ChatChannel, Size, States } from '../../types/props';
+import { Meeting, Participant } from '../../types/rtk-client';
+import { Size, States } from '../../types/props';
 import { SyncWithStore } from '../../utils/sync-with-store';
 
 @Component({
@@ -31,16 +32,6 @@ export class RtkChatMessagesUiPaginated {
   @Prop()
   meeting: Meeting;
 
-  /**
-   * Selected channel
-   */
-  @Prop() selectedChannel?: ChatChannel;
-
-  /**
-   * Selected channel id
-   */
-  @Prop() selectedChannelId?: string;
-
   /** Size */
   @Prop({ reflect: true }) size: Size;
 
@@ -54,6 +45,9 @@ export class RtkChatMessagesUiPaginated {
   @Prop()
   t: RtkI18n = useLanguage();
 
+  /** Selected recipient for private chat; when unset, messages are loaded for public chat (Everyone). */
+  @Prop() privateChatRecipient: Participant | null;
+
   /** Event for editing a message */
   @Event({ bubbles: true, composed: true }) editMessageInit: EventEmitter<{
     payload: TextMessage;
@@ -63,6 +57,9 @@ export class RtkChatMessagesUiPaginated {
   /** Event emitted when a message is pinned or unpinned */
   @Event({ eventName: 'pinMessage' }) onPinMessage: EventEmitter<Message>;
 
+  /** Event emitted when a message is edited */
+  @Event({ eventName: 'editMessage' }) onEditMessage: EventEmitter<Message>;
+
   /** Event emitted when a message is deleted */
   @Event({ eventName: 'deleteMessage' }) onDeleteMessage: EventEmitter<Message>;
 
@@ -71,14 +68,9 @@ export class RtkChatMessagesUiPaginated {
 
   @State() children: HTMLElement;
 
-  /** Whether to align chat bubbles to the left */
-  @Prop() leftAlign = false;
-
   @State() permissionsChanged = false;
 
   private pageSize: number = 25;
-
-  private lastReadMessageIndex = -1;
 
   componentDidLoad() {
     const slotted = this.host.shadowRoot.querySelector('slot') as HTMLSlotElement;
@@ -90,8 +82,20 @@ export class RtkChatMessagesUiPaginated {
     this.meetingChanged(this.meeting);
   }
 
+  @Listen('rtkPinnedMessageSelect', { target: 'window' })
+  async onPinnedMessageSelect(event: CustomEvent<Message>) {
+    const message = event.detail;
+    if (!message) return;
+    await this.$paginatedListRef?.reset?.(message.timeMs + 1);
+  }
+
   disconnectedCallback() {
     this.disconnectMeeting(this.meeting);
+  }
+
+  @Watch('privateChatRecipient')
+  privateChatRecipientChanged() {
+    this.$paginatedListRef?.reset();
   }
 
   @Watch('meeting')
@@ -105,36 +109,34 @@ export class RtkChatMessagesUiPaginated {
     this.permissionsUpdateListener();
   }
 
-  @Watch('selectedChannelId')
-  channelChanged() {
-    this.lastReadMessageIndex = -1;
-  }
-
   private permissionsUpdateListener = () => {
     this.permissionsChanged = !this.permissionsChanged;
   };
 
-  private maybeMarkChannelAsRead = (messages: Message[]) => {
-    if (!this.selectedChannelId) return;
-    if (messages.length === 0) return;
-    if (this.lastReadMessageIndex !== -1) return;
-    const latestMsg = messages.at(0).time > messages.at(-1).time ? messages.at(0) : messages.at(-1);
-    if (!latestMsg.channelIndex) return;
-    this.lastReadMessageIndex = parseInt(latestMsg.channelIndex, 10);
-    this.meeting.chat.markLastReadMessage(this.selectedChannelId, latestMsg);
-  };
-
   private getChatMessages = async (timestamp: number, size: number, reversed: boolean) => {
-    const { messages } = await this.meeting.chat.getMessages(
-      timestamp,
-      size,
-      reversed,
-      undefined,
-      this.selectedChannelId
-    );
-    this.maybeMarkChannelAsRead(messages);
-
-    return messages;
+    if (this.privateChatRecipient) {
+      try {
+        const messages = await this.meeting.chat.fetchPrivateMessages({
+          timestamp,
+          limit: size,
+          direction: reversed ? 'before' : 'after',
+          userId: this.privateChatRecipient.userId,
+        });
+        return messages;
+      } catch (err) {
+        return [];
+      }
+    }
+    try {
+      const messages = await this.meeting.chat.fetchPublicMessages({
+        timestamp,
+        limit: size,
+        direction: reversed ? 'before' : 'after',
+      });
+      return messages;
+    } catch (err) {
+      return [];
+    }
   };
 
   private createChatNodes = (data: Message[]) => {
@@ -144,6 +146,8 @@ export class RtkChatMessagesUiPaginated {
      */
     return data.map((message, idx) => {
       const isContinued = message.userId === data[idx - 1]?.userId;
+      // FIXME(ikabra): Socket sends private messages sent to the recipient as a part of public messages
+      if (!this.privateChatRecipient && message.targetUserIds?.length > 0) return;
       return this.createChatNode(message, isContinued);
     });
   };
@@ -159,21 +163,11 @@ export class RtkChatMessagesUiPaginated {
   private getMessageActions = (message: Message) => {
     const actions = [];
 
-    // const isSelf = this.meeting.self.userId === message.userId;
-    // const chatMessagePermissions = this.meeting.self.permissions?.chatMessage;
-    // const canEdit =
-    //   chatMessagePermissions === undefined
-    //     ? isSelf
-    //     : chatMessagePermissions.canEdit === 'ALL' ||
-    //       (chatMessagePermissions.canEdit === 'SELF' && isSelf);
+    const messageBelongsToSelf = message.userId === this.meeting.self.userId;
 
-    // const canDelete =
-    //   chatMessagePermissions === undefined
-    //     ? isSelf
-    //     : chatMessagePermissions.canDelete === 'ALL' ||
-    //       (chatMessagePermissions.canDelete === 'SELF' && isSelf);
+    const isPrivateMessage = message.targetUserIds?.length > 0;
 
-    if (this.meeting.self.permissions.pinParticipant) {
+    if (!isPrivateMessage) {
       actions.push({
         id: 'pin_message',
         label: message.pinned ? this.t('unpin') : this.t('pin'),
@@ -181,13 +175,19 @@ export class RtkChatMessagesUiPaginated {
       });
     }
 
-    // if (canDelete) {
-    //   actions.push({
-    //     id: 'delete_message',
-    //     label: this.t('chat.delete_msg'),
-    //     icon: this.iconPack.delete,
-    //   });
-    // }
+    if (messageBelongsToSelf) {
+      actions.push({
+        id: 'edit_message',
+        label: this.t('chat.edit_msg'),
+        icon: this.iconPack.edit,
+      });
+
+      actions.push({
+        id: 'delete_message',
+        label: this.t('chat.delete_msg'),
+        icon: this.iconPack.delete,
+      });
+    }
 
     return actions;
   };
@@ -196,6 +196,9 @@ export class RtkChatMessagesUiPaginated {
     switch (actionId) {
       case 'pin_message':
         this.onPinMessage.emit(message);
+        break;
+      case 'edit_message':
+        this.onEditMessage.emit(message);
         break;
       case 'delete_message':
         this.onDeleteMessage.emit(message);
@@ -206,8 +209,6 @@ export class RtkChatMessagesUiPaginated {
   };
 
   private createChatNode = (message: Message, isContinued: boolean) => {
-    if (message.targetUserIds.length !== 0) return null; // don't render private messages
-
     let displayPicture: string;
 
     if (this.meeting.meta.viewType === 'CHAT') {
@@ -227,16 +228,22 @@ export class RtkChatMessagesUiPaginated {
       }
     }
 
+    const isSelf = message.userId === this.meeting.self.userId;
+    const viewType = isSelf ? 'outgoing' : 'incoming';
     return (
-      <div class={{ pinned: message.pinned }}>
-        <div class="message-wrapper">
+      <div>
+        <div class="message-wrapper" id={message.id}>
           <rtk-message-view
+            messageType={message.type}
+            pinned={message.pinned}
+            isEdited={message.isEdited}
             time={message.time}
             actions={this.getMessageActions(message)}
             authorName={message.displayName}
+            isSelf={isSelf}
             avatarUrl={displayPicture}
             hideAuthorName={isContinued}
-            viewType={'incoming'}
+            viewType={viewType}
             variant="bubble"
             onAction={(event: CustomEvent<string>) =>
               this.onMessageActionHandler(event.detail, message)
@@ -263,11 +270,6 @@ export class RtkChatMessagesUiPaginated {
                   ></rtk-image-message-view>
                 )}
               </div>
-              {message.pinned && (
-                <div class="pin-icon" part="pin-icon">
-                  <rtk-icon icon={this.iconPack.pin} size="sm" />
-                </div>
-              )}
             </div>
           </rtk-message-view>
         </div>
@@ -276,12 +278,21 @@ export class RtkChatMessagesUiPaginated {
   };
 
   private chatUpdateListener = (data: ChatUpdateParams) => {
-    if (this.selectedChannelId && data.message.channelId !== this.selectedChannelId) return;
+    // if private message and not for privateChatRecipient, ignore
+    // if private message and public chat selected, ignore
+    if (
+      data.message.targetUserIds?.length > 0 &&
+      !data.message.targetUserIds.includes(this.privateChatRecipient?.userId)
+    )
+      return;
+
+    // if public message and private chat selected, ignore
+    if (this.privateChatRecipient && data.message.targetUserIds?.length === 0) {
+      return;
+    }
 
     if (data.action === 'add') {
       this.$paginatedListRef.onNewNode(data.message);
-      this.lastReadMessageIndex = -1;
-      this.maybeMarkChannelAsRead([data.message as Message]);
     } else if (data.action === 'delete') {
       this.$paginatedListRef.onNodeDelete(data.message.id);
     } else if (data.action === 'edit') {
@@ -298,8 +309,7 @@ export class RtkChatMessagesUiPaginated {
           pagesAllowed={3}
           fetchData={this.getChatMessages}
           createNodes={this.createChatNodes}
-          selectedItemId={this.selectedChannelId}
-          emptyListLabel={this.t('chat.empty_channel')}
+          emptyListLabel={this.t('chat.empty_chat')}
         >
           <slot></slot>
         </rtk-paginated-list>

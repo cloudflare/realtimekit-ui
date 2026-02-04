@@ -5,20 +5,20 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
-import { Meeting, Peer, WaitlistedParticipant } from "./types/rtk-client";
-import { Chat, ChatChannel, Notification, PartialStateEvent, Poll, PollObject, Size, States, Transcript } from "./types/props";
+import { Meeting, RTKParticipant as Participant, Peer, WaitlistedParticipant } from "./types/rtk-client";
+import { Chat, Notification, PartialStateEvent, Poll, PollObject, Size, States, Transcript } from "./types/props";
 import { UIConfig } from "./types/ui-config";
 import { IconPack } from "./lib/icons";
 import { RtkI18n } from "./lib/lang";
 import { AIView } from "./components/rtk-ai/rtk-ai";
 import { ControlBarVariant } from "./components/rtk-controlbar-button/rtk-controlbar-button";
-import { IconPack as IconPack1, RtkI18n as RtkI18n1, Size as Size1, States as States1, UIConfig as UIConfig1 } from "./exports";
+import { IconPack as IconPack1, Overrides as Overrides1, RtkI18n as RtkI18n1, Size as Size1, States as States1, UIConfig as UIConfig1 } from "./exports";
 import { AudioVisualizerVariant } from "./components/rtk-audio-visualizer/rtk-audio-visualizer";
 import { AvatarVariant } from "./components/rtk-avatar/rtk-avatar";
 import { DraftMeeting } from "./utils/breakout-rooms-manager";
 import { ButtonKind, ButtonVariant } from "./components/rtk-button/rtk-button";
-import { FileMessage, ImageMessage, Message, RTKBasicParticipant, RTKPermissionsPreset, RTKPlugin, TextMessage } from "@cloudflare/realtimekit";
-import { ChatFilter } from "./components/rtk-chat/rtk-chat";
+import { Overrides } from "./lib/overrides";
+import { FileMessage, ImageMessage, Message, BasicParticipant as RTKBasicParticipant, RTKPermissionsPreset, RTKPlugin, TextMessage } from "@cloudflare/realtimekit";
 import { RtkNewMessageEvent } from "./components/rtk-chat-composer-ui/rtk-chat-composer-ui";
 import { NewMessageEvent } from "./components/rtk-chat-composer-view/rtk-chat-composer-view";
 import { ChatGroup, ChatGroupChangedType } from "./components/rtk-chat-selector-ui/rtk-chat-selector-ui";
@@ -45,20 +45,20 @@ import { TooltipKind, TooltipVariant } from "./components/rtk-tooltip/rtk-toolti
 import { MeetingMode as MeetingMode1 } from "./components/rtk-meeting/rtk-meeting";
 import { ViewerCountVariant } from "./components/rtk-viewer-count/rtk-viewer-count";
 import { Peer as Peer1 } from ".";
-export { Meeting, Peer, WaitlistedParticipant } from "./types/rtk-client";
-export { Chat, ChatChannel, Notification, PartialStateEvent, Poll, PollObject, Size, States, Transcript } from "./types/props";
+export { Meeting, RTKParticipant as Participant, Peer, WaitlistedParticipant } from "./types/rtk-client";
+export { Chat, Notification, PartialStateEvent, Poll, PollObject, Size, States, Transcript } from "./types/props";
 export { UIConfig } from "./types/ui-config";
 export { IconPack } from "./lib/icons";
 export { RtkI18n } from "./lib/lang";
 export { AIView } from "./components/rtk-ai/rtk-ai";
 export { ControlBarVariant } from "./components/rtk-controlbar-button/rtk-controlbar-button";
-export { IconPack as IconPack1, RtkI18n as RtkI18n1, Size as Size1, States as States1, UIConfig as UIConfig1 } from "./exports";
+export { IconPack as IconPack1, Overrides as Overrides1, RtkI18n as RtkI18n1, Size as Size1, States as States1, UIConfig as UIConfig1 } from "./exports";
 export { AudioVisualizerVariant } from "./components/rtk-audio-visualizer/rtk-audio-visualizer";
 export { AvatarVariant } from "./components/rtk-avatar/rtk-avatar";
 export { DraftMeeting } from "./utils/breakout-rooms-manager";
 export { ButtonKind, ButtonVariant } from "./components/rtk-button/rtk-button";
-export { FileMessage, ImageMessage, Message, RTKBasicParticipant, RTKPermissionsPreset, RTKPlugin, TextMessage } from "@cloudflare/realtimekit";
-export { ChatFilter } from "./components/rtk-chat/rtk-chat";
+export { Overrides } from "./lib/overrides";
+export { FileMessage, ImageMessage, Message, BasicParticipant as RTKBasicParticipant, RTKPermissionsPreset, RTKPlugin, TextMessage } from "@cloudflare/realtimekit";
 export { RtkNewMessageEvent } from "./components/rtk-chat-composer-ui/rtk-chat-composer-ui";
 export { NewMessageEvent } from "./components/rtk-chat-composer-view/rtk-chat-composer-view";
 export { ChatGroup, ChatGroupChangedType } from "./components/rtk-chat-selector-ui/rtk-chat-selector-ui";
@@ -526,120 +526,6 @@ export namespace Components {
          */
         "variant": ControlBarVariant;
     }
-    interface RtkChannelCreator {
-        /**
-          * Icon pack
-         */
-        "iconPack": IconPack1;
-        /**
-          * Meeting object
-         */
-        "meeting": Meeting;
-        /**
-          * Language
-         */
-        "t": RtkI18n1;
-    }
-    interface RtkChannelDetails {
-        /**
-          * Channel object
-         */
-        "channel": ChatChannel;
-        /**
-          * Icon pack
-         */
-        "iconPack": IconPack1;
-        /**
-          * List of channel members
-         */
-        "members": RTKBasicParticipant[];
-        /**
-          * Language
-         */
-        "t": RtkI18n1;
-    }
-    interface RtkChannelHeader {
-        /**
-          * Channel object
-         */
-        "channel": ChatChannel;
-        /**
-          * Icon pack
-         */
-        "iconPack": IconPack1;
-        /**
-          * Meeting object
-         */
-        "meeting": Meeting;
-        /**
-          * Show back button
-         */
-        "showBackButton": boolean;
-        /**
-          * Language
-         */
-        "t": RtkI18n1;
-    }
-    interface RtkChannelSelectorUi {
-        /**
-          * Channels
-         */
-        "channels": ChatChannel[];
-        /**
-          * Icon pack
-         */
-        "iconPack": IconPack1;
-        /**
-          * Selected channel id
-         */
-        "selectedChannelId": string;
-        /**
-          * show recent message in channel
-         */
-        "showRecentMessage": boolean;
-        /**
-          * Language
-         */
-        "t": RtkI18n1;
-    }
-    interface RtkChannelSelectorView {
-        /**
-          * Channels
-         */
-        "channels": {
-    id: string;
-    name: string;
-    avatarUrl?: string;
-    icon?: keyof IconPack1;
-    latestMessage?: string;
-    latestMessageTime?: Date;
-    unreadCount?: number;
-  }[];
-        /**
-          * Disables search bar (default = false)
-         */
-        "disableSearch": boolean;
-        /**
-          * Hides avatar (default = false)
-         */
-        "hideAvatar": boolean;
-        /**
-          * Icon Pack
-         */
-        "iconPack": IconPack1;
-        /**
-          * Selected channel id
-         */
-        "selectedChannelId": string;
-        /**
-          * Language
-         */
-        "t": RtkI18n1;
-        /**
-          * Render as dropdown or list (default = list)
-         */
-        "viewAs": 'dropdown' | 'list';
-    }
     /**
      * Fully featured chat component with image & file upload, emoji picker and auto-scroll.
      */
@@ -649,14 +535,6 @@ export namespace Components {
          */
         "config": UIConfig1;
         /**
-          * disables private chat
-         */
-        "disablePrivateChat": boolean;
-        /**
-          * @deprecated Beta API, will change in future A filter function for messages to be displayed
-         */
-        "displayFilter": ChatFilter;
-        /**
           * Icon pack
          */
         "iconPack": IconPack;
@@ -665,9 +543,9 @@ export namespace Components {
          */
         "meeting": Meeting;
         /**
-          * @deprecated Beta API, will change in future List of target presets allowed as private chat recipient
+          * UI Overrides
          */
-        "privatePresetFilter": String[];
+        "overrides": Overrides;
         /**
           * Size
          */
@@ -677,6 +555,9 @@ export namespace Components {
          */
         "t": RtkI18n;
     }
+    /**
+     * @deprecated . This component is deprecated, please use rtk-chat-composer-view instead.
+     */
     interface RtkChatComposerUi {
         /**
           * Whether user can send file messages
@@ -686,10 +567,6 @@ export namespace Components {
           * Whether user can send text messages
          */
         "canSendTextMessage": boolean;
-        /**
-          * channel id
-         */
-        "channelId"?: string;
         /**
           * Whether to show emoji picker
          */
@@ -747,6 +624,7 @@ export namespace Components {
           * Sets composer to edit mode
          */
         "isEditing": boolean;
+        "isSending": boolean;
         /**
           * Max length for text input
          */
@@ -772,6 +650,11 @@ export namespace Components {
          */
         "t": RtkI18n1;
     }
+    interface RtkChatHeader {
+    }
+    /**
+     * @deprecated `rtk-chat-message` is deprecated and will be removed soon. Use `rtk-message-view` instead.
+     */
     interface RtkChatMessage {
         /**
           * aligns message to right
@@ -842,6 +725,9 @@ export namespace Components {
          */
         "t": RtkI18n1;
     }
+    /**
+     * @deprecated Use `rtk-chat-messages-ui-paginated` instead.
+     */
     interface RtkChatMessagesUi {
         /**
           * Can current user pin/unpin messages
@@ -878,21 +764,13 @@ export namespace Components {
          */
         "iconPack": IconPack;
         /**
-          * Whether to align chat bubbles to the left
-         */
-        "leftAlign": boolean;
-        /**
           * Meeting object
          */
         "meeting": Meeting;
         /**
-          * Selected channel
+          * Selected recipient for private chat; when unset, messages are loaded for public chat (Everyone).
          */
-        "selectedChannel"?: ChatChannel;
-        /**
-          * Selected channel id
-         */
-        "selectedChannelId"?: string;
+        "privateChatRecipient": Participant | null;
         /**
           * Size
          */
@@ -902,6 +780,9 @@ export namespace Components {
          */
         "t": RtkI18n;
     }
+    /**
+     * @deprecated `rtk-chat-search-results` is deprecated and will be removed soon. Use `rtk-chat-messages-ui-paginated` instead. -
+     */
     interface RtkChatSearchResults {
         /**
           * Channel id
@@ -923,6 +804,37 @@ export namespace Components {
           * Language
          */
         "t": RtkI18n1;
+    }
+    interface RtkChatSelector {
+        "close": () => Promise<void>;
+        /**
+          * Config
+         */
+        "config": UIConfig1;
+        /**
+          * Icon pack
+         */
+        "iconPack": IconPack;
+        /**
+          * Meeting object
+         */
+        "meeting": Meeting;
+        /**
+          * UI Overrides
+         */
+        "overrides": Overrides1;
+        /**
+          * Size
+         */
+        "size": Size;
+        /**
+          * States object
+         */
+        "states": States1;
+        /**
+          * Language
+         */
+        "t": RtkI18n;
     }
     interface RtkChatSelectorUi {
         /**
@@ -1435,6 +1347,7 @@ export namespace Components {
         "t": RtkI18n1;
     }
     /**
+     * @deprecated `rtk-file-message` is deprecated and will be removed soon. Use `rtk-file-message-view` instead.
      * A component which renders a file message from chat.
      */
     interface RtkFileMessage {
@@ -1692,6 +1605,7 @@ export namespace Components {
         "t": RtkI18n;
     }
     /**
+     * @deprecated `rtk-image-message` is deprecated and will be removed soon. Use `rtk-image-message-view` instead.
      * A component which renders an image message from chat.
      */
     interface RtkImageMessage {
@@ -1966,6 +1880,10 @@ export namespace Components {
          */
         "mode": MeetingMode;
         /**
+          * UI Kit Overrides
+         */
+        "overrides": Overrides;
+        /**
           * Whether to show setup screen or not
          */
         "showSetupScreen": boolean;
@@ -2029,6 +1947,10 @@ export namespace Components {
          */
         "iconPack": IconPack;
         /**
+          * Variant
+         */
+        "menuVariant": 'primary' | 'secondary';
+        /**
           * Size
          */
         "size": Size;
@@ -2045,6 +1967,10 @@ export namespace Components {
           * Icon pack
          */
         "iconPack": IconPack;
+        /**
+          * Variant
+         */
+        "menuVariant": 'primary' | 'secondary';
         /**
           * Language
          */
@@ -2108,6 +2034,22 @@ export namespace Components {
           * Icon pack
          */
         "iconPack": IconPack1;
+        /**
+          * Has the message been edited
+         */
+        "isEdited": boolean;
+        /**
+          * Is the message sent by the current user
+         */
+        "isSelf": boolean;
+        /**
+          * Type of message
+         */
+        "messageType": Message['type'];
+        /**
+          * Is message pinned
+         */
+        "pinned": boolean;
         /**
           * Time when message was sent
          */
@@ -2461,17 +2403,21 @@ export namespace Components {
          */
         "iconPack": IconPack;
         /**
-          * On a new node created
+          * Adds a new node to the beginning of the paginated list
+          * @param node - The data node to add to the beginning of the list
          */
         "onNewNode": (node: DataNode) => Promise<void>;
         /**
-          * On node deleted
+          * Deletes a node anywhere from the list
+          * @param id - The id of the node to delete
          */
-        "onNodeDelete": (key: string) => Promise<void>;
+        "onNodeDelete": (id: string) => Promise<void>;
         /**
-          * On node updated
+          * Updates a new node anywhere in the list
+          * @param id - The id of the node to update
+          * @param node - The updated data node
          */
-        "onNodeUpdate": (key: string, newItem: DataNode) => Promise<void>;
+        "onNodeUpdate": (id: string, node: DataNode) => Promise<void>;
         /**
           * Page Size
          */
@@ -2481,9 +2427,13 @@ export namespace Components {
          */
         "pagesAllowed": number;
         /**
-          * Item id
+          * Rerender paginated list
          */
-        "selectedItemId"?: string;
+        "rerenderList": () => Promise<void>;
+        /**
+          * Resets the paginated list to a given timestamp
+         */
+        "reset": (timestamp?: number) => Promise<void>;
         /**
           * Language
          */
@@ -2872,6 +2822,21 @@ export namespace Components {
           * States object
          */
         "states": States;
+        /**
+          * Language
+         */
+        "t": RtkI18n;
+    }
+    interface RtkPinnedMessageSelector {
+        "close": () => Promise<void>;
+        /**
+          * Icon pack
+         */
+        "iconPack": IconPack;
+        /**
+          * Meeting object
+         */
+        "meeting": Meeting;
         /**
           * Language
          */
@@ -3426,7 +3391,7 @@ export namespace Components {
         /**
           * Icon Pack
          */
-        "iconPack": { people: string; people_checked: string; chat: string; poll: string; participants: string; rocket: string; call_end: string; share: string; mic_on: string; mic_off: string; video_on: string; video_off: string; share_screen_start: string; share_screen_stop: string; share_screen_person: string; clock: string; dismiss: string; send: string; search: string; more_vertical: string; chevron_down: string; chevron_up: string; chevron_left: string; chevron_right: string; settings: string; wifi: string; speaker: string; speaker_off: string; download: string; full_screen_maximize: string; full_screen_minimize: string; copy: string; attach: string; image: string; emoji_multiple: string; image_off: string; disconnected: string; wand: string; recording: string; subtract: string; stop_recording: string; warning: string; pin: string; pin_off: string; spinner: string; breakout_rooms: string; add: string; shuffle: string; edit: string; delete: string; back: string; save: string; web: string; checkmark: string; spotlight: string; join_stage: string; leave_stage: string; pip_off: string; pip_on: string; signal_1: string; signal_2: string; signal_3: string; signal_4: string; signal_5: string; start_livestream: string; stop_livestream: string; viewers: string; debug: string; info: string; devices: string; horizontal_dots: string; ai_sparkle: string; meeting_ai: string; create_channel: string; create_channel_illustration: string; captionsOn: string; captionsOff: string; play: string; pause: string; fastForward: string; minimize: string; maximize: string; };
+        "iconPack": { people: string; people_checked: string; chat: string; poll: string; participants: string; rocket: string; call_end: string; share: string; mic_on: string; mic_off: string; video_on: string; video_off: string; share_screen_start: string; share_screen_stop: string; share_screen_person: string; clock: string; dismiss: string; send: string; search: string; more_vertical: string; chevron_down: string; chevron_up: string; chevron_left: string; chevron_right: string; settings: string; wifi: string; speaker: string; speaker_off: string; download: string; full_screen_maximize: string; full_screen_minimize: string; copy: string; attach: string; image: string; emoji_multiple: string; image_off: string; disconnected: string; wand: string; recording: string; subtract: string; stop_recording: string; warning: string; pin: string; pin_off: string; spinner: string; breakout_rooms: string; add: string; shuffle: string; edit: string; delete: string; back: string; save: string; web: string; checkmark: string; spotlight: string; join_stage: string; leave_stage: string; pip_off: string; pip_on: string; signal_1: string; signal_2: string; signal_3: string; signal_4: string; signal_5: string; start_livestream: string; stop_livestream: string; viewers: string; debug: string; info: string; devices: string; horizontal_dots: string; ai_sparkle: string; meeting_ai: string; captionsOn: string; captionsOff: string; play: string; pause: string; fastForward: string; minimize: string; maximize: string; };
         /**
           * Language
          */
@@ -3750,6 +3715,7 @@ export namespace Components {
         "value": string;
     }
     /**
+     * @deprecated `rtk-text-message` is deprecated and will be removed soon. Use `rtk-text-message-view` instead.
      * A component which renders a text message from chat.
      */
     interface RtkTextMessage {
@@ -3884,6 +3850,10 @@ export namespace Components {
          */
         "mode": MeetingMode1;
         /**
+          * UI Kit Overrides
+         */
+        "overrides": Overrides1;
+        /**
           * Whether to show setup screen or not
          */
         "showSetupScreen": boolean;
@@ -3990,22 +3960,6 @@ export interface RtkCaptionToggleCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLRtkCaptionToggleElement;
 }
-export interface RtkChannelCreatorCustomEvent<T> extends CustomEvent<T> {
-    detail: T;
-    target: HTMLRtkChannelCreatorElement;
-}
-export interface RtkChannelHeaderCustomEvent<T> extends CustomEvent<T> {
-    detail: T;
-    target: HTMLRtkChannelHeaderElement;
-}
-export interface RtkChannelSelectorUiCustomEvent<T> extends CustomEvent<T> {
-    detail: T;
-    target: HTMLRtkChannelSelectorUiElement;
-}
-export interface RtkChannelSelectorViewCustomEvent<T> extends CustomEvent<T> {
-    detail: T;
-    target: HTMLRtkChannelSelectorViewElement;
-}
 export interface RtkChatCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLRtkChatElement;
@@ -4029,6 +3983,10 @@ export interface RtkChatMessagesUiCustomEvent<T> extends CustomEvent<T> {
 export interface RtkChatMessagesUiPaginatedCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLRtkChatMessagesUiPaginatedElement;
+}
+export interface RtkChatSelectorCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLRtkChatSelectorElement;
 }
 export interface RtkChatSelectorUiCustomEvent<T> extends CustomEvent<T> {
     detail: T;
@@ -4173,6 +4131,10 @@ export interface RtkParticipantsToggleCustomEvent<T> extends CustomEvent<T> {
 export interface RtkPermissionsMessageCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLRtkPermissionsMessageElement;
+}
+export interface RtkPinnedMessageSelectorCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLRtkPinnedMessageSelectorElement;
 }
 export interface RtkPipToggleCustomEvent<T> extends CustomEvent<T> {
     detail: T;
@@ -4509,91 +4471,6 @@ declare global {
         prototype: HTMLRtkCaptionToggleElement;
         new (): HTMLRtkCaptionToggleElement;
     };
-    interface HTMLRtkChannelCreatorElementEventMap {
-        "rtkStateUpdate": States1;
-        "switchChannel": string;
-    }
-    interface HTMLRtkChannelCreatorElement extends Components.RtkChannelCreator, HTMLStencilElement {
-        addEventListener<K extends keyof HTMLRtkChannelCreatorElementEventMap>(type: K, listener: (this: HTMLRtkChannelCreatorElement, ev: RtkChannelCreatorCustomEvent<HTMLRtkChannelCreatorElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLRtkChannelCreatorElementEventMap>(type: K, listener: (this: HTMLRtkChannelCreatorElement, ev: RtkChannelCreatorCustomEvent<HTMLRtkChannelCreatorElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
-    }
-    var HTMLRtkChannelCreatorElement: {
-        prototype: HTMLRtkChannelCreatorElement;
-        new (): HTMLRtkChannelCreatorElement;
-    };
-    interface HTMLRtkChannelDetailsElement extends Components.RtkChannelDetails, HTMLStencilElement {
-    }
-    var HTMLRtkChannelDetailsElement: {
-        prototype: HTMLRtkChannelDetailsElement;
-        new (): HTMLRtkChannelDetailsElement;
-    };
-    interface HTMLRtkChannelHeaderElementEventMap {
-        "search": string;
-        "searchDismissed": any;
-        "back": void;
-    }
-    interface HTMLRtkChannelHeaderElement extends Components.RtkChannelHeader, HTMLStencilElement {
-        addEventListener<K extends keyof HTMLRtkChannelHeaderElementEventMap>(type: K, listener: (this: HTMLRtkChannelHeaderElement, ev: RtkChannelHeaderCustomEvent<HTMLRtkChannelHeaderElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLRtkChannelHeaderElementEventMap>(type: K, listener: (this: HTMLRtkChannelHeaderElement, ev: RtkChannelHeaderCustomEvent<HTMLRtkChannelHeaderElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
-    }
-    var HTMLRtkChannelHeaderElement: {
-        prototype: HTMLRtkChannelHeaderElement;
-        new (): HTMLRtkChannelHeaderElement;
-    };
-    interface HTMLRtkChannelSelectorUiElementEventMap {
-        "channelChanged": string;
-    }
-    interface HTMLRtkChannelSelectorUiElement extends Components.RtkChannelSelectorUi, HTMLStencilElement {
-        addEventListener<K extends keyof HTMLRtkChannelSelectorUiElementEventMap>(type: K, listener: (this: HTMLRtkChannelSelectorUiElement, ev: RtkChannelSelectorUiCustomEvent<HTMLRtkChannelSelectorUiElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLRtkChannelSelectorUiElementEventMap>(type: K, listener: (this: HTMLRtkChannelSelectorUiElement, ev: RtkChannelSelectorUiCustomEvent<HTMLRtkChannelSelectorUiElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
-    }
-    var HTMLRtkChannelSelectorUiElement: {
-        prototype: HTMLRtkChannelSelectorUiElement;
-        new (): HTMLRtkChannelSelectorUiElement;
-    };
-    interface HTMLRtkChannelSelectorViewElementEventMap {
-        "channelChange": {
-    id: string;
-    name: string;
-    avatarUrl?: string;
-    icon?: keyof IconPack1;
-    latestMessage?: string;
-    latestMessageTime?: Date;
-    unreadCount?: number;
-  };
-    }
-    interface HTMLRtkChannelSelectorViewElement extends Components.RtkChannelSelectorView, HTMLStencilElement {
-        addEventListener<K extends keyof HTMLRtkChannelSelectorViewElementEventMap>(type: K, listener: (this: HTMLRtkChannelSelectorViewElement, ev: RtkChannelSelectorViewCustomEvent<HTMLRtkChannelSelectorViewElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLRtkChannelSelectorViewElementEventMap>(type: K, listener: (this: HTMLRtkChannelSelectorViewElement, ev: RtkChannelSelectorViewCustomEvent<HTMLRtkChannelSelectorViewElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
-    }
-    var HTMLRtkChannelSelectorViewElement: {
-        prototype: HTMLRtkChannelSelectorViewElement;
-        new (): HTMLRtkChannelSelectorViewElement;
-    };
     interface HTMLRtkChatElementEventMap {
         "rtkStateUpdate": States1;
     }
@@ -4619,10 +4496,12 @@ declare global {
         "rtkEditMessage": {
     id: string;
     message: string;
-    channelId?: string;
   };
         "rtkEditCancelled": any;
     }
+    /**
+     * @deprecated . This component is deprecated, please use rtk-chat-composer-view instead.
+     */
     interface HTMLRtkChatComposerUiElement extends Components.RtkChatComposerUi, HTMLStencilElement {
         addEventListener<K extends keyof HTMLRtkChatComposerUiElementEventMap>(type: K, listener: (this: HTMLRtkChatComposerUiElement, ev: RtkChatComposerUiCustomEvent<HTMLRtkChatComposerUiElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
         addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
@@ -4660,12 +4539,21 @@ declare global {
         prototype: HTMLRtkChatComposerViewElement;
         new (): HTMLRtkChatComposerViewElement;
     };
+    interface HTMLRtkChatHeaderElement extends Components.RtkChatHeader, HTMLStencilElement {
+    }
+    var HTMLRtkChatHeaderElement: {
+        prototype: HTMLRtkChatHeaderElement;
+        new (): HTMLRtkChatHeaderElement;
+    };
     interface HTMLRtkChatMessageElementEventMap {
         "edit": Message;
         "reply": Message;
         "pin": Message;
         "delete": Message;
     }
+    /**
+     * @deprecated `rtk-chat-message` is deprecated and will be removed soon. Use `rtk-message-view` instead.
+     */
     interface HTMLRtkChatMessageElement extends Components.RtkChatMessage, HTMLStencilElement {
         addEventListener<K extends keyof HTMLRtkChatMessageElementEventMap>(type: K, listener: (this: HTMLRtkChatMessageElement, ev: RtkChatMessageCustomEvent<HTMLRtkChatMessageElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
         addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
@@ -4684,6 +4572,9 @@ declare global {
         "pinMessage": Message;
         "rtkStateUpdate": States;
     }
+    /**
+     * @deprecated Use `rtk-chat-messages-ui-paginated` instead.
+     */
     interface HTMLRtkChatMessagesUiElement extends Components.RtkChatMessagesUi, HTMLStencilElement {
         addEventListener<K extends keyof HTMLRtkChatMessagesUiElementEventMap>(type: K, listener: (this: HTMLRtkChatMessagesUiElement, ev: RtkChatMessagesUiCustomEvent<HTMLRtkChatMessagesUiElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
         addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
@@ -4704,6 +4595,7 @@ declare global {
     flags: { isReply?: boolean; isEdit?: boolean };
   };
         "pinMessage": Message;
+        "editMessage": Message;
         "deleteMessage": Message;
         "rtkStateUpdate": States;
     }
@@ -4721,11 +4613,32 @@ declare global {
         prototype: HTMLRtkChatMessagesUiPaginatedElement;
         new (): HTMLRtkChatMessagesUiPaginatedElement;
     };
+    /**
+     * @deprecated `rtk-chat-search-results` is deprecated and will be removed soon. Use `rtk-chat-messages-ui-paginated` instead. -
+     */
     interface HTMLRtkChatSearchResultsElement extends Components.RtkChatSearchResults, HTMLStencilElement {
     }
     var HTMLRtkChatSearchResultsElement: {
         prototype: HTMLRtkChatSearchResultsElement;
         new (): HTMLRtkChatSearchResultsElement;
+    };
+    interface HTMLRtkChatSelectorElementEventMap {
+        "rtkDropdownToggle": { open: boolean };
+        "rtkChatSelectorChange": { selectedUser?: Participant | undefined };
+    }
+    interface HTMLRtkChatSelectorElement extends Components.RtkChatSelector, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLRtkChatSelectorElementEventMap>(type: K, listener: (this: HTMLRtkChatSelectorElement, ev: RtkChatSelectorCustomEvent<HTMLRtkChatSelectorElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLRtkChatSelectorElementEventMap>(type: K, listener: (this: HTMLRtkChatSelectorElement, ev: RtkChatSelectorCustomEvent<HTMLRtkChatSelectorElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLRtkChatSelectorElement: {
+        prototype: HTMLRtkChatSelectorElement;
+        new (): HTMLRtkChatSelectorElement;
     };
     interface HTMLRtkChatSelectorUiElementEventMap {
         "rtkChatGroupChanged": ChatGroupChangedType;
@@ -5017,6 +4930,7 @@ declare global {
         new (): HTMLRtkFileDropzoneElement;
     };
     /**
+     * @deprecated `rtk-file-message` is deprecated and will be removed soon. Use `rtk-file-message-view` instead.
      * A component which renders a file message from chat.
      */
     interface HTMLRtkFileMessageElement extends Components.RtkFileMessage, HTMLStencilElement {
@@ -5134,6 +5048,7 @@ declare global {
         "rtkStateUpdate": States;
     }
     /**
+     * @deprecated `rtk-image-message` is deprecated and will be removed soon. Use `rtk-image-message-view` instead.
      * A component which renders an image message from chat.
      */
     interface HTMLRtkImageMessageElement extends Components.RtkImageMessage, HTMLStencilElement {
@@ -5757,6 +5672,24 @@ declare global {
         prototype: HTMLRtkPermissionsMessageElement;
         new (): HTMLRtkPermissionsMessageElement;
     };
+    interface HTMLRtkPinnedMessageSelectorElementEventMap {
+        "rtkDropdownToggle": { open: boolean };
+        "rtkPinnedMessageSelect": Message;
+    }
+    interface HTMLRtkPinnedMessageSelectorElement extends Components.RtkPinnedMessageSelector, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLRtkPinnedMessageSelectorElementEventMap>(type: K, listener: (this: HTMLRtkPinnedMessageSelectorElement, ev: RtkPinnedMessageSelectorCustomEvent<HTMLRtkPinnedMessageSelectorElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLRtkPinnedMessageSelectorElementEventMap>(type: K, listener: (this: HTMLRtkPinnedMessageSelectorElement, ev: RtkPinnedMessageSelectorCustomEvent<HTMLRtkPinnedMessageSelectorElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLRtkPinnedMessageSelectorElement: {
+        prototype: HTMLRtkPinnedMessageSelectorElement;
+        new (): HTMLRtkPinnedMessageSelectorElement;
+    };
     interface HTMLRtkPipToggleElementEventMap {
         "rtkStateUpdate": States1;
     }
@@ -6303,6 +6236,7 @@ declare global {
         new (): HTMLRtkTextComposerViewElement;
     };
     /**
+     * @deprecated `rtk-text-message` is deprecated and will be removed soon. Use `rtk-text-message-view` instead.
      * A component which renders a text message from chat.
      */
     interface HTMLRtkTextMessageElement extends Components.RtkTextMessage, HTMLStencilElement {
@@ -6431,18 +6365,15 @@ declare global {
         "rtk-camera-selector": HTMLRtkCameraSelectorElement;
         "rtk-camera-toggle": HTMLRtkCameraToggleElement;
         "rtk-caption-toggle": HTMLRtkCaptionToggleElement;
-        "rtk-channel-creator": HTMLRtkChannelCreatorElement;
-        "rtk-channel-details": HTMLRtkChannelDetailsElement;
-        "rtk-channel-header": HTMLRtkChannelHeaderElement;
-        "rtk-channel-selector-ui": HTMLRtkChannelSelectorUiElement;
-        "rtk-channel-selector-view": HTMLRtkChannelSelectorViewElement;
         "rtk-chat": HTMLRtkChatElement;
         "rtk-chat-composer-ui": HTMLRtkChatComposerUiElement;
         "rtk-chat-composer-view": HTMLRtkChatComposerViewElement;
+        "rtk-chat-header": HTMLRtkChatHeaderElement;
         "rtk-chat-message": HTMLRtkChatMessageElement;
         "rtk-chat-messages-ui": HTMLRtkChatMessagesUiElement;
         "rtk-chat-messages-ui-paginated": HTMLRtkChatMessagesUiPaginatedElement;
         "rtk-chat-search-results": HTMLRtkChatSearchResultsElement;
+        "rtk-chat-selector": HTMLRtkChatSelectorElement;
         "rtk-chat-selector-ui": HTMLRtkChatSelectorUiElement;
         "rtk-chat-toggle": HTMLRtkChatToggleElement;
         "rtk-clock": HTMLRtkClockElement;
@@ -6515,6 +6446,7 @@ declare global {
         "rtk-participants-viewer-list": HTMLRtkParticipantsViewerListElement;
         "rtk-participants-waiting-list": HTMLRtkParticipantsWaitingListElement;
         "rtk-permissions-message": HTMLRtkPermissionsMessageElement;
+        "rtk-pinned-message-selector": HTMLRtkPinnedMessageSelectorElement;
         "rtk-pip-toggle": HTMLRtkPipToggleElement;
         "rtk-plugin-main": HTMLRtkPluginMainElement;
         "rtk-plugins": HTMLRtkPluginsElement;
@@ -7061,156 +6993,6 @@ declare namespace LocalJSX {
          */
         "variant"?: ControlBarVariant;
     }
-    interface RtkChannelCreator {
-        /**
-          * Icon pack
-         */
-        "iconPack"?: IconPack1;
-        /**
-          * Meeting object
-         */
-        "meeting"?: Meeting;
-        /**
-          * Emits updated state data
-         */
-        "onRtkStateUpdate"?: (event: RtkChannelCreatorCustomEvent<States1>) => void;
-        /**
-          * Emits event to switch channel
-         */
-        "onSwitchChannel"?: (event: RtkChannelCreatorCustomEvent<string>) => void;
-        /**
-          * Language
-         */
-        "t"?: RtkI18n1;
-    }
-    interface RtkChannelDetails {
-        /**
-          * Channel object
-         */
-        "channel": ChatChannel;
-        /**
-          * Icon pack
-         */
-        "iconPack"?: IconPack1;
-        /**
-          * List of channel members
-         */
-        "members"?: RTKBasicParticipant[];
-        /**
-          * Language
-         */
-        "t"?: RtkI18n1;
-    }
-    interface RtkChannelHeader {
-        /**
-          * Channel object
-         */
-        "channel"?: ChatChannel;
-        /**
-          * Icon pack
-         */
-        "iconPack"?: IconPack1;
-        /**
-          * Meeting object
-         */
-        "meeting"?: Meeting;
-        /**
-          * Event emitted when back button is clicked
-         */
-        "onBack"?: (event: RtkChannelHeaderCustomEvent<void>) => void;
-        /**
-          * event triggered for search
-         */
-        "onSearch"?: (event: RtkChannelHeaderCustomEvent<string>) => void;
-        /**
-          * event triggered for search
-         */
-        "onSearchDismissed"?: (event: RtkChannelHeaderCustomEvent<any>) => void;
-        /**
-          * Show back button
-         */
-        "showBackButton"?: boolean;
-        /**
-          * Language
-         */
-        "t"?: RtkI18n1;
-    }
-    interface RtkChannelSelectorUi {
-        /**
-          * Channels
-         */
-        "channels"?: ChatChannel[];
-        /**
-          * Icon pack
-         */
-        "iconPack"?: IconPack1;
-        /**
-          * On channel changed
-         */
-        "onChannelChanged"?: (event: RtkChannelSelectorUiCustomEvent<string>) => void;
-        /**
-          * Selected channel id
-         */
-        "selectedChannelId"?: string;
-        /**
-          * show recent message in channel
-         */
-        "showRecentMessage"?: boolean;
-        /**
-          * Language
-         */
-        "t"?: RtkI18n1;
-    }
-    interface RtkChannelSelectorView {
-        /**
-          * Channels
-         */
-        "channels": {
-    id: string;
-    name: string;
-    avatarUrl?: string;
-    icon?: keyof IconPack1;
-    latestMessage?: string;
-    latestMessageTime?: Date;
-    unreadCount?: number;
-  }[];
-        /**
-          * Disables search bar (default = false)
-         */
-        "disableSearch"?: boolean;
-        /**
-          * Hides avatar (default = false)
-         */
-        "hideAvatar"?: boolean;
-        /**
-          * Icon Pack
-         */
-        "iconPack"?: IconPack1;
-        /**
-          * Event emitted when selected channel changes
-         */
-        "onChannelChange"?: (event: RtkChannelSelectorViewCustomEvent<{
-    id: string;
-    name: string;
-    avatarUrl?: string;
-    icon?: keyof IconPack1;
-    latestMessage?: string;
-    latestMessageTime?: Date;
-    unreadCount?: number;
-  }>) => void;
-        /**
-          * Selected channel id
-         */
-        "selectedChannelId"?: string;
-        /**
-          * Language
-         */
-        "t"?: RtkI18n1;
-        /**
-          * Render as dropdown or list (default = list)
-         */
-        "viewAs"?: 'dropdown' | 'list';
-    }
     /**
      * Fully featured chat component with image & file upload, emoji picker and auto-scroll.
      */
@@ -7219,14 +7001,6 @@ declare namespace LocalJSX {
           * Config
          */
         "config"?: UIConfig1;
-        /**
-          * disables private chat
-         */
-        "disablePrivateChat"?: boolean;
-        /**
-          * @deprecated Beta API, will change in future A filter function for messages to be displayed
-         */
-        "displayFilter"?: ChatFilter;
         /**
           * Icon pack
          */
@@ -7240,9 +7014,9 @@ declare namespace LocalJSX {
          */
         "onRtkStateUpdate"?: (event: RtkChatCustomEvent<States1>) => void;
         /**
-          * @deprecated Beta API, will change in future List of target presets allowed as private chat recipient
+          * UI Overrides
          */
-        "privatePresetFilter"?: String[];
+        "overrides"?: Overrides;
         /**
           * Size
          */
@@ -7252,6 +7026,9 @@ declare namespace LocalJSX {
          */
         "t"?: RtkI18n;
     }
+    /**
+     * @deprecated . This component is deprecated, please use rtk-chat-composer-view instead.
+     */
     interface RtkChatComposerUi {
         /**
           * Whether user can send file messages
@@ -7261,10 +7038,6 @@ declare namespace LocalJSX {
           * Whether user can send text messages
          */
         "canSendTextMessage"?: boolean;
-        /**
-          * channel id
-         */
-        "channelId"?: string;
         /**
           * Whether to show emoji picker
          */
@@ -7287,7 +7060,6 @@ declare namespace LocalJSX {
         "onRtkEditMessage"?: (event: RtkChatComposerUiCustomEvent<{
     id: string;
     message: string;
-    channelId?: string;
   }>) => void;
         /**
           * Event emitted when new message is submitted
@@ -7338,6 +7110,7 @@ declare namespace LocalJSX {
           * Sets composer to edit mode
          */
         "isEditing"?: boolean;
+        "isSending"?: boolean;
         /**
           * Max length for text input
          */
@@ -7379,6 +7152,11 @@ declare namespace LocalJSX {
          */
         "t"?: RtkI18n1;
     }
+    interface RtkChatHeader {
+    }
+    /**
+     * @deprecated `rtk-chat-message` is deprecated and will be removed soon. Use `rtk-message-view` instead.
+     */
     interface RtkChatMessage {
         /**
           * aligns message to right
@@ -7465,6 +7243,9 @@ declare namespace LocalJSX {
          */
         "t"?: RtkI18n1;
     }
+    /**
+     * @deprecated Use `rtk-chat-messages-ui-paginated` instead.
+     */
     interface RtkChatMessagesUi {
         /**
           * Can current user pin/unpin messages
@@ -7509,10 +7290,6 @@ declare namespace LocalJSX {
          */
         "iconPack"?: IconPack;
         /**
-          * Whether to align chat bubbles to the left
-         */
-        "leftAlign"?: boolean;
-        /**
           * Meeting object
          */
         "meeting"?: Meeting;
@@ -7520,6 +7297,10 @@ declare namespace LocalJSX {
           * Event emitted when a message is deleted
          */
         "onDeleteMessage"?: (event: RtkChatMessagesUiPaginatedCustomEvent<Message>) => void;
+        /**
+          * Event emitted when a message is edited
+         */
+        "onEditMessage"?: (event: RtkChatMessagesUiPaginatedCustomEvent<Message>) => void;
         /**
           * Event for editing a message
          */
@@ -7536,13 +7317,9 @@ declare namespace LocalJSX {
          */
         "onRtkStateUpdate"?: (event: RtkChatMessagesUiPaginatedCustomEvent<States>) => void;
         /**
-          * Selected channel
+          * Selected recipient for private chat; when unset, messages are loaded for public chat (Everyone).
          */
-        "selectedChannel"?: ChatChannel;
-        /**
-          * Selected channel id
-         */
-        "selectedChannelId"?: string;
+        "privateChatRecipient"?: Participant | null;
         /**
           * Size
          */
@@ -7552,6 +7329,9 @@ declare namespace LocalJSX {
          */
         "t"?: RtkI18n;
     }
+    /**
+     * @deprecated `rtk-chat-search-results` is deprecated and will be removed soon. Use `rtk-chat-messages-ui-paginated` instead. -
+     */
     interface RtkChatSearchResults {
         /**
           * Channel id
@@ -7573,6 +7353,38 @@ declare namespace LocalJSX {
           * Language
          */
         "t"?: RtkI18n1;
+    }
+    interface RtkChatSelector {
+        /**
+          * Config
+         */
+        "config"?: UIConfig1;
+        /**
+          * Icon pack
+         */
+        "iconPack"?: IconPack;
+        /**
+          * Meeting object
+         */
+        "meeting"?: Meeting;
+        "onRtkChatSelectorChange"?: (event: RtkChatSelectorCustomEvent<{ selectedUser?: Participant | undefined }>) => void;
+        "onRtkDropdownToggle"?: (event: RtkChatSelectorCustomEvent<{ open: boolean }>) => void;
+        /**
+          * UI Overrides
+         */
+        "overrides"?: Overrides1;
+        /**
+          * Size
+         */
+        "size"?: Size;
+        /**
+          * States object
+         */
+        "states"?: States1;
+        /**
+          * Language
+         */
+        "t"?: RtkI18n;
     }
     interface RtkChatSelectorUi {
         /**
@@ -8133,6 +7945,7 @@ declare namespace LocalJSX {
         "t"?: RtkI18n1;
     }
     /**
+     * @deprecated `rtk-file-message` is deprecated and will be removed soon. Use `rtk-file-message-view` instead.
      * A component which renders a file message from chat.
      */
     interface RtkFileMessage {
@@ -8402,6 +8215,7 @@ declare namespace LocalJSX {
         "t"?: RtkI18n;
     }
     /**
+     * @deprecated `rtk-image-message` is deprecated and will be removed soon. Use `rtk-image-message-view` instead.
      * A component which renders an image message from chat.
      */
     interface RtkImageMessage {
@@ -8730,6 +8544,10 @@ declare namespace LocalJSX {
          */
         "onRtkStatesUpdate"?: (event: RtkMeetingCustomEvent<States>) => void;
         /**
+          * UI Kit Overrides
+         */
+        "overrides"?: Overrides;
+        /**
           * Whether to show setup screen or not
          */
         "showSetupScreen"?: boolean;
@@ -8793,6 +8611,10 @@ declare namespace LocalJSX {
          */
         "iconPack"?: IconPack;
         /**
+          * Variant
+         */
+        "menuVariant"?: 'primary' | 'secondary';
+        /**
           * Size
          */
         "size"?: Size;
@@ -8809,6 +8631,10 @@ declare namespace LocalJSX {
           * Icon pack
          */
         "iconPack"?: IconPack;
+        /**
+          * Variant
+         */
+        "menuVariant"?: 'primary' | 'secondary';
         /**
           * Language
          */
@@ -8873,9 +8699,25 @@ declare namespace LocalJSX {
          */
         "iconPack"?: IconPack1;
         /**
+          * Has the message been edited
+         */
+        "isEdited"?: boolean;
+        /**
+          * Is the message sent by the current user
+         */
+        "isSelf"?: boolean;
+        /**
+          * Type of message
+         */
+        "messageType"?: Message['type'];
+        /**
           * action event
          */
         "onAction"?: (event: RtkMessageViewCustomEvent<string>) => void;
+        /**
+          * Is message pinned
+         */
+        "pinned"?: boolean;
         /**
           * Time when message was sent
          */
@@ -9260,10 +9102,6 @@ declare namespace LocalJSX {
           * Number of pages allowed to be shown
          */
         "pagesAllowed"?: number;
-        /**
-          * Item id
-         */
-        "selectedItemId"?: string;
         /**
           * Language
          */
@@ -9683,6 +9521,25 @@ declare namespace LocalJSX {
           * States object
          */
         "states"?: States;
+        /**
+          * Language
+         */
+        "t"?: RtkI18n;
+    }
+    interface RtkPinnedMessageSelector {
+        /**
+          * Icon pack
+         */
+        "iconPack"?: IconPack;
+        /**
+          * Meeting object
+         */
+        "meeting"?: Meeting;
+        "onRtkDropdownToggle"?: (event: RtkPinnedMessageSelectorCustomEvent<{ open: boolean }>) => void;
+        /**
+          * Emits when a pinned message is selected
+         */
+        "onRtkPinnedMessageSelect"?: (event: RtkPinnedMessageSelectorCustomEvent<Message>) => void;
         /**
           * Language
          */
@@ -10317,7 +10174,7 @@ declare namespace LocalJSX {
         /**
           * Icon Pack
          */
-        "iconPack"?: { people: string; people_checked: string; chat: string; poll: string; participants: string; rocket: string; call_end: string; share: string; mic_on: string; mic_off: string; video_on: string; video_off: string; share_screen_start: string; share_screen_stop: string; share_screen_person: string; clock: string; dismiss: string; send: string; search: string; more_vertical: string; chevron_down: string; chevron_up: string; chevron_left: string; chevron_right: string; settings: string; wifi: string; speaker: string; speaker_off: string; download: string; full_screen_maximize: string; full_screen_minimize: string; copy: string; attach: string; image: string; emoji_multiple: string; image_off: string; disconnected: string; wand: string; recording: string; subtract: string; stop_recording: string; warning: string; pin: string; pin_off: string; spinner: string; breakout_rooms: string; add: string; shuffle: string; edit: string; delete: string; back: string; save: string; web: string; checkmark: string; spotlight: string; join_stage: string; leave_stage: string; pip_off: string; pip_on: string; signal_1: string; signal_2: string; signal_3: string; signal_4: string; signal_5: string; start_livestream: string; stop_livestream: string; viewers: string; debug: string; info: string; devices: string; horizontal_dots: string; ai_sparkle: string; meeting_ai: string; create_channel: string; create_channel_illustration: string; captionsOn: string; captionsOff: string; play: string; pause: string; fastForward: string; minimize: string; maximize: string; };
+        "iconPack"?: { people: string; people_checked: string; chat: string; poll: string; participants: string; rocket: string; call_end: string; share: string; mic_on: string; mic_off: string; video_on: string; video_off: string; share_screen_start: string; share_screen_stop: string; share_screen_person: string; clock: string; dismiss: string; send: string; search: string; more_vertical: string; chevron_down: string; chevron_up: string; chevron_left: string; chevron_right: string; settings: string; wifi: string; speaker: string; speaker_off: string; download: string; full_screen_maximize: string; full_screen_minimize: string; copy: string; attach: string; image: string; emoji_multiple: string; image_off: string; disconnected: string; wand: string; recording: string; subtract: string; stop_recording: string; warning: string; pin: string; pin_off: string; spinner: string; breakout_rooms: string; add: string; shuffle: string; edit: string; delete: string; back: string; save: string; web: string; checkmark: string; spotlight: string; join_stage: string; leave_stage: string; pip_off: string; pip_on: string; signal_1: string; signal_2: string; signal_3: string; signal_4: string; signal_5: string; start_livestream: string; stop_livestream: string; viewers: string; debug: string; info: string; devices: string; horizontal_dots: string; ai_sparkle: string; meeting_ai: string; captionsOn: string; captionsOff: string; play: string; pause: string; fastForward: string; minimize: string; maximize: string; };
         /**
           * Tab change event
          */
@@ -10665,6 +10522,7 @@ declare namespace LocalJSX {
         "value"?: string;
     }
     /**
+     * @deprecated `rtk-text-message` is deprecated and will be removed soon. Use `rtk-text-message-view` instead.
      * A component which renders a text message from chat.
      */
     interface RtkTextMessage {
@@ -10814,6 +10672,10 @@ declare namespace LocalJSX {
          */
         "onRtkStatesUpdate"?: (event: RtkUiProviderCustomEvent<States1>) => void;
         /**
+          * UI Kit Overrides
+         */
+        "overrides"?: Overrides1;
+        /**
           * Whether to show setup screen or not
          */
         "showSetupScreen"?: boolean;
@@ -10900,18 +10762,15 @@ declare namespace LocalJSX {
         "rtk-camera-selector": RtkCameraSelector;
         "rtk-camera-toggle": RtkCameraToggle;
         "rtk-caption-toggle": RtkCaptionToggle;
-        "rtk-channel-creator": RtkChannelCreator;
-        "rtk-channel-details": RtkChannelDetails;
-        "rtk-channel-header": RtkChannelHeader;
-        "rtk-channel-selector-ui": RtkChannelSelectorUi;
-        "rtk-channel-selector-view": RtkChannelSelectorView;
         "rtk-chat": RtkChat;
         "rtk-chat-composer-ui": RtkChatComposerUi;
         "rtk-chat-composer-view": RtkChatComposerView;
+        "rtk-chat-header": RtkChatHeader;
         "rtk-chat-message": RtkChatMessage;
         "rtk-chat-messages-ui": RtkChatMessagesUi;
         "rtk-chat-messages-ui-paginated": RtkChatMessagesUiPaginated;
         "rtk-chat-search-results": RtkChatSearchResults;
+        "rtk-chat-selector": RtkChatSelector;
         "rtk-chat-selector-ui": RtkChatSelectorUi;
         "rtk-chat-toggle": RtkChatToggle;
         "rtk-clock": RtkClock;
@@ -10984,6 +10843,7 @@ declare namespace LocalJSX {
         "rtk-participants-viewer-list": RtkParticipantsViewerList;
         "rtk-participants-waiting-list": RtkParticipantsWaitingList;
         "rtk-permissions-message": RtkPermissionsMessage;
+        "rtk-pinned-message-selector": RtkPinnedMessageSelector;
         "rtk-pip-toggle": RtkPipToggle;
         "rtk-plugin-main": RtkPluginMain;
         "rtk-plugins": RtkPlugins;
@@ -11076,24 +10936,33 @@ declare module "@stencil/core" {
              */
             "rtk-camera-toggle": LocalJSX.RtkCameraToggle & JSXBase.HTMLAttributes<HTMLRtkCameraToggleElement>;
             "rtk-caption-toggle": LocalJSX.RtkCaptionToggle & JSXBase.HTMLAttributes<HTMLRtkCaptionToggleElement>;
-            "rtk-channel-creator": LocalJSX.RtkChannelCreator & JSXBase.HTMLAttributes<HTMLRtkChannelCreatorElement>;
-            "rtk-channel-details": LocalJSX.RtkChannelDetails & JSXBase.HTMLAttributes<HTMLRtkChannelDetailsElement>;
-            "rtk-channel-header": LocalJSX.RtkChannelHeader & JSXBase.HTMLAttributes<HTMLRtkChannelHeaderElement>;
-            "rtk-channel-selector-ui": LocalJSX.RtkChannelSelectorUi & JSXBase.HTMLAttributes<HTMLRtkChannelSelectorUiElement>;
-            "rtk-channel-selector-view": LocalJSX.RtkChannelSelectorView & JSXBase.HTMLAttributes<HTMLRtkChannelSelectorViewElement>;
             /**
              * Fully featured chat component with image & file upload, emoji picker and auto-scroll.
              */
             "rtk-chat": LocalJSX.RtkChat & JSXBase.HTMLAttributes<HTMLRtkChatElement>;
+            /**
+             * @deprecated . This component is deprecated, please use rtk-chat-composer-view instead.
+             */
             "rtk-chat-composer-ui": LocalJSX.RtkChatComposerUi & JSXBase.HTMLAttributes<HTMLRtkChatComposerUiElement>;
             /**
              * A component which renders a chat composer
              */
             "rtk-chat-composer-view": LocalJSX.RtkChatComposerView & JSXBase.HTMLAttributes<HTMLRtkChatComposerViewElement>;
+            "rtk-chat-header": LocalJSX.RtkChatHeader & JSXBase.HTMLAttributes<HTMLRtkChatHeaderElement>;
+            /**
+             * @deprecated `rtk-chat-message` is deprecated and will be removed soon. Use `rtk-message-view` instead.
+             */
             "rtk-chat-message": LocalJSX.RtkChatMessage & JSXBase.HTMLAttributes<HTMLRtkChatMessageElement>;
+            /**
+             * @deprecated Use `rtk-chat-messages-ui-paginated` instead.
+             */
             "rtk-chat-messages-ui": LocalJSX.RtkChatMessagesUi & JSXBase.HTMLAttributes<HTMLRtkChatMessagesUiElement>;
             "rtk-chat-messages-ui-paginated": LocalJSX.RtkChatMessagesUiPaginated & JSXBase.HTMLAttributes<HTMLRtkChatMessagesUiPaginatedElement>;
+            /**
+             * @deprecated `rtk-chat-search-results` is deprecated and will be removed soon. Use `rtk-chat-messages-ui-paginated` instead. -
+             */
             "rtk-chat-search-results": LocalJSX.RtkChatSearchResults & JSXBase.HTMLAttributes<HTMLRtkChatSearchResultsElement>;
+            "rtk-chat-selector": LocalJSX.RtkChatSelector & JSXBase.HTMLAttributes<HTMLRtkChatSelectorElement>;
             "rtk-chat-selector-ui": LocalJSX.RtkChatSelectorUi & JSXBase.HTMLAttributes<HTMLRtkChatSelectorUiElement>;
             /**
              * A button which toggles visibility of chat.
@@ -11162,6 +11031,7 @@ declare module "@stencil/core" {
             "rtk-ended-screen": LocalJSX.RtkEndedScreen & JSXBase.HTMLAttributes<HTMLRtkEndedScreenElement>;
             "rtk-file-dropzone": LocalJSX.RtkFileDropzone & JSXBase.HTMLAttributes<HTMLRtkFileDropzoneElement>;
             /**
+             * @deprecated `rtk-file-message` is deprecated and will be removed soon. Use `rtk-file-message-view` instead.
              * A component which renders a file message from chat.
              */
             "rtk-file-message": LocalJSX.RtkFileMessage & JSXBase.HTMLAttributes<HTMLRtkFileMessageElement>;
@@ -11198,6 +11068,7 @@ declare module "@stencil/core" {
              */
             "rtk-idle-screen": LocalJSX.RtkIdleScreen & JSXBase.HTMLAttributes<HTMLRtkIdleScreenElement>;
             /**
+             * @deprecated `rtk-image-message` is deprecated and will be removed soon. Use `rtk-image-message-view` instead.
              * A component which renders an image message from chat.
              */
             "rtk-image-message": LocalJSX.RtkImageMessage & JSXBase.HTMLAttributes<HTMLRtkImageMessageElement>;
@@ -11354,6 +11225,7 @@ declare module "@stencil/core" {
              * information.
              */
             "rtk-permissions-message": LocalJSX.RtkPermissionsMessage & JSXBase.HTMLAttributes<HTMLRtkPermissionsMessageElement>;
+            "rtk-pinned-message-selector": LocalJSX.RtkPinnedMessageSelector & JSXBase.HTMLAttributes<HTMLRtkPinnedMessageSelectorElement>;
             "rtk-pip-toggle": LocalJSX.RtkPipToggle & JSXBase.HTMLAttributes<HTMLRtkPipToggleElement>;
             /**
              * A component which loads a plugin.
@@ -11509,6 +11381,7 @@ declare module "@stencil/core" {
              */
             "rtk-text-composer-view": LocalJSX.RtkTextComposerView & JSXBase.HTMLAttributes<HTMLRtkTextComposerViewElement>;
             /**
+             * @deprecated `rtk-text-message` is deprecated and will be removed soon. Use `rtk-text-message-view` instead.
              * A component which renders a text message from chat.
              */
             "rtk-text-message": LocalJSX.RtkTextMessage & JSXBase.HTMLAttributes<HTMLRtkTextMessageElement>;
