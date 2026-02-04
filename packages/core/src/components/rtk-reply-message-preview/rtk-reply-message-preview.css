@@ -1,0 +1,34 @@
+:host {
+  @apply block;
+}
+
+.reply-box {
+  @apply bg-background-600 m-2 box-border flex flex-col justify-between overflow-hidden rounded-md p-2;
+  @apply text-text-1000 gap-2;
+
+  rtk-icon {
+    @apply cursor-pointer;
+    @apply text-text-600 hover:text-text-1000 rounded-md hover:cursor-pointer;
+    @apply transition-colors;
+  }
+}
+
+.reply-box-header {
+  @apply flex flex-row items-center justify-between;
+}
+
+.reply-box-user {
+  @apply text-text-sm flex flex-row items-center gap-2;
+
+  rtk-avatar {
+    @apply !h-6 !w-6;
+  }
+}
+
+.reply-box-content {
+  @apply line-clamp-1 text-text-700 w-[90%] break-all;
+
+  img {
+    @apply h-auto w-full rounded-md;
+  }
+}

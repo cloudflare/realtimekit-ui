@@ -4,31 +4,6 @@
   @apply relative;
 }
 
-.quoted-message-container {
-  @apply mb-2 flex justify-between;
-  @apply bg-background-800 text-text-1000;
-  @apply rounded-md;
-  border: theme('borderWidth.sm') solid theme('colors.background.600');
-
-  .quoted-message {
-    @apply flex-1 p-2;
-    @apply rounded-md;
-    @apply max-h-24;
-    @apply overflow-y-auto;
-    @apply break-all;
-
-    blockquote {
-      @apply hidden;
-    }
-  }
-
-  rtk-icon.dismiss {
-    @apply ml-auto h-5 w-5 p-2;
-    @apply text-text-600 hover:text-text-1000 rounded-md hover:cursor-pointer;
-    @apply transition-colors;
-  }
-}
-
 .composer-container {
   @apply relative;
   @apply bg-background-800;

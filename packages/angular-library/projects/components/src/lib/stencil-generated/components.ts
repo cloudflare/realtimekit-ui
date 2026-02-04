@@ -520,26 +520,27 @@ export declare interface RtkChatComposerUi extends Components.RtkChatComposerUi 
 
 
 @ProxyCmp({
-  inputs: ['canSendFiles', 'canSendTextMessage', 'disableEmojiPicker', 'iconPack', 'inputTextPlaceholder', 'isEditing', 'isSending', 'maxLength', 'message', 'quotedMessage', 'rateLimits', 'storageKey', 't']
+  inputs: ['canSendFiles', 'canSendTextMessage', 'disableEmojiPicker', 'iconPack', 'inputTextPlaceholder', 'isEditing', 'isSending', 'maxLength', 'message', 'rateLimits', 'replyMessage', 'storageKey', 't']
 })
 @Component({
   selector: 'rtk-chat-composer-view',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: '<ng-content></ng-content>',
   // eslint-disable-next-line @angular-eslint/no-inputs-metadata-property
-  inputs: ['canSendFiles', 'canSendTextMessage', 'disableEmojiPicker', 'iconPack', 'inputTextPlaceholder', 'isEditing', 'isSending', 'maxLength', 'message', 'quotedMessage', 'rateLimits', 'storageKey', 't'],
+  inputs: ['canSendFiles', 'canSendTextMessage', 'disableEmojiPicker', 'iconPack', 'inputTextPlaceholder', 'isEditing', 'isSending', 'maxLength', 'message', 'rateLimits', 'replyMessage', 'storageKey', 't'],
 })
 export class RtkChatComposerView {
   protected el: HTMLRtkChatComposerViewElement;
   constructor(c: ChangeDetectorRef, r: ElementRef, protected z: NgZone) {
     c.detach();
     this.el = r.nativeElement;
-    proxyOutputs(this, this.el, ['newMessage', 'editMessage', 'editCancel', 'quotedMessageDismiss']);
+    proxyOutputs(this, this.el, ['newMessage', 'editMessage', 'replyMessage', 'editCancel']);
   }
 }
 
 
 import type { NewMessageEvent as IRtkChatComposerViewNewMessageEvent } from '@cloudflare/realtimekit-ui';
+import type { Message as IRtkChatComposerViewMessage } from '@cloudflare/realtimekit-ui';
 
 export declare interface RtkChatComposerView extends Components.RtkChatComposerView {
   /**
@@ -551,13 +552,13 @@ export declare interface RtkChatComposerView extends Components.RtkChatComposerV
    */
   editMessage: EventEmitter<CustomEvent<string>>;
   /**
+   * Event emitted when message is replied to
+   */
+  replyMessage: EventEmitter<CustomEvent<IRtkChatComposerViewMessage>>;
+  /**
    * Event emitted when message editing is cancelled
    */
   editCancel: EventEmitter<CustomEvent<void>>;
-  /**
-   * Event emitted when quoted message is dismissed
-   */
-  quotedMessageDismiss: EventEmitter<CustomEvent<void>>;
 }
 
 
@@ -674,20 +675,15 @@ export class RtkChatMessagesUiPaginated {
   constructor(c: ChangeDetectorRef, r: ElementRef, protected z: NgZone) {
     c.detach();
     this.el = r.nativeElement;
-    proxyOutputs(this, this.el, ['editMessageInit', 'pinMessage', 'editMessage', 'deleteMessage', 'rtkStateUpdate']);
+    proxyOutputs(this, this.el, ['pinMessage', 'editMessage', 'deleteMessage', 'replyMessage', 'rtkStateUpdate']);
   }
 }
 
 
-import type { TextMessage as IRtkChatMessagesUiPaginatedTextMessage } from '@cloudflare/realtimekit-ui';
 import type { Message as IRtkChatMessagesUiPaginatedMessage } from '@cloudflare/realtimekit-ui';
 import type { States as IRtkChatMessagesUiPaginatedStates } from '@cloudflare/realtimekit-ui';
 
 export declare interface RtkChatMessagesUiPaginated extends Components.RtkChatMessagesUiPaginated {
-  /**
-   * Event for editing a message
-   */
-  editMessageInit: EventEmitter<CustomEvent<{ payload: IRtkChatMessagesUiPaginatedTextMessage; flags: { isReply?: boolean; isEdit?: boolean }; }>>;
   /**
    * Event emitted when a message is pinned or unpinned
    */
@@ -700,6 +696,10 @@ export declare interface RtkChatMessagesUiPaginated extends Components.RtkChatMe
    * Event emitted when a message is deleted
    */
   deleteMessage: EventEmitter<CustomEvent<IRtkChatMessagesUiPaginatedMessage>>;
+  /**
+   * Event emitted when a message is replied to
+   */
+  replyMessage: EventEmitter<CustomEvent<IRtkChatMessagesUiPaginatedMessage>>;
   /**
    * Emits updated state data
    */
@@ -2930,6 +2930,32 @@ export declare interface RtkRecordingToggle extends Components.RtkRecordingToggl
    * Emit api error events
    */
   rtkApiError: EventEmitter<CustomEvent<{ trace: string; message: string; }>>;
+}
+
+
+@ProxyCmp({
+  inputs: ['iconPack', 'isDissmisable', 'replyMessage']
+})
+@Component({
+  selector: 'rtk-reply-message-preview',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: '<ng-content></ng-content>',
+  // eslint-disable-next-line @angular-eslint/no-inputs-metadata-property
+  inputs: ['iconPack', 'isDissmisable', 'replyMessage'],
+})
+export class RtkReplyMessagePreview {
+  protected el: HTMLRtkReplyMessagePreviewElement;
+  constructor(c: ChangeDetectorRef, r: ElementRef, protected z: NgZone) {
+    c.detach();
+    this.el = r.nativeElement;
+    proxyOutputs(this, this.el, ['rtkReplyMessageDismiss']);
+  }
+}
+
+
+export declare interface RtkReplyMessagePreview extends Components.RtkReplyMessagePreview {
+
+  rtkReplyMessageDismiss: EventEmitter<CustomEvent<void>>;
 }
 
 

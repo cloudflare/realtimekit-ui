@@ -3,19 +3,23 @@ import { RtkI18n, IconPack, defaultIconPack, useLanguage } from '../../exports';
 import gracefulStorage from '../../utils/graceful-storage';
 import { SyncWithStore } from '../../utils/sync-with-store';
 import { MAX_TEXT_LENGTH } from '../../utils/chat';
+import { Message } from '@cloudflare/realtimekit';
 
 export type NewMessageEvent =
   | {
       type: 'text';
       message: string;
+      replyTo?: Message;
     }
   | {
       type: 'file';
       file: File;
+      replyTo?: Message;
     }
   | {
       type: 'image';
       image: File;
+      replyTo?: Message;
     };
 
 const messageLimits = {
@@ -43,9 +47,6 @@ export class RtkChatComposerView {
   /** Message to be pre-populated */
   @Prop() message: string = '';
 
-  /** Quote message to be displayed */
-  @Prop() quotedMessage: string = '';
-
   /** Key for storing message in localStorage */
   @Prop() storageKey: string = 'rtk-text-message';
 
@@ -54,6 +55,9 @@ export class RtkChatComposerView {
 
   /** Sets composer to edit mode */
   @Prop() isEditing: boolean = false;
+
+  /** If a message is being replied to */
+  @Prop() replyMessage: Message | undefined;
 
   /** Icon pack */
   @SyncWithStore()
@@ -91,11 +95,11 @@ export class RtkChatComposerView {
   /** Event emitted when message is edited */
   @Event({ eventName: 'editMessage' }) onEditMessage: EventEmitter<string>;
 
+  /** Event emitted when message is replied to */
+  @Event({ eventName: 'replyMessage' }) onReplyMessage: EventEmitter<Message>;
+
   /** Event emitted when message editing is cancelled */
   @Event({ eventName: 'editCancel' }) onEditCancel: EventEmitter<void>;
-
-  /** Event emitted when quoted message is dismissed */
-  @Event({ eventName: 'quotedMessageDismiss' }) onQuotedMessageDismiss: EventEmitter<void>;
 
   private textMessage: string = '';
 
@@ -128,9 +132,14 @@ export class RtkChatComposerView {
       this.onNewMessage.emit({
         type: 'image',
         image: this.fileToUpload.file,
+        replyTo: this.replyMessage,
       });
     } else {
-      this.onNewMessage.emit({ type: 'file', file: this.fileToUpload.file });
+      this.onNewMessage.emit({
+        type: 'file',
+        file: this.fileToUpload.file,
+        replyTo: this.replyMessage,
+      });
     }
 
     this.fileToUpload = null;
@@ -142,6 +151,7 @@ export class RtkChatComposerView {
     }
     if (this.fileToUpload !== null) {
       this.sendFile();
+      this.onReplyMessage.emit(undefined);
       return;
     }
 
@@ -156,7 +166,8 @@ export class RtkChatComposerView {
     this.checkRateLimitBreached(currentTime);
 
     if (message.length > 0) {
-      this.onNewMessage.emit({ type: 'text', message });
+      this.onNewMessage.emit({ type: 'text', message, replyTo: this.replyMessage });
+      this.onReplyMessage.emit(undefined);
       this.cleanup();
     }
   };
@@ -218,10 +229,6 @@ export class RtkChatComposerView {
     this.fileToUpload = { type, file };
   };
 
-  private onQuotedMessageDismissHandler = () => {
-    this.onQuotedMessageDismiss.emit();
-  };
-
   private cleanup = () => {
     this.textMessage = '';
     this.fileToUpload = null;
@@ -247,45 +254,41 @@ export class RtkChatComposerView {
             {...uiProps}
           />
         )}
+
         <slot name="chat-addon"></slot>
-        {this.quotedMessage && this.quotedMessage.length !== 0 && (
-          <div class="quoted-message-container" part="quoted-message-container">
-            <div class="quoted-message scrollbar">
-              <rtk-text-message-view text={this.quotedMessage} isMarkdown></rtk-text-message-view>
-            </div>
-            <div>
-              <rtk-icon
-                aria-label={this.t('dismiss')}
-                class="dismiss"
-                icon={this.iconPack.dismiss}
-                onClick={this.onQuotedMessageDismissHandler}
-              />
-            </div>
-          </div>
-        )}
         <div class="composer-container">
-          <div class="composers">
-            {this.fileToUpload && (
-              <rtk-draft-attachment-view
-                {...uiProps}
-                attachment={this.fileToUpload}
-                onDeleteAttachment={() => (this.fileToUpload = null)}
-              ></rtk-draft-attachment-view>
-            )}
-            {!this.fileToUpload && (
-              <rtk-text-composer-view
-                value={this.textMessage}
-                placeholder={this.inputTextPlaceholder}
-                onTextChange={this.onTextChangeHandler}
-                keyDownHandler={this.onKeyDownHandler}
-                maxLength={this.maxLength ?? MAX_TEXT_LENGTH}
-                rateLimitBreached={this.rateLimitsBreached}
-                t={this.t}
-                iconPack={this.iconPack}
-                ref={(el) => (this.$textComposer = el)}
-              ></rtk-text-composer-view>
-            )}
-          </div>
+          {this.replyMessage ? (
+            <rtk-reply-message-preview
+              isDissmisable
+              replyMessage={this.replyMessage}
+              iconPack={this.iconPack}
+              onRtkReplyMessageDismiss={() => {
+                this.onReplyMessage.emit(undefined);
+              }}
+            ></rtk-reply-message-preview>
+          ) : null}
+          {/* <div class="composers"> */}
+          {this.fileToUpload && (
+            <rtk-draft-attachment-view
+              {...uiProps}
+              attachment={this.fileToUpload}
+              onDeleteAttachment={() => (this.fileToUpload = null)}
+            ></rtk-draft-attachment-view>
+          )}
+          {!this.fileToUpload && (
+            <rtk-text-composer-view
+              value={this.textMessage}
+              placeholder={this.inputTextPlaceholder}
+              onTextChange={this.onTextChangeHandler}
+              keyDownHandler={this.onKeyDownHandler}
+              maxLength={this.maxLength ?? MAX_TEXT_LENGTH}
+              rateLimitBreached={this.rateLimitsBreached}
+              t={this.t}
+              iconPack={this.iconPack}
+              ref={(el) => (this.$textComposer = el)}
+            ></rtk-text-composer-view>
+          )}
+          {/* </div> */}
 
           <div class="chat-buttons" part="chat-buttons">
             <div class="left" part="chat-buttons-left">

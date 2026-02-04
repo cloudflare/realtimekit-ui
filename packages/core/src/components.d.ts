@@ -585,7 +585,6 @@ export namespace Components {
         "prefill": {
     suggestedReplies?: string[];
     editMessage?: TextMessage;
-    replyMessage?: TextMessage;
   };
         /**
           * Size
@@ -634,13 +633,13 @@ export namespace Components {
          */
         "message": string;
         /**
-          * Quote message to be displayed
-         */
-        "quotedMessage": string;
-        /**
           * Rate limits
          */
         "rateLimits": { period: number; maxInvocations: number; };
+        /**
+          * If a message is being replied to
+         */
+        "replyMessage": Message | undefined;
         /**
           * Key for storing message in localStorage
          */
@@ -3105,6 +3104,11 @@ export namespace Components {
          */
         "variant": ControlBarVariant;
     }
+    interface RtkReplyMessagePreview {
+        "iconPack": IconPack1;
+        "isDissmisable": boolean;
+        "replyMessage": Message;
+    }
     /**
      * A button which toggles your screenshare.
      */
@@ -4164,6 +4168,10 @@ export interface RtkRecordingToggleCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLRtkRecordingToggleElement;
 }
+export interface RtkReplyMessagePreviewCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLRtkReplyMessagePreviewElement;
+}
 export interface RtkScreenShareToggleCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLRtkScreenShareToggleElement;
@@ -4519,8 +4527,8 @@ declare global {
     interface HTMLRtkChatComposerViewElementEventMap {
         "newMessage": NewMessageEvent;
         "editMessage": string;
+        "replyMessage": Message;
         "editCancel": void;
-        "quotedMessageDismiss": void;
     }
     /**
      * A component which renders a chat composer
@@ -4590,13 +4598,10 @@ declare global {
         new (): HTMLRtkChatMessagesUiElement;
     };
     interface HTMLRtkChatMessagesUiPaginatedElementEventMap {
-        "editMessageInit": {
-    payload: TextMessage;
-    flags: { isReply?: boolean; isEdit?: boolean };
-  };
         "pinMessage": Message;
         "editMessage": Message;
         "deleteMessage": Message;
+        "replyMessage": Message;
         "rtkStateUpdate": States;
     }
     interface HTMLRtkChatMessagesUiPaginatedElement extends Components.RtkChatMessagesUiPaginated, HTMLStencilElement {
@@ -5876,6 +5881,23 @@ declare global {
         prototype: HTMLRtkRecordingToggleElement;
         new (): HTMLRtkRecordingToggleElement;
     };
+    interface HTMLRtkReplyMessagePreviewElementEventMap {
+        "rtkReplyMessageDismiss": void;
+    }
+    interface HTMLRtkReplyMessagePreviewElement extends Components.RtkReplyMessagePreview, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLRtkReplyMessagePreviewElementEventMap>(type: K, listener: (this: HTMLRtkReplyMessagePreviewElement, ev: RtkReplyMessagePreviewCustomEvent<HTMLRtkReplyMessagePreviewElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLRtkReplyMessagePreviewElementEventMap>(type: K, listener: (this: HTMLRtkReplyMessagePreviewElement, ev: RtkReplyMessagePreviewCustomEvent<HTMLRtkReplyMessagePreviewElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLRtkReplyMessagePreviewElement: {
+        prototype: HTMLRtkReplyMessagePreviewElement;
+        new (): HTMLRtkReplyMessagePreviewElement;
+    };
     interface HTMLRtkScreenShareToggleElementEventMap {
         "rtkStateUpdate": States;
         "rtkApiError": {
@@ -6457,6 +6479,7 @@ declare global {
         "rtk-polls-toggle": HTMLRtkPollsToggleElement;
         "rtk-recording-indicator": HTMLRtkRecordingIndicatorElement;
         "rtk-recording-toggle": HTMLRtkRecordingToggleElement;
+        "rtk-reply-message-preview": HTMLRtkReplyMessagePreviewElement;
         "rtk-screen-share-toggle": HTMLRtkScreenShareToggleElement;
         "rtk-screenshare-view": HTMLRtkScreenshareViewElement;
         "rtk-settings": HTMLRtkSettingsElement;
@@ -7071,7 +7094,6 @@ declare namespace LocalJSX {
         "prefill"?: {
     suggestedReplies?: string[];
     editMessage?: TextMessage;
-    replyMessage?: TextMessage;
   };
         /**
           * Size
@@ -7132,17 +7154,17 @@ declare namespace LocalJSX {
          */
         "onNewMessage"?: (event: RtkChatComposerViewCustomEvent<NewMessageEvent>) => void;
         /**
-          * Event emitted when quoted message is dismissed
+          * Event emitted when message is replied to
          */
-        "onQuotedMessageDismiss"?: (event: RtkChatComposerViewCustomEvent<void>) => void;
-        /**
-          * Quote message to be displayed
-         */
-        "quotedMessage"?: string;
+        "onReplyMessage"?: (event: RtkChatComposerViewCustomEvent<Message>) => void;
         /**
           * Rate limits
          */
         "rateLimits"?: { period: number; maxInvocations: number; };
+        /**
+          * If a message is being replied to
+         */
+        "replyMessage"?: Message | undefined;
         /**
           * Key for storing message in localStorage
          */
@@ -7302,16 +7324,13 @@ declare namespace LocalJSX {
          */
         "onEditMessage"?: (event: RtkChatMessagesUiPaginatedCustomEvent<Message>) => void;
         /**
-          * Event for editing a message
-         */
-        "onEditMessageInit"?: (event: RtkChatMessagesUiPaginatedCustomEvent<{
-    payload: TextMessage;
-    flags: { isReply?: boolean; isEdit?: boolean };
-  }>) => void;
-        /**
           * Event emitted when a message is pinned or unpinned
          */
         "onPinMessage"?: (event: RtkChatMessagesUiPaginatedCustomEvent<Message>) => void;
+        /**
+          * Event emitted when a message is replied to
+         */
+        "onReplyMessage"?: (event: RtkChatMessagesUiPaginatedCustomEvent<Message>) => void;
         /**
           * Emits updated state data
          */
@@ -9842,6 +9861,12 @@ declare namespace LocalJSX {
          */
         "variant"?: ControlBarVariant;
     }
+    interface RtkReplyMessagePreview {
+        "iconPack"?: IconPack1;
+        "isDissmisable"?: boolean;
+        "onRtkReplyMessageDismiss"?: (event: RtkReplyMessagePreviewCustomEvent<void>) => void;
+        "replyMessage"?: Message;
+    }
     /**
      * A button which toggles your screenshare.
      */
@@ -10854,6 +10879,7 @@ declare namespace LocalJSX {
         "rtk-polls-toggle": RtkPollsToggle;
         "rtk-recording-indicator": RtkRecordingIndicator;
         "rtk-recording-toggle": RtkRecordingToggle;
+        "rtk-reply-message-preview": RtkReplyMessagePreview;
         "rtk-screen-share-toggle": RtkScreenShareToggle;
         "rtk-screenshare-view": RtkScreenshareView;
         "rtk-settings": RtkSettings;
@@ -11279,6 +11305,7 @@ declare module "@stencil/core" {
              * who don't have the permission to record a meeting.
              */
             "rtk-recording-toggle": LocalJSX.RtkRecordingToggle & JSXBase.HTMLAttributes<HTMLRtkRecordingToggleElement>;
+            "rtk-reply-message-preview": LocalJSX.RtkReplyMessagePreview & JSXBase.HTMLAttributes<HTMLRtkReplyMessagePreviewElement>;
             /**
              * A button which toggles your screenshare.
              */

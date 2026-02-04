@@ -106,6 +106,13 @@ export class RtkMessageView {
               </div>
             )}
             <div class={{ body: true, bubble: this.variant === 'bubble' }}>
+              {/* <rtk-reply-message-preview
+                replyMessage={}
+                iconPack={this.iconPack}
+                onRtkReplyMessageDismiss={() => {
+                  // this.onReplyMessage.emit(undefined);
+                }}
+              ></rtk-reply-message-preview> */}
               <slot></slot>
               {!this.hideMetadata && !!this.time && (
                 <div class="metadata" title={formatDateTime(this.time)}>

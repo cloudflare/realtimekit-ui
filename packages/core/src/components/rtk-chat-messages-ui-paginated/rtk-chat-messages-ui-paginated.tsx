@@ -1,4 +1,4 @@
-import type { Message, ChatUpdateParams, TextMessage } from '@cloudflare/realtimekit';
+import type { Message, ChatUpdateParams } from '@cloudflare/realtimekit';
 import {
   Component,
   Event,
@@ -48,12 +48,6 @@ export class RtkChatMessagesUiPaginated {
   /** Selected recipient for private chat; when unset, messages are loaded for public chat (Everyone). */
   @Prop() privateChatRecipient: Participant | null;
 
-  /** Event for editing a message */
-  @Event({ bubbles: true, composed: true }) editMessageInit: EventEmitter<{
-    payload: TextMessage;
-    flags: { isReply?: boolean; isEdit?: boolean };
-  }>;
-
   /** Event emitted when a message is pinned or unpinned */
   @Event({ eventName: 'pinMessage' }) onPinMessage: EventEmitter<Message>;
 
@@ -62,6 +56,9 @@ export class RtkChatMessagesUiPaginated {
 
   /** Event emitted when a message is deleted */
   @Event({ eventName: 'deleteMessage' }) onDeleteMessage: EventEmitter<Message>;
+
+  /** Event emitted when a message is replied to */
+  @Event({ eventName: 'replyMessage' }) onReplyMessage: EventEmitter<Message>;
 
   /** Emits updated state data */
   @Event({ eventName: 'rtkStateUpdate' }) stateUpdate: EventEmitter<States>;
@@ -189,6 +186,12 @@ export class RtkChatMessagesUiPaginated {
       });
     }
 
+    actions.push({
+      id: 'reply_message',
+      label: this.t('chat.reply'),
+      icon: this.iconPack.back,
+    });
+
     return actions;
   };
 
@@ -202,6 +205,9 @@ export class RtkChatMessagesUiPaginated {
         break;
       case 'delete_message':
         this.onDeleteMessage.emit(message);
+        break;
+      case 'reply_message':
+        this.onReplyMessage.emit(message);
         break;
       default:
         break;

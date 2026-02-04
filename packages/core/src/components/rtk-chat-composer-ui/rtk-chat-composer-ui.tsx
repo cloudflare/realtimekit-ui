@@ -67,7 +67,6 @@ export class RtkChatComposerUi {
   @Prop() prefill: {
     suggestedReplies?: string[];
     editMessage?: TextMessage;
-    replyMessage?: TextMessage;
   } = {};
 
   /** list of members that can be mentioned */
@@ -108,7 +107,7 @@ export class RtkChatComposerUi {
   }
 
   componentDidRender() {
-    if (this.prefill.editMessage || this.prefill.replyMessage) {
+    if (this.prefill.editMessage) {
       writeTask(() => this.$textArea.focus());
     }
   }
@@ -217,16 +216,7 @@ export class RtkChatComposerUi {
 
     const message = this.$textArea.value.trim();
     if (message.length > 0) {
-      if (this.prefill.replyMessage) {
-        this.onNewMessage.emit({
-          type: 'text',
-          message,
-          replyTo: this.prefill.replyMessage,
-        });
-      } else {
-        this.onNewMessage.emit({ type: 'text', message });
-      }
-
+      this.onNewMessage.emit({ type: 'text', message });
       this.cleanup();
     }
   };

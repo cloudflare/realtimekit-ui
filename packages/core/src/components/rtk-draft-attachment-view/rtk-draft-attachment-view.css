@@ -4,12 +4,13 @@
   @apply rounded-t-md;
 }
 .preview-overlay {
-  @apply absolute inset-0;
+  @apply relative;
   @apply bg-inherit;
+  @apply p-2;
 }
 
 .preview {
-  @apply absolute top-4 left-4 max-w-fit;
+  @apply relative max-w-fit;
   @apply max-h-20;
 
   &:hover {

@@ -110,6 +110,7 @@ export const DIRECTIVES = [
   d.RtkPollsToggle,
   d.RtkRecordingIndicator,
   d.RtkRecordingToggle,
+  d.RtkReplyMessagePreview,
   d.RtkScreenShareToggle,
   d.RtkScreenshareView,
   d.RtkSettings,

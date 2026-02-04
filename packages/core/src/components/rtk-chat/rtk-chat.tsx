@@ -92,8 +92,6 @@ export class RtkChat {
 
   @State() editingMessage: TextMessage | null = null;
 
-  @State() replyMessage: TextMessage | null = null;
-
   @State() searchQuery = '';
 
   @State() selectorState: 'desktop' | 'hide' | 'mobile' = 'hide';
@@ -101,6 +99,8 @@ export class RtkChat {
   @State() isSendingMessage = false;
 
   @State() showPinnedMessages: boolean = false;
+
+  @State() replyMessage: Message | undefined;
 
   /** Emits updated state data */
   @Event({ eventName: 'rtkStateUpdate' }) stateUpdate: EventEmitter<States>;
@@ -151,22 +151,9 @@ export class RtkChat {
     }
   }
 
-  @Listen('editMessageInit', { target: 'window' })
-  onEditMessageInit(
-    event: CustomEvent<{
-      payload: TextMessage;
-      flags: { isReply?: boolean; isEdit?: boolean };
-    }>
-  ) {
-    if (event.detail.flags.isReply) {
-      this.replyMessage = event.detail.payload;
-    } else if (event.detail.flags.isEdit) {
-      this.editingMessage = event.detail.payload;
-    }
-  }
-
   @Listen('rtkChatSelectorChange')
   onChatSelectorChange(event: CustomEvent<{ selectedUser?: Participant }>) {
+    this.replyMessage = undefined;
     const selectedUser = event.detail?.selectedUser;
     // Everyone
     if (!selectedUser) {
@@ -233,15 +220,11 @@ export class RtkChat {
     return this.canPrivateMessage && this.canSendPrivateFiles;
   };
 
-  private onQuotedMessageDismiss = () => {
-    this.replyMessage = null;
-  };
-
   private onNewMessageHandler = async (e: CustomEvent<NewMessageEvent>) => {
     const message = e.detail;
     this.isSendingMessage = true;
     try {
-      await this.meeting.chat.sendMessage(message, this.getRecipientPeerIds());
+      await this.meeting.chat.sendMessage(message as any, this.getRecipientPeerIds());
     } finally {
       this.isSendingMessage = false;
     }
@@ -298,9 +281,12 @@ export class RtkChat {
   private onMessageEdit = (event: CustomEvent<Message>) => {
     const message = event.detail;
     if (message.type !== 'text') return;
-
-    this.replyMessage = null;
     this.editingMessage = message as TextMessage;
+  };
+
+  private onReplyMessage = (event: CustomEvent<Message>) => {
+    const message = event.detail;
+    this.replyMessage = message;
   };
 
   private renderComposerUI() {
@@ -312,7 +298,6 @@ export class RtkChat {
 
     const uiProps = { iconPack: this.iconPack, t: this.t, size: this.size };
     const message = this.editingMessage ? this.editingMessage.message : '';
-    const quotedMessage = this.replyMessage ? this.replyMessage.message : '';
 
     const draftStorageKey = 'rtk-chat-draft';
     const editStorageKey = this.editingMessage
@@ -322,9 +307,9 @@ export class RtkChat {
 
     return (
       <rtk-chat-composer-view
+        replyMessage={this.replyMessage}
         message={message}
         storageKey={storageKey}
-        quotedMessage={quotedMessage}
         isEditing={!!this.editingMessage}
         isSending={this.isSendingMessage}
         canSendTextMessage={this.isTextMessagingAllowed()}
@@ -335,8 +320,8 @@ export class RtkChat {
         inputTextPlaceholder={this.t('chat.message_placeholder')}
         onNewMessage={this.onNewMessageHandler}
         onEditMessage={this.onEditMessageHandler}
+        onReplyMessage={this.onReplyMessage}
         onEditCancel={this.onEditCancel}
-        onQuotedMessageDismiss={this.onQuotedMessageDismiss}
         {...uiProps}
       >
         <slot name="chat-addon" slot="chat-addon" />
@@ -366,6 +351,7 @@ export class RtkChat {
               onPinMessage={this.onPinMessage}
               onEditMessage={this.onMessageEdit}
               onDeleteMessage={this.onDeleteMessage}
+              onReplyMessage={this.onReplyMessage}
               size={this.size}
               iconPack={this.iconPack}
               t={this.t}

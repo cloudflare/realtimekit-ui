@@ -116,6 +116,7 @@ export const RtkPolls = /*@__PURE__*/createReactComponent<JSX.RtkPolls, HTMLRtkP
 export const RtkPollsToggle = /*@__PURE__*/createReactComponent<JSX.RtkPollsToggle, HTMLRtkPollsToggleElement>('rtk-polls-toggle');
 export const RtkRecordingIndicator = /*@__PURE__*/createReactComponent<JSX.RtkRecordingIndicator, HTMLRtkRecordingIndicatorElement>('rtk-recording-indicator');
 export const RtkRecordingToggle = /*@__PURE__*/createReactComponent<JSX.RtkRecordingToggle, HTMLRtkRecordingToggleElement>('rtk-recording-toggle');
+export const RtkReplyMessagePreview = /*@__PURE__*/createReactComponent<JSX.RtkReplyMessagePreview, HTMLRtkReplyMessagePreviewElement>('rtk-reply-message-preview');
 export const RtkScreenShareToggle = /*@__PURE__*/createReactComponent<JSX.RtkScreenShareToggle, HTMLRtkScreenShareToggleElement>('rtk-screen-share-toggle');
 export const RtkScreenshareView = /*@__PURE__*/createReactComponent<JSX.RtkScreenshareView, HTMLRtkScreenshareViewElement>('rtk-screenshare-view');
 export const RtkSettings = /*@__PURE__*/createReactComponent<JSX.RtkSettings, HTMLRtkSettingsElement>('rtk-settings');
