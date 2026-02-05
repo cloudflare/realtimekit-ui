@@ -1,3 +1,12 @@
+## [1.1.1-staging.1](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.1.0...@cloudflare/realtimekit-ui-v1.1.1-staging.1) (2026-02-05)
+
+
+### Bug Fixes
+
+* add jsdoc style description for components that are missing it ([8570b26](https://github.com/cloudflare/realtimekit-ui/commit/8570b26d67c33b9be03d8e7d467c4cfc9e6114a2))
+* update docs generate script ([9f784f9](https://github.com/cloudflare/realtimekit-ui/commit/9f784f9ce4a2450f638fb4ef11d6f7c3c8f66619))
+* update generate stencil script ([41809dc](https://github.com/cloudflare/realtimekit-ui/commit/41809dc1ea0e604001f0757ef9b727eba618372b))
+
 # [1.1.0](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.8...@cloudflare/realtimekit-ui-v1.1.0) (2026-01-30)
 
 
