@@ -18,6 +18,86 @@ class StencilDocGenerator {
       : this.detectLibraryName(filePath);
   }
 
+  escapeMarkdownTableCell(value) {
+    if (value == null) return '';
+    return String(value).replace(/\r?\n/g, ' ').replace(/\|/g, '\\|');
+  }
+
+  wrapInlineCode(value) {
+    const str = this.escapeMarkdownTableCell(value);
+    return `\`${str}\``;
+  }
+
+  readUntilTopLevelSemicolon(content, startIndex) {
+    let buf = '';
+    let depthCurly = 0;
+    let depthParen = 0;
+    let depthBracket = 0;
+    let depthAngle = 0;
+    let inSingle = false;
+    let inDouble = false;
+    let inTemplate = false;
+    let escaping = false;
+
+    for (let i = startIndex; i < content.length; i++) {
+      const ch = content[i];
+
+      if (escaping) {
+        buf += ch;
+        escaping = false;
+        continue;
+      }
+
+      if ((inSingle || inDouble || inTemplate) && ch === '\\') {
+        buf += ch;
+        escaping = true;
+        continue;
+      }
+
+      if (!inDouble && !inTemplate && ch === "'") {
+        inSingle = !inSingle;
+        buf += ch;
+        continue;
+      }
+
+      if (!inSingle && !inTemplate && ch === '"') {
+        inDouble = !inDouble;
+        buf += ch;
+        continue;
+      }
+
+      if (!inSingle && !inDouble && ch === '`') {
+        inTemplate = !inTemplate;
+        buf += ch;
+        continue;
+      }
+
+      if (inSingle || inDouble || inTemplate) {
+        buf += ch;
+        continue;
+      }
+
+      if (ch === '{') depthCurly++;
+      else if (ch === '}') depthCurly = Math.max(0, depthCurly - 1);
+      else if (ch === '(') depthParen++;
+      else if (ch === ')') depthParen = Math.max(0, depthParen - 1);
+      else if (ch === '[') depthBracket++;
+      else if (ch === ']') depthBracket = Math.max(0, depthBracket - 1);
+      else if (ch === '<') depthAngle++;
+      else if (ch === '>') depthAngle = Math.max(0, depthAngle - 1);
+
+      const atTopLevel =
+        depthCurly === 0 && depthParen === 0 && depthBracket === 0 && depthAngle === 0;
+      if (ch === ';' && atTopLevel) {
+        return { value: buf, endIndex: i };
+      }
+
+      buf += ch;
+    }
+
+    return { value: buf, endIndex: content.length };
+  }
+
   detectLibraryName(filePath) {
     if (filePath.includes('/core/')) return 'Core';
     if (filePath.includes('/react/')) return 'React';
@@ -100,11 +180,19 @@ class StencilDocGenerator {
 
   parseProps(propsContent, componentName) {
     const props = [];
-    const propRegex = /\/\*\*\s*\n\s*\*\s*(.*?)\s*\n\s*\*\/\s*\n\s*"([^"]+)":\s*([^;]+);/g;
+    const propRegex = /\/\*\*\s*\n\s*\*\s*(.*?)\s*\n\s*\*\/\s*\n\s*"([^"]+)":\s*/g;
 
     let match;
     while ((match = propRegex.exec(propsContent)) !== null) {
-      const [, description, name, typeWithDefault] = match;
+      const [, description, name] = match;
+      const typeStartIndex = propRegex.lastIndex;
+      const { value: typeWithDefault, endIndex } = this.readUntilTopLevelSemicolon(
+        propsContent,
+        typeStartIndex
+      );
+
+      // Move regex cursor past this property so we can find the next one
+      propRegex.lastIndex = Math.min(propsContent.length, endIndex + 1);
 
       // Parse type and default value from type definition
       const { type } = this.parseTypeAndDefault(typeWithDefault.trim());
@@ -245,49 +333,13 @@ class StencilDocGenerator {
   }
 
   async generateIndex() {
-    const components = Array.from(this.components.values()).sort((a, b) =>
-      a.name.localeCompare(b.name)
-    );
-
-    let content = `---
+    const content = `---
 title: ${this.libraryName} Components API Reference
 description: Complete API reference for ${this.libraryName} library components
----
-
-# ${this.libraryName} Components API Reference
-
-Auto-generated from \`${path.basename(this.filePath)}\` - ${new Date().toISOString()}
-
-## Available Components
-
-`;
-
-    components.forEach((component) => {
-      const propCount = component.props?.length || 0;
-      const eventCount = component.events?.length || 0;
-
-      content += `### [${component.name}](./${component.tagName})
-
-      - **Tag:** \`<${component.tagName}>\`
-      - **Props:** ${propCount}
-      - **Events:** ${eventCount}
-
-      `;
-    });
-
-    content += `
-      ## Component Overview
-
-      | Component | Tag Name | Props | Events |
-      |-----------|----------|-------|--------|
-      `;
-
-    components.forEach((component) => {
-      const propCount = component.props?.length || 0;
-      const eventCount = component.events?.length || 0;
-
-      content += `| [${component.name}](./${component.tagName}) | \`<${component.tagName}>\` | ${propCount} | ${eventCount} |\n`;
-    });
+sidebar:
+  group:
+    hideIndex: true
+---`;
 
     fs.writeFileSync(path.join(this.outputDir, 'index.mdx'), content);
   }
@@ -296,12 +348,9 @@ Auto-generated from \`${path.basename(this.filePath)}\` - ${new Date().toISOStri
     const { name, tagName, props = [], events = [], description } = component;
 
     let content = `---
-title: ${name}
-description: API reference for ${name} component (${this.libraryName} Library)
----
-
-# ${name}
-
+      title: ${name}
+      description: API reference for ${name} component (${this.libraryName} Library)
+      ---
 `;
 
     // Add component description if available
@@ -324,7 +373,7 @@ description: API reference for ${name} component (${this.libraryName} Library)
         const required = prop.required ? '✅' : '❌';
         const description = prop.description || '*No description*';
         const type = this.formatType(prop.type);
-        const defaultValue = prop.defaultValue ? `\`${prop.defaultValue}\`` : '-';
+        const defaultValue = prop.defaultValue ? this.wrapInlineCode(prop.defaultValue) : '-';
 
         content += `| \`${prop.name}\` | ${type} | ${required} | ${defaultValue} | ${description} |\n`;
       });
@@ -353,10 +402,8 @@ description: API reference for ${name} component (${this.libraryName} Library)
 
   formatType(type) {
     // Clean up TypeScript types for better display
-    if (type.length > 50) {
-      return `\`${type.substring(0, 47)}...\``;
-    }
-    return `\`${type}\``;
+    const safeType = type == null ? '' : String(type);
+    return this.wrapInlineCode(safeType);
   }
 
   generateUsageExamples(component) {
@@ -425,7 +472,7 @@ description: API reference for ${name} component (${this.libraryName} Library)
     let content = `### Basic Usage
 
 \`\`\`tsx
-import { ${name} } from '@cloudflare/realtimekit-ui/react';
+import { ${name} } from '@cloudflare/realtimekit-react-ui';
 
 function MyComponent() {
   return <${name} />;
@@ -438,7 +485,7 @@ function MyComponent() {
       content += `### With Properties
 
 \`\`\`tsx
-import { ${name} } from '@cloudflare/realtimekit-ui/react';
+import { ${name} } from '@cloudflare/realtimekit-react-ui';
 
 function MyComponent() {
   return (
@@ -477,7 +524,7 @@ function MyComponent() {
 \`\`\`typescript
 // app.module.ts
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { defineCustomElements } from '@cloudflare/realtimekit-ui/loader';
+import { defineCustomElements } from '@cloudflare/realtimekit-angular-ui/loader';
 
 defineCustomElements();
 
@@ -548,7 +595,7 @@ export class AppModule { }
     } else if (lowerType.includes('uiconfig')) {
       return '{defaultUiConfig}';
     } else if (lowerType.includes('iconpack')) {
-      return "{'defaultIconPack'}";
+      return '{defaultIconPack}';
     } else if (lowerType.includes('peer')) {
       return '{participant}';
     } else if (lowerType.includes('controlbarvariant')) {
@@ -583,6 +630,22 @@ async function main() {
   const generator = new StencilDocGenerator(filePath, outputDir, framework);
   await generator.parseFile();
   await generator.generateDocs();
+
+  const docsRootDir = path.resolve(process.cwd(), 'docs');
+  if (!fs.existsSync(docsRootDir)) {
+    fs.mkdirSync(docsRootDir, { recursive: true });
+  }
+
+  const docsRootIndexContent = `---
+pcx_content_type: navigation
+title: Component Reference
+sidebar:
+  group:
+    hideIndex: true
+---
+`;
+
+  fs.writeFileSync(path.join(docsRootDir, 'index.mdx'), docsRootIndexContent);
 
   console.log(`📁 Documentation saved to: ${outputDir}`);
 }
