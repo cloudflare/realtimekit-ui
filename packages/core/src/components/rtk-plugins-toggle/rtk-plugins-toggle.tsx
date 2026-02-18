@@ -97,8 +97,8 @@ export class RtkPluginsToggle {
 
   @Watch('pluginsActive')
   handlePluginsActiveChange() {
-    // Plugins sidebar closed without opening a different sidebar
-    if (!this.pluginsActive && !this.states.activeSidebar) {
+    // Plugins sidebar closed without opening a different sidebar or AI panel
+    if (!this.pluginsActive && !this.states.activeSidebar && !this.states.activeAI) {
       this.buttonEl.focus();
     }
   }

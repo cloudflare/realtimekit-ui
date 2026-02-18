@@ -164,8 +164,8 @@ export class RtkParticipantsToggle {
 
   @Watch('participantsActive')
   handleParticipantsActiveChange() {
-    // Participants sidebar closed without opening a different sidebar
-    if (!this.participantsActive && !this.states.activeSidebar) {
+    // Participants sidebar closed without opening a different sidebar or AI panel
+    if (!this.participantsActive && !this.states.activeSidebar && !this.states.activeAI) {
       this.buttonEl.focus();
     }
   }

@@ -128,8 +128,8 @@ export class RtkChatToggle {
 
   @Watch('chatActive')
   handleChatActiveChange() {
-    // Chat sidebar closed without opening a different sidebar
-    if (!this.chatActive && !this.states.activeSidebar) {
+    // Chat sidebar closed without opening a different sidebar or AI panel
+    if (!this.chatActive && !this.states.activeSidebar && !this.states.activeAI) {
       this.buttonEl.focus();
     }
   }

@@ -111,8 +111,8 @@ export class RtkPollsToggle {
 
   @Watch('pollsActive')
   handlePollsActiveChange() {
-    // Polls sidebar closed without opening a different sidebar
-    if (!this.pollsActive && !this.states.activeSidebar) {
+    // Polls sidebar closed without opening a different sidebar or AI panel
+    if (!this.pollsActive && !this.states.activeSidebar && !this.states.activeAI) {
       this.buttonEl.focus();
     }
   }
