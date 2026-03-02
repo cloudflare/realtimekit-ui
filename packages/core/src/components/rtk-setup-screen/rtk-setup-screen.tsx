@@ -67,6 +67,8 @@ export class RtkSetupScreen {
 
   @State() isJoining: boolean = false;
 
+  @State() joinError?: string;
+
   @State() canEditName: boolean = true;
 
   @State() canProduceAudio: boolean = true;
@@ -97,12 +99,26 @@ export class RtkSetupScreen {
 
   private socketStateUpdate = ({ state }: SocketConnectionState) => {
     this.connectionState = state;
+    if (state === 'connected') {
+      this.joinError = undefined;
+    }
     if (state === 'failed') this.isJoining = false;
   };
 
   private join = async () => {
     if (this.displayName?.trim() !== '' && !this.isJoining) {
+      if (this.connectionState !== 'connected') {
+        if (this.connectionState) {
+          this.joinError =
+            this.connectionState === 'failed'
+              ? this.t('network.lost_extended')
+              : this.t('network.lost');
+        }
+        return;
+      }
+
       this.isJoining = true;
+      this.joinError = undefined;
       this.meeting?.self.setName(this.displayName);
 
       gracefulStorage.setItem('rtk-display-name', this.displayName);
@@ -110,6 +126,7 @@ export class RtkSetupScreen {
         await this.meeting?.joinRoom();
       } catch (e) {
         this.isJoining = false;
+        this.joinError = e?.message ? e.message : this.t('network.lost_extended');
       }
     }
   };
@@ -118,6 +135,15 @@ export class RtkSetupScreen {
     if (!this.meeting) {
       return;
     }
+
+    const showSocketError =
+      !!this.connectionState && this.connectionState !== 'connected' && !this.joinError;
+
+    const errorText = this.joinError
+      ? this.joinError
+      : this.connectionState === 'failed'
+      ? this.t('network.lost_extended')
+      : this.t('network.lost');
 
     const disabled =
       this.displayName?.trim() === '' || this.connectionState !== 'connected' || this.isJoining;
@@ -186,12 +212,10 @@ export class RtkSetupScreen {
               {this.isJoining ? <rtk-spinner iconPack={this.iconPack} /> : this.t('join')}
             </rtk-button>
 
-            {this.connectionState !== 'connected' && (
+            {(this.joinError || showSocketError) && (
               <div class="no-network-badge">
                 <rtk-icon size="md" variant="danger" icon={this.iconPack.disconnected}></rtk-icon>
-                {this.connectionState === 'failed'
-                  ? this.t('network.lost_extended')
-                  : this.t('network.lost')}
+                {errorText}
               </div>
             )}
           </div>
