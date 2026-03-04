@@ -1,3 +1,11 @@
+## [1.1.1-staging.2](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.1.1-staging.1...@cloudflare/realtimekit-ui-v1.1.1-staging.2) (2026-03-04)
+
+
+### Bug Fixes
+
+* add join room error handling to idle screen component ([bd6113b](https://github.com/cloudflare/realtimekit-ui/commit/bd6113b89a576c8ac8442ff0af28a08f6a10fe24))
+* show network errors in the setup screen ([253e81a](https://github.com/cloudflare/realtimekit-ui/commit/253e81a958234ebf03294f34605c26dd83a957ef))
+
 ## [1.1.1-staging.1](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.1.0...@cloudflare/realtimekit-ui-v1.1.1-staging.1) (2026-02-05)
 
 
