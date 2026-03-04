@@ -42,7 +42,7 @@ export class RtkMeeting {
   private providerId: string = 'provider-' + Math.floor(Math.random() * 100);
 
   private roomJoinedListener = () => {
-    this.updateStates({ meeting: 'joined' });
+    this.updateStates({ meeting: 'joined', joinError: undefined });
   };
 
   private waitlistedListener = () => {
@@ -317,7 +317,15 @@ export class RtkMeeting {
       if (this.showSetupScreen) {
         this.updateStates({ meeting: 'setup' });
       } else {
-        meeting.joinRoom();
+        meeting
+          .joinRoom()
+          .then(() => {
+            this.updateStates({ joinError: undefined });
+          })
+          .catch((err) => {
+            const message = err?.message ? err.message : this.t('network.lost_extended');
+            this.updateStates({ joinError: message });
+          });
       }
     }
 
