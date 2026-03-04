@@ -1,8 +1,8 @@
 # PROJECT KNOWLEDGE BASE
 
-**Generated:** 2026-02-25  
-**Commit:** 2557985  
-**Branch:** sm/agents-md
+**Generated:** 2026-03-04
+**Commit:** 6b4f4a1
+**Branch:** sm/RTK-7806-ai-reviewer
 
 ## OVERVIEW
 
@@ -14,10 +14,10 @@ Stencil.js Web Components UI kit for Cloudflare RealtimeKit (RTK), published as 
 realtimekit-ui/
 ├── packages/core/            # Source of truth — 136 Stencil Web Components
 ├── packages/react-library/   # Auto-generated React proxies (@stencil/react-output-target)
-├── packages/angular-library/ # Auto-generated Angular directives (@stencil/angular-output-target)
-├── packages/vue-library/     # Deprecated — not supported
-├── scripts/                  # Docs generation + emoji processing
-├── .github/workflows/        # CI: lint, test, release, cross-repo docs PR
+├── packages/angular-library/ # Auto-generated Angular directives; actual published package is at projects/components/
+├── packages/vue-library/     # Deprecated — not in root npm workspaces, not supported
+├── scripts/                  # Docs generation (docs.sh, generate-stencil-docs.js) + emoji processing
+├── .github/workflows/        # CI: lint, test, release, cross-repo docs PR, AI code review (Bonk)
 └── .releaserc.js             # semantic-release config (Lerna publish after release)
 ```
 
@@ -34,6 +34,7 @@ realtimekit-ui/
 | Default component tree    | `packages/core/src/lib/default-ui-config.ts`                                        |
 | Stencil + build config    | `packages/core/stencil.config.ts`, `packages/core/rollup.config.mjs`                |
 | Release pipeline          | `.releaserc.js` + `.github/workflows/release.yml`                                   |
+| CI workflows              | `.github/workflows/` — lint, test, release, update-docs, ai-code-review             |
 
 ## CODE MAP
 
@@ -91,6 +92,7 @@ realtimekit-ui/
 - **Never** target `main` in PRs — always `staging` first.
 - **Never** call `UIElemEditor.style`, `.setChildrenProps()`, `.getChildrenProps()`, `.replace()` — unimplemented stubs.
 - **Never** edit files in `packages/*/src/*/stencil-generated/` by hand — auto-overwritten on build.
+- **Never** add new components to `packages/vue-library/lib/components.ts` — the Vue library is deprecated and excluded from the root npm workspaces.
 
 ## KNOWN INCOMPLETE / WORKAROUNDS
 
@@ -99,6 +101,10 @@ realtimekit-ui/
 - `rtk-grid.tsx` `filterParticipants()` uses `overrides.videoUnsubscribed` as a temp hack.
 - Vue library is deprecated and unsupported — do not add new components to `packages/vue-library/lib/components.ts`.
 - `peerDepdendencies` (misspelled) in `packages/core/package.json:55` is silently ignored by npm.
+- `usePaginatedChat()` in `utils/flags.ts` always returns `true` — the flag is hardcoded; the paginated path is always active.
+- `exitFullSreen` in `utils/full-screen.ts` is a typo (missing `c`) — callers must use this exact misspelled name.
+- `rtk-chat-selector` has `@State() pageSize = 100000` — backend pagination API does not exist yet.
+- `release.yml` uses `dyte-devel` as the git identity for the post-release `main → staging` merge (legacy branding).
 
 ## COMMANDS
 
