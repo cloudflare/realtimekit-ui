@@ -101,7 +101,6 @@ export class RtkPollsToggle {
       activeSidebar: this.pollsActive,
       sidebar: this.pollsActive ? 'polls' : undefined,
       activeMoreMenu: false,
-      activeAI: false,
     });
   }
 
