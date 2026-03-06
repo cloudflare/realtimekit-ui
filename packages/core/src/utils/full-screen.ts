@@ -15,7 +15,7 @@ export const requestFullScreen = (el: HTMLElement) => {
   }
 };
 
-export const exitFullSreen = () => {
+export const exitFullScreen = () => {
   if (document.exitFullscreen != null) {
     document.exitFullscreen();
   } else if (document.mozExitFullScreen != null) {

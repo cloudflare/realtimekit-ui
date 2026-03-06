@@ -3,7 +3,7 @@ import { defaultIconPack, IconPack } from '../../lib/icons';
 import { RtkI18n, useLanguage } from '../../lib/lang';
 import { Size, States } from '../../types/props';
 import {
-  exitFullSreen,
+  exitFullScreen,
   isFullScreenEnabled,
   isFullScreenSupported,
   requestFullScreen,
@@ -75,7 +75,7 @@ export class RtkFullscreenToggle {
       requestFullScreen(fullScreenElement);
       this.fullScreenActive = true;
     } else {
-      exitFullSreen();
+      exitFullScreen();
       this.fullScreenActive = false;
     }
     this.stateUpdate.emit({ activeMoreMenu: false });
