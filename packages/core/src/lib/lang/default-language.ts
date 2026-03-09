@@ -265,7 +265,7 @@ export const defaultLanguage = {
   'ai.personal': 'Personal',
   'ai.caption_view': 'Caption View',
   'ai.chat.tooltip': 'This conversation will just be visible to you and not to others in the call.',
-  'ai.chat.summarise': 'Hey AI, summarise this call',
+  'ai.chat.summarize': 'Hey AI, summarize this call',
   'ai.chat.agenda': "Hey AI, what is today's agenda?",
   search: 'Search',
   'search.could_not_find': "Couldn't find a participant with the specified name or ID.",
