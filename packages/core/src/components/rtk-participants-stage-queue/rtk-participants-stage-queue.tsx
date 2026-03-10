@@ -12,6 +12,12 @@ import { Meeting, Participant, Peer } from '../../types/rtk-client';
 import { SyncWithStore } from '../../utils/sync-with-store';
 import { ParticipantsViewMode } from '../rtk-participants/rtk-participants';
 
+/**
+ * A component that displays participants waiting in the stage queue.
+ *
+ * Shows users who are waiting to be promoted to the stage in meetings
+ * with stage functionality enabled.
+ */
 @Component({
   tag: 'rtk-participants-stage-queue',
   styleUrl: 'rtk-participants-stage-queue.css',

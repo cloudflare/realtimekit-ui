@@ -1481,14 +1481,14 @@ export declare interface RtkIcon extends Components.RtkIcon {}
 
 
 @ProxyCmp({
-  inputs: ['config', 'iconPack', 'meeting', 't']
+  inputs: ['config', 'iconPack', 'meeting', 'states', 't']
 })
 @Component({
   selector: 'rtk-idle-screen',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: '<ng-content></ng-content>',
   // eslint-disable-next-line @angular-eslint/no-inputs-metadata-property
-  inputs: ['config', 'iconPack', 'meeting', 't'],
+  inputs: ['config', 'iconPack', 'meeting', 'states', 't'],
 })
 export class RtkIdleScreen {
   protected el: HTMLRtkIdleScreenElement;

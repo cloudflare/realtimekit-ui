@@ -1,3 +1,36 @@
+## [1.1.1-staging.4](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.1.1-staging.3...@cloudflare/realtimekit-ui-v1.1.1-staging.4) (2026-03-10)
+
+
+### Bug Fixes
+
+* update script for generating docs ([3c7ce08](https://github.com/cloudflare/realtimekit-ui/commit/3c7ce08e36f05ec3a892587fa60498a9b27a1750))
+* update scripts/generate-stencil-docs.js ([f8e2af3](https://github.com/cloudflare/realtimekit-ui/commit/f8e2af3c8778544755637b310a80d2dab67e5e50))
+* update scripts/generate-stencil-docs.js ([6f5d8f9](https://github.com/cloudflare/realtimekit-ui/commit/6f5d8f9d38eb7a1cd9e73e03ea2146a7b852138a))
+
+## [1.1.1-staging.3](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.1.1-staging.2...@cloudflare/realtimekit-ui-v1.1.1-staging.3) (2026-03-10)
+
+
+### Bug Fixes
+
+* **lang:** correct typos in default language dictionary ([0918bdb](https://github.com/cloudflare/realtimekit-ui/commit/0918bdba7d478eed9b7de6a9797463f39ab9a122))
+
+## [1.1.1-staging.2](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.1.1-staging.1...@cloudflare/realtimekit-ui-v1.1.1-staging.2) (2026-03-04)
+
+
+### Bug Fixes
+
+* add join room error handling to idle screen component ([bd6113b](https://github.com/cloudflare/realtimekit-ui/commit/bd6113b89a576c8ac8442ff0af28a08f6a10fe24))
+* show network errors in the setup screen ([253e81a](https://github.com/cloudflare/realtimekit-ui/commit/253e81a958234ebf03294f34605c26dd83a957ef))
+
+## [1.1.1-staging.1](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.1.0...@cloudflare/realtimekit-ui-v1.1.1-staging.1) (2026-02-05)
+
+
+### Bug Fixes
+
+* add jsdoc style description for components that are missing it ([8570b26](https://github.com/cloudflare/realtimekit-ui/commit/8570b26d67c33b9be03d8e7d467c4cfc9e6114a2))
+* update docs generate script ([9f784f9](https://github.com/cloudflare/realtimekit-ui/commit/9f784f9ce4a2450f638fb4ef11d6f7c3c8f66619))
+* update generate stencil script ([41809dc](https://github.com/cloudflare/realtimekit-ui/commit/41809dc1ea0e604001f0757ef9b727eba618372b))
+
 # [1.1.0](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.0.8...@cloudflare/realtimekit-ui-v1.1.0) (2026-01-30)
 
 

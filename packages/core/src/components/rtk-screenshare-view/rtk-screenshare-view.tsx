@@ -15,7 +15,7 @@ import { RtkI18n, useLanguage } from '../../lib/lang';
 import { Meeting, Peer } from '../../types/rtk-client';
 import { Size, States } from '../../types/props';
 import {
-  exitFullSreen,
+  exitFullScreen,
   isFullScreenEnabled,
   isFullScreenSupported,
   requestFullScreen,
@@ -172,7 +172,7 @@ export class RtkScreenshareView {
       requestFullScreen(this.host);
       this.isFullScreen = true;
     } else {
-      exitFullSreen();
+      exitFullScreen();
       this.isFullScreen = false;
     }
   };
