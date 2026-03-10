@@ -8,22 +8,20 @@ Main source package for `@cloudflare/realtimekit-ui`. All authored Web Component
 packages/core/
 ├── stencil.config.ts     # Output targets: dist, react, angular, dist-custom-elements, docs-json, docs-vscode, www
 ├── tailwind.config.js    # Tailwind v3.1 — preflight off, Shadow DOM size-* variants, CSS variable colors
-├── rollup.config.mjs     # Post-Stencil Rollup: produces dist/browser.js (IIFE, global RtkUiKit) + ESM loader
+├── rollup.config.mjs     # Lib bundle config
 ├── src/
-│   ├── index.ts          # Two-line bridge: `export type * from './components'` + `export * from './exports'`
+│   ├── index.ts          # Re-exports: type * from components + * from exports
 │   ├── exports.ts        # All runtime exports (stores, utils, builder, i18n, icons, types)
 │   ├── components/       # 136 rtk-* Stencil Web Components
 │   ├── lib/              # Shared modules (render, audio, grid, icons, lang, builder, addons)
 │   ├── utils/            # ~29 utility files + sync-with-store/ (store + @SyncWithStore decorator)
 │   ├── types/            # TypeScript types: UIConfig, States, DesignTokens, Peer
 │   ├── theme/            # Tailwind theme: colors.js, space.js, breakpoints.json, presets/
-│   └── styles/           # Global CSS (outside Shadow DOM): reset.css, scrollbar.css, html-select.css
+│   └── styles/           # Global CSS: reset.css, scrollbar.css, html-select.css
 ├── dist/                 # Build output — never edit by hand
-├── loader/               # Generated ESM loader (esmLoaderPath: '../loader') — never edit by hand
+├── loader/               # Generated ESM loader — never edit by hand
 └── docs/                 # Generated docs JSON — never edit by hand
 ```
-
-**`src/index.ts` split:** `export type *` re-exports component types only (prevents implementation leaking into public API types). `export *` from `exports.ts` carries all runtime exports.
 
 ## OUTPUT TARGETS (stencil.config.ts)
 
@@ -35,28 +33,9 @@ packages/core/
 | `dist-custom-elements` | `dist/components/`                                                  | Tree-shakeable; runtime bundled inline (`externalRuntime: false`)              |
 | `docs-json`            | `dist/docs/docs-components.json`                                    | Component docs; source for TypeDoc cross-repo PR                               |
 | `docs-vscode`          | `dist/docs/docs-vscode.json`                                        | VS Code HTML autocomplete data                                                 |
-| `www`                  | `www/`                                                              | Dev server only; copies `@cloudflare/realtimekit` inlined bundle to `www/`     |
+| `www`                  | `www/`                                                              | Dev server only                                                                |
 
 **Vue output target is disabled** (commented out) — `packages/vue-library/lib/components.ts` is frozen.
-
-**Non-standard stencil options:**
-
-- `experimentalImportInjection: true` — non-stable feature; enables CSS injection via import.
-- `sourceMap: false` — no source maps in production builds.
-- `rollupPlugins.after: [nodePolyfills()]` — Node.js built-in polyfills applied globally (a dependency needs `Buffer` etc.).
-
-## ROLLUP SECOND PASS (`rollup.config.mjs`)
-
-After `stencil build`, a second Rollup pass runs on `dist/esm/loader.js` and produces:
-
-- `dist/browser.js` ��� standalone IIFE bundle, global name `RtkUiKit`, minified.
-- An inline-import ESM loader variant.
-
-This browser bundle is not a standard Stencil output. It's the entrypoint for script-tag usage.
-
-## ANGULAR PACKAGE STRUCTURE
-
-The outer `packages/angular-library/package.json` is a **private** Angular CLI workspace — it is NOT published. The actual published package (`@cloudflare/realtimekit-angular-ui`) lives at `packages/angular-library/projects/components/`. The `ng-package.json` + `ng-packagr` build writes the publishable output to `projects/components/dist/`. The `.releaserc.js` `pkgRoot` for Angular points to this nested path.
 
 ## TAILWIND SETUP
 
@@ -65,7 +44,6 @@ The outer `packages/angular-library/package.json` is a **private** Angular CLI w
 - Custom `size-sm:`, `size-md:`, `size-lg:`, `size-xl:` variants map to `:host([size='X']) &` — not media queries.
 - `content: ['']` — no purging; PostCSS handles per-component CSS.
 - Colors use CSS variables: `rgb(var(--rtk-colors-brand-500, 33 96 253))` — all overridable at runtime.
-- PostCSS plugin order: `tailwindcss/nesting` → `tailwindcss` → `autoprefixer` (nesting required for `@apply` inside nested rules).
 
 ## THEME SYSTEM
 
@@ -78,9 +56,9 @@ All CSS variables use `--rtk-` prefix (configurable via `tokenPrefix`).
 ## BUILD SCRIPTS
 
 ```bash
-npm run build    # Stencil build (generates React + Angular wrappers as side effect) + Rollup second pass
+npm run build    # Stencil build (generates React + Angular wrappers as side effect)
 npm run dev      # stencil build --dev --watch + www server
-npm test         # stencil test --spec --e2e (uses puppeteer for e2e; submodules: recursive required)
+npm test         # stencil test --spec --e2e
 npm run lint     # eslint src/
 npm run lint:fix # eslint --fix
 ```
@@ -93,4 +71,3 @@ npm run lint:fix # eslint --fix
 - **Never** edit `src/components.d.ts` — Stencil-generated; changes to component APIs go in the `.tsx` source file.
 - **Never** use Tailwind `sm:`, `md:` breakpoint prefixes for size variants — use `size-sm:`, `size-md:` instead.
 - **Note:** `peerDepdendencies` (misspelled at `package.json:55`) is silently ignored by npm — the peer dep on `@cloudflare/realtimekit >=0` is not enforced.
-- **Note:** React wrapper calls `defineCustomElements()` at import time (side effect) — can cause issues in SSR or test environments if not handled.
