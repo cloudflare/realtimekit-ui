@@ -88,6 +88,16 @@ export class RtkFoo {
 }
 ```
 
+## SHADOW DOM VARIANTS
+
+Three variants exist in this codebase:
+
+| Variant                            | Usage                                                           | Components                                    |
+| ---------------------------------- | --------------------------------------------------------------- | --------------------------------------------- |
+| `shadow: true`                     | Default — vast majority                                         | All feature components                        |
+| `shadow: { delegatesFocus: true }` | Interactive elements needing focus delegation for keyboard a11y | `rtk-button`, `rtk-controlbar-button`         |
+| `shadow: false`                    | Styles must propagate to children                               | `rtk-virtualized-participant-list` (only one) |
+
 ## UIConfig-DRIVEN RENDERING
 
 Smart container components (`rtk-meeting`, `rtk-header`, etc.) delegate layout to `<Render>` from `lib/render/index.tsx`:
@@ -116,6 +126,19 @@ Smart container components (`rtk-meeting`, `rtk-header`, etc.) delegate layout t
 
 **Never apply `@SyncWithStore()` to component-specific props** (e.g., `size`, `variant`). Only the standard six store props get this decorator.
 
+## KNOWN DEVIATIONS IN EXISTING COMPONENTS
+
+Some older components pre-date current conventions. Do not replicate these patterns in new code:
+
+| Component                    | Deviation                                                                                                                         |
+| ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `rtk-participant-tile`       | Uses `constructor()` + `.bind()` (anti-pattern); emits non-`rtk`-prefixed events (`tileLoad`, `tileUnload`)                       |
+| `rtk-chat-composer-view`     | Uses `constructor()` + `.bind()`; emits lowercase events without `rtk` prefix (`newMessage`, `editMessage`)                       |
+| `rtk-paginated-list`         | Uses `.bind()` in constructor                                                                                                     |
+| `rtk-tooltip`                | **Class is named `RtkMenu`** (naming bug — class name does not match tag); uses `componentDidLoad` instead of `connectedCallback` |
+| `rtk-grid`                   | `overrides` prop typed as `any`, marked `@deprecated`, no `@SyncWithStore`                                                        |
+| `rtk-breakout-rooms-manager` | Uses `.on()`/`.off()` instead of `addListener`/`removeListener`; no `@Watch('meeting')` guard                                     |
+
 ## KNOWN INCOMPLETE COMPONENTS
 
 | Component                        | Issue                                                                     |
@@ -123,7 +146,7 @@ Smart container components (`rtk-meeting`, `rtk-header`, etc.) delegate layout t
 | `rtk-broadcast-message-modal`    | `sendMessage()` is a stub — no real API call, just 2s fake success        |
 | `rtk-breakout-room-manager`      | Active state is a workaround pending socket support                       |
 | `rtk-chat-messages-ui-paginated` | Private message filtering is a client-side hack (backend bug)             |
-| `rtk-chat-selector`              | Initial load de-duplication is a temp hack (needs pagination API)         |
+| `rtk-chat-selector`              | `pageSize = 100000` — needs pagination API; initial dedup is a temp hack  |
 | `rtk-pinned-message-selector`    | `reset()` called as hack because socket doesn't update `updatedAt` on pin |
 
 ## ADDING A NEW COMPONENT
@@ -133,4 +156,4 @@ Smart container components (`rtk-meeting`, `rtk-header`, etc.) delegate layout t
 3. Create `rtk-<name>.css` (can be empty; Tailwind processes it).
 4. Apply `@SyncWithStore() @Prop()` for any of the six standard store props needed.
 5. Run `npm run build` — Stencil will auto-update `src/components.d.ts`, React wrapper, and Angular wrapper.
-6. Manually add the component to `packages/vue-library/lib/components.ts` (Vue generator is disabled).
+6. **Do NOT** add to `packages/vue-library/lib/components.ts` — the Vue library is deprecated and unsupported.
