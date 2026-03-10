@@ -33,8 +33,6 @@ audio.onError((err) => {});    // register error callback
 
 Used only by `rtk-participants-audio` — instantiated per meeting, tracks added/removed as participants join/leave.
 
-**Note:** The `'joined'` and `'left'` sounds in `RTKNotificationsAudio` currently map to the same MP3 (`notification_join.mp3`) — there is no distinct leave sound.
-
 ### `useGrid` / grid math (`grid.ts`)
 
 ```ts
@@ -48,8 +46,6 @@ const { top, left } = getPosition(index); // CSS position for tile i
 ```
 
 Pure functions — no side effects, no store access. Safe to call in `render()`.
-
-**`getPosition` is stateful** — the closure maintains internal `col`/`row` counters that increment on each call. It **must** be called in index order `0..N-1`. Obtain a fresh closure from `useGrid` for each render pass.
 
 ### `createDefaultConfig` / `defaultConfig` (`default-ui-config.ts`)
 
@@ -80,8 +76,6 @@ const config = registerAddons([myAddon, anotherAddon], meeting, baseConfig?);
 ```
 
 Each `Addon.register(config, meeting, getBuilder)` receives the threaded config and returns an updated one. If no `baseConfig` is supplied, `generateConfig(meeting)` synthesizes one from the meeting preset.
-
-**Warning:** Addons run sequentially via `Array.map`. If any `addon.register()` fails to return a config, the next addon will receive `undefined` — always return the config from every addon.
 
 ### `useLanguage` + i18n (`lang/index.ts`)
 
@@ -124,16 +118,15 @@ const count = lenChildren('rtk-sidebar', config, states, size);
 
 ## RENDER ENGINE INTERNALS (`render/utils.ts`)
 
-| Function                                            | What it does                                                                                                                                                                    |
-| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `computeSelectors({element, states, size, config})` | Builds priority-ordered selector list: `['rtk-stage', 'rtk-stage.sm', 'rtk-stage.activeSidebar', ...]`; boolean states are sorted alphabetically before building compound keys  |
-| `getComputedStyles({selectors, styles})`            | Merges matched `StyleProps` objects; later selectors win                                                                                                                        |
-| `getComputedChildren({selectors, root})`            | Layers children operations in order: set base → `remove[]` → `addBefore{}` → `add[]` → `prepend[]`; an early selector's base array can be fully overwritten by a later selector |
+| Function                                            | What it does                                                                                           |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `computeSelectors({element, states, size, config})` | Builds priority-ordered selector list: `['rtk-stage', 'rtk-stage.sm', 'rtk-stage.activeSidebar', ...]` |
+| `getComputedStyles({selectors, styles})`            | Merges matched `StyleProps` objects; later selectors win                                               |
+| `getComputedChildren({selectors, root})`            | Layers children operations in order: set base → `remove[]` → `addBefore{}` → `add[]` → `prepend[]`     |
 
 ## ANTI-PATTERNS
 
 - **Never** mutate `defaultConfig` directly — call `createDefaultConfig()` for a fresh mutable copy.
 - **Never** use `UIElemEditor.style/setChildrenProps/getChildrenProps/replace` — stubs, not implemented.
 - **Never** instantiate `RTKAudio` outside the component that owns the meeting listener — create in `@Watch('meeting')`, destroy in `disconnectedCallback`.
-- **Never** call `getPosition(index)` out of order — the closure is stateful and must be called 0..N-1 per render pass.
 - **Prefer preset** over `Overrides.disablePrivateChat` for controlling private chat access.
