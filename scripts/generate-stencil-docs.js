@@ -99,7 +99,7 @@ class StencilDocGenerator {
   }
 
   detectLibraryName(filePath) {
-    if (filePath.includes('/core/')) return 'Core';
+    if (filePath.includes('/core/')) return 'Web Components (HTML)';
     if (filePath.includes('/react/')) return 'React';
     if (filePath.includes('/angular/')) return 'Angular';
     return 'Unknown';
@@ -108,7 +108,7 @@ class StencilDocGenerator {
   formatFrameworkName(framework) {
     switch (framework.toLowerCase()) {
       case 'core':
-        return 'Core';
+        return 'Web Components (HTML)';
       case 'react':
         return 'React';
       case 'angular':
@@ -334,7 +334,8 @@ class StencilDocGenerator {
 
   async generateIndex() {
     const content = `---
-title: ${this.libraryName} Components API Reference
+pcx_content_type: navigation
+title: ${this.libraryName}
 description: Complete API reference for ${this.libraryName} library components
 sidebar:
   group:
@@ -348,9 +349,10 @@ sidebar:
     const { name, tagName, props = [], events = [], description } = component;
 
     let content = `---
-      title: ${name}
-      description: API reference for ${name} component (${this.libraryName} Library)
-      ---
+pcx_content_type: navigation
+title: ${name}
+description: API reference for ${name} component (${this.libraryName} Library)
+---
 `;
 
     // Add component description if available
@@ -452,14 +454,37 @@ sidebar:
       }
 
       exampleProps.forEach((prop) => {
-        const exampleValue = this.getExampleValue(prop.type);
-        content += `\n  ${prop.name}=${exampleValue}`;
+        const exampleValue = this.getCoreValue(prop.name, prop.type);
+        content += `${exampleValue}`;
       });
 
       content += `>
 </${tagName}>
 \`\`\`
 
+`;
+    }
+
+    if (props.length > 0) {
+      content += `
+\`\`\`html
+<script>
+  const el = document.querySelector("${name}");
+`;
+      const filteredProps = props.filter((p) => !p.name.toLowerCase().includes('state'));
+      const exampleProps = filteredProps.filter((p) => p.required).slice(0, 3);
+      if (exampleProps.length === 0) {
+        // If no required props, show first 3 optional ones
+        exampleProps.push(...filteredProps.slice(0, 3));
+      }
+      exampleProps.forEach((prop) => {
+        const exampleValue = this.getCoreScript(prop.name, prop.type);
+        content += `${exampleValue}`;
+      });
+
+      content += `
+</script>
+\`\`\`
 `;
     }
 
@@ -500,7 +525,7 @@ function MyComponent() {
       }
 
       exampleProps.forEach((prop) => {
-        const exampleValue = this.getExampleValue(prop.type, true);
+        const exampleValue = this.getReactValue(prop.type);
         content += `\n      ${prop.name}=${exampleValue}`;
       });
 
@@ -517,24 +542,9 @@ function MyComponent() {
   }
 
   generateAngularExample(component) {
-    const { name, tagName, props = [] } = component;
+    const { tagName, props = [] } = component;
 
-    let content = `### Setup
-
-\`\`\`typescript
-// app.module.ts
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { defineCustomElements } from '@cloudflare/realtimekit-angular-ui/loader';
-
-defineCustomElements();
-
-@NgModule({
-  schemas: [CUSTOM_ELEMENTS_SCHEMA]
-})
-export class AppModule { }
-\`\`\`
-
-### Basic Usage
+    let content = `### Basic Usage
 
 \`\`\`html
 <!-- component.html -->
@@ -559,8 +569,8 @@ export class AppModule { }
       }
 
       exampleProps.forEach((prop) => {
-        const exampleValue = this.getExampleValue(prop.type);
-        content += `\n  [${prop.name}]=${exampleValue}`;
+        const exampleValue = this.getAngularValue(prop.name, prop.type);
+        content += `\n ${exampleValue}`;
       });
 
       content += `>
@@ -573,21 +583,21 @@ export class AppModule { }
     return content;
   }
 
-  getExampleValue(type, isReact = false) {
+  getReactValue(type) {
     const lowerType = type.toLowerCase();
 
     if (lowerType.includes('string')) {
       return '"example"';
     } else if (lowerType.includes('boolean')) {
-      return isReact ? '{true}' : 'true';
+      return '{true}';
     } else if (lowerType.includes('number')) {
-      return isReact ? '{42}' : '42';
+      return '{42}';
     } else if (lowerType.includes('function') || lowerType.includes('=>')) {
-      return isReact ? '{handleEvent}' : 'handleEvent';
+      return '{handleEvent}';
     } else if (lowerType.includes('[]') || lowerType.includes('array')) {
-      return isReact ? '{[]}' : '[]';
+      return '{[]}';
     } else if (lowerType.includes('object') || lowerType.includes('{')) {
-      return isReact ? '{{}}' : '{}';
+      return '{{}}';
     } else if (lowerType.includes('meeting')) {
       return '{meeting}';
     } else if (lowerType.includes('size')) {
@@ -607,7 +617,87 @@ export class AppModule { }
     } else if (lowerType.includes('viewercountvariant')) {
       return '"primary"';
     }
-    return isReact ? `{${lowerType}}` : `${lowerType}`;
+    return `{${lowerType}}`;
+  }
+
+  getAngularValue(prop, type) {
+    const lowerType = type.toLowerCase();
+
+    if (lowerType.includes('string')) {
+      return `${prop}="example"`;
+    } else if (lowerType.includes('boolean')) {
+      return `[${prop}]="true"`;
+    } else if (lowerType.includes('number')) {
+      return `${prop}="42"`;
+    } else if (lowerType.includes('function') || lowerType.includes('=>')) {
+      return `${prop}="handleEvent"`;
+    } else if (lowerType.includes('[]') || lowerType.includes('array')) {
+      return `[${prop}]="[]"`;
+    } else if (lowerType.includes('object') || lowerType.includes('{')) {
+      return `[${prop}=]"{}"`;
+    } else if (lowerType.includes('meeting')) {
+      return `[${prop}]="meeting"`;
+    } else if (lowerType.includes('size')) {
+      return `${prop}="md"`;
+    } else if (lowerType.includes('uiconfig')) {
+      return `[${prop}]="defaultUiConfig"`;
+    } else if (lowerType.includes('iconpack')) {
+      return `[${prop}]="defaultIconPack"`;
+    } else if (lowerType.includes('peer')) {
+      return `[${prop}]="participant"`;
+    } else if (lowerType.includes('controlbarvariant')) {
+      return `${prop}="button"`;
+    } else if (lowerType.includes('iconvariant')) {
+      return `${prop}="primary"`;
+    } else if (lowerType.includes('avatarvariant')) {
+      return `${prop}="circular"`;
+    } else if (lowerType.includes('viewercountvariant')) {
+      return `${prop}="primary"`;
+    }
+    return `[${prop}]="${lowerType}"`;
+  }
+
+  getCoreValue(prop, type) {
+    const lowerType = type.toLowerCase();
+
+    if (lowerType.includes('string')) {
+      return `\n ${prop}="example"`;
+    } else if (lowerType.includes('size')) {
+      return `\n ${prop}="md"`;
+    } else if (lowerType.includes('controlbarvariant')) {
+      return `\n ${prop}"button"`;
+    } else if (lowerType.includes('iconvariant')) {
+      return `\n ${prop}="primary"`;
+    } else if (lowerType.includes('avatarvariant')) {
+      return `\n ${prop}="circular"`;
+    } else if (lowerType.includes('viewercountvariant')) {
+      return `\n ${prop}="primary"`;
+    }
+    return '';
+  }
+
+  getCoreScript(prop, type) {
+    const lowerType = type.toLowerCase();
+    if (lowerType.includes('boolean')) {
+      return `\n  el.${prop}= true;`;
+    } else if (lowerType.includes('number')) {
+      return `\n  el.${prop}= 42;`;
+    } else if (lowerType.includes('function') || lowerType.includes('=>')) {
+      return `\n  el.${prop}= handleEvent;`;
+    } else if (lowerType.includes('[]') || lowerType.includes('array')) {
+      return `\n  el.${prop}= [];`;
+    } else if (lowerType.includes('object') || lowerType.includes('{')) {
+      return `\n  el.${prop}= {};`;
+    } else if (lowerType.includes('meeting')) {
+      return `\n  el.${prop}= meeting`;
+    } else if (lowerType.includes('uiconfig')) {
+      return `\n  el.${prop}= defaultUiConfig`;
+    } else if (lowerType.includes('iconpack')) {
+      return `\n  el.${prop}= defaultIconPack`;
+    } else if (lowerType.includes('peer')) {
+      return `\n  el.${prop}= participant`;
+    }
+    return '';
   }
 }
 
