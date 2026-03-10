@@ -1,3 +1,12 @@
+## [1.1.1-staging.4](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.1.1-staging.3...@cloudflare/realtimekit-ui-v1.1.1-staging.4) (2026-03-10)
+
+
+### Bug Fixes
+
+* update script for generating docs ([3c7ce08](https://github.com/cloudflare/realtimekit-ui/commit/3c7ce08e36f05ec3a892587fa60498a9b27a1750))
+* update scripts/generate-stencil-docs.js ([f8e2af3](https://github.com/cloudflare/realtimekit-ui/commit/f8e2af3c8778544755637b310a80d2dab67e5e50))
+* update scripts/generate-stencil-docs.js ([6f5d8f9](https://github.com/cloudflare/realtimekit-ui/commit/6f5d8f9d38eb7a1cd9e73e03ea2146a7b852138a))
+
 ## [1.1.1-staging.3](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.1.1-staging.2...@cloudflare/realtimekit-ui-v1.1.1-staging.3) (2026-03-10)
 
 
