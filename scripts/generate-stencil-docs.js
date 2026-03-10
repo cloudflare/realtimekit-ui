@@ -349,7 +349,7 @@ sidebar:
     const { name, tagName, props = [], events = [], description } = component;
 
     let content = `---
-pcx_content_type: navigation
+pcx_content_type: reference
 title: ${name}
 description: API reference for ${name} component (${this.libraryName} Library)
 ---
