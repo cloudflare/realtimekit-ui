@@ -13,6 +13,13 @@ Here is a short description for all the packages:
 
 You can find some core documentation about UI Kit [here](./packages/core/docs).
 
+## Running the UI Kit
+
+```
+npm run build
+npm run dev
+```
+
 ## Contributing
 
 To get started, you need to first make changes in the `packages/core` directory.
