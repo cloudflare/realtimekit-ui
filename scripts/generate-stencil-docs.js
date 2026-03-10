@@ -334,7 +334,7 @@ class StencilDocGenerator {
 
   async generateIndex() {
     const content = `---
-pcx_content_type: navigation
+pcx_content_type: reference
 title: ${this.libraryName}
 description: Complete API reference for ${this.libraryName} library components
 sidebar:
