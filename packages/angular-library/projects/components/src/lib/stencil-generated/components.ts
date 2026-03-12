@@ -22,19 +22,11 @@ export class RtkAi {
   constructor(c: ChangeDetectorRef, r: ElementRef, protected z: NgZone) {
     c.detach();
     this.el = r.nativeElement;
-    proxyOutputs(this, this.el, ['rtkStateUpdate']);
   }
 }
 
 
-import type { States as IRtkAiStates } from '@cloudflare/realtimekit-ui';
-
-export declare interface RtkAi extends Components.RtkAi {
-  /**
-   * Emits updated state data
-   */
-  rtkStateUpdate: EventEmitter<CustomEvent<IRtkAiStates>>;
-}
+export declare interface RtkAi extends Components.RtkAi {}
 
 
 @ProxyCmp({

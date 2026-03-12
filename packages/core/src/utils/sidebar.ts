@@ -35,6 +35,10 @@ export const canViewParticipants = (meeting: Meeting) => {
   return true;
 };
 
+export const canViewAI = (meeting: Meeting) => {
+  return !!(meeting?.self?.permissions as any)?.transcriptionEnabled;
+};
+
 export const canViewPlugins = (meeting: Meeting) => {
   if (isLiveStreamViewer(meeting)) return false;
   if (meeting && !meeting.plugins) return false;

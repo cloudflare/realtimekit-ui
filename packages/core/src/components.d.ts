@@ -86,6 +86,11 @@ export { MeetingMode as MeetingMode1 } from "./components/rtk-meeting/rtk-meetin
 export { ViewerCountVariant } from "./components/rtk-viewer-count/rtk-viewer-count";
 export { Peer as Peer1 } from ".";
 export namespace Components {
+    /**
+     * An AI assistant component for meeting interactions.
+     * Provides AI-powered features like transcription, summarization, and
+     * intelligent meeting assistance. Rendered inside rtk-sidebar as the 'ai' section.
+     */
     interface RtkAi {
         /**
           * Config
@@ -391,6 +396,11 @@ export namespace Components {
          */
         "variant": ControlBarVariant;
     }
+    /**
+     * A modal for sending broadcast messages to all meeting participants.
+     * Allows hosts and moderators to send important announcements that
+     * appear prominently to all users in the meeting.
+     */
     interface RtkBroadcastMessageModal {
         /**
           * Icon pack
@@ -1600,6 +1610,10 @@ export namespace Components {
          */
         "meeting": Meeting;
         /**
+          * States object
+         */
+        "states": States;
+        /**
           * Language
          */
         "t": RtkI18n;
@@ -1787,6 +1801,11 @@ export namespace Components {
          */
         "t": RtkI18n1;
     }
+    /**
+     * A toggle button for starting/stopping livestream broadcasting.
+     * Only visible to users with livestream permissions. Allows hosts to
+     * broadcast the meeting to external streaming platforms.
+     */
     interface RtkLivestreamToggle {
         /**
           * Icon pack
@@ -2686,6 +2705,11 @@ export namespace Components {
          */
         "view": ParticipantsViewMode;
     }
+    /**
+     * A component that displays participants waiting in the stage queue.
+     * Shows users who are waiting to be promoted to the stage in meetings
+     * with stage functionality enabled.
+     */
     interface RtkParticipantsStageQueue {
         /**
           * Config
@@ -2842,6 +2866,11 @@ export namespace Components {
          */
         "t": RtkI18n;
     }
+    /**
+     * A toggle button for enabling/disabling Picture-in-Picture mode.
+     * Allows users to switch the video display to a floating window that stays
+     * on top of other applications.
+     */
     interface RtkPipToggle {
         /**
           * Config
@@ -3371,6 +3400,11 @@ export namespace Components {
          */
         "view": RtkSidebarView;
     }
+    /**
+     * A sidebar UI component with tabbed navigation.
+     * Provides a container for sidebar content with tab switching functionality.
+     * Can be displayed as a sidebar or in full-screen mode.
+     */
     interface RtkSidebarUi {
         /**
           * Default tab to open
@@ -3924,10 +3958,6 @@ export namespace Components {
         "t": RtkI18n;
     }
 }
-export interface RtkAiCustomEvent<T> extends CustomEvent<T> {
-    detail: T;
-    target: HTMLRtkAiElement;
-}
 export interface RtkAiToggleCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLRtkAiToggleElement;
@@ -4233,18 +4263,12 @@ export interface RtkUiProviderCustomEvent<T> extends CustomEvent<T> {
     target: HTMLRtkUiProviderElement;
 }
 declare global {
-    interface HTMLRtkAiElementEventMap {
-        "rtkStateUpdate": States;
-    }
+    /**
+     * An AI assistant component for meeting interactions.
+     * Provides AI-powered features like transcription, summarization, and
+     * intelligent meeting assistance. Rendered inside rtk-sidebar as the 'ai' section.
+     */
     interface HTMLRtkAiElement extends Components.RtkAi, HTMLStencilElement {
-        addEventListener<K extends keyof HTMLRtkAiElementEventMap>(type: K, listener: (this: HTMLRtkAiElement, ev: RtkAiCustomEvent<HTMLRtkAiElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLRtkAiElementEventMap>(type: K, listener: (this: HTMLRtkAiElement, ev: RtkAiCustomEvent<HTMLRtkAiElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLRtkAiElement: {
         prototype: HTMLRtkAiElement;
@@ -4394,6 +4418,11 @@ declare global {
     interface HTMLRtkBroadcastMessageModalElementEventMap {
         "rtkStateUpdate": States1;
     }
+    /**
+     * A modal for sending broadcast messages to all meeting participants.
+     * Allows hosts and moderators to send important announcements that
+     * appear prominently to all users in the meeting.
+     */
     interface HTMLRtkBroadcastMessageModalElement extends Components.RtkBroadcastMessageModal, HTMLStencilElement {
         addEventListener<K extends keyof HTMLRtkBroadcastMessageModalElementEventMap>(type: K, listener: (this: HTMLRtkBroadcastMessageModalElement, ev: RtkBroadcastMessageModalCustomEvent<HTMLRtkBroadcastMessageModalElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
         addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
@@ -5204,6 +5233,11 @@ declare global {
     message: string;
   };
     }
+    /**
+     * A toggle button for starting/stopping livestream broadcasting.
+     * Only visible to users with livestream permissions. Allows hosts to
+     * broadcast the meeting to external streaming platforms.
+     */
     interface HTMLRtkLivestreamToggleElement extends Components.RtkLivestreamToggle, HTMLStencilElement {
         addEventListener<K extends keyof HTMLRtkLivestreamToggleElementEventMap>(type: K, listener: (this: HTMLRtkLivestreamToggleElement, ev: RtkLivestreamToggleCustomEvent<HTMLRtkLivestreamToggleElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
         addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
@@ -5609,6 +5643,11 @@ declare global {
         prototype: HTMLRtkParticipantsStageListElement;
         new (): HTMLRtkParticipantsStageListElement;
     };
+    /**
+     * A component that displays participants waiting in the stage queue.
+     * Shows users who are waiting to be promoted to the stage in meetings
+     * with stage functionality enabled.
+     */
     interface HTMLRtkParticipantsStageQueueElement extends Components.RtkParticipantsStageQueue, HTMLStencilElement {
     }
     var HTMLRtkParticipantsStageQueueElement: {
@@ -5693,6 +5732,11 @@ declare global {
     interface HTMLRtkPipToggleElementEventMap {
         "rtkStateUpdate": States1;
     }
+    /**
+     * A toggle button for enabling/disabling Picture-in-Picture mode.
+     * Allows users to switch the video display to a floating window that stays
+     * on top of other applications.
+     */
     interface HTMLRtkPipToggleElement extends Components.RtkPipToggle, HTMLStencilElement {
         addEventListener<K extends keyof HTMLRtkPipToggleElementEventMap>(type: K, listener: (this: HTMLRtkPipToggleElement, ev: RtkPipToggleCustomEvent<HTMLRtkPipToggleElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
         addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
@@ -6073,6 +6117,11 @@ declare global {
         "tabChange": string;
         "sidebarClose": void;
     }
+    /**
+     * A sidebar UI component with tabbed navigation.
+     * Provides a container for sidebar content with tab switching functionality.
+     * Can be displayed as a sidebar or in full-screen mode.
+     */
     interface HTMLRtkSidebarUiElement extends Components.RtkSidebarUi, HTMLStencilElement {
         addEventListener<K extends keyof HTMLRtkSidebarUiElementEventMap>(type: K, listener: (this: HTMLRtkSidebarUiElement, ev: RtkSidebarUiCustomEvent<HTMLRtkSidebarUiElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
         addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
@@ -6488,6 +6537,11 @@ declare global {
     }
 }
 declare namespace LocalJSX {
+    /**
+     * An AI assistant component for meeting interactions.
+     * Provides AI-powered features like transcription, summarization, and
+     * intelligent meeting assistance. Rendered inside rtk-sidebar as the 'ai' section.
+     */
     interface RtkAi {
         /**
           * Config
@@ -6501,10 +6555,6 @@ declare namespace LocalJSX {
           * Meeting object
          */
         "meeting"?: Meeting;
-        /**
-          * Emits updated state data
-         */
-        "onRtkStateUpdate"?: (event: RtkAiCustomEvent<States>) => void;
         /**
           * Size
          */
@@ -6846,6 +6896,11 @@ declare namespace LocalJSX {
          */
         "variant"?: ControlBarVariant;
     }
+    /**
+     * A modal for sending broadcast messages to all meeting participants.
+     * Allows hosts and moderators to send important announcements that
+     * appear prominently to all users in the meeting.
+     */
     interface RtkBroadcastMessageModal {
         /**
           * Icon pack
@@ -8210,6 +8265,10 @@ declare namespace LocalJSX {
          */
         "meeting"?: Meeting;
         /**
+          * States object
+         */
+        "states"?: States;
+        /**
           * Language
          */
         "t"?: RtkI18n;
@@ -8436,6 +8495,11 @@ declare namespace LocalJSX {
          */
         "t"?: RtkI18n1;
     }
+    /**
+     * A toggle button for starting/stopping livestream broadcasting.
+     * Only visible to users with livestream permissions. Allows hosts to
+     * broadcast the meeting to external streaming platforms.
+     */
     interface RtkLivestreamToggle {
         /**
           * Icon pack
@@ -9377,6 +9441,11 @@ declare namespace LocalJSX {
          */
         "view"?: ParticipantsViewMode;
     }
+    /**
+     * A component that displays participants waiting in the stage queue.
+     * Shows users who are waiting to be promoted to the stage in meetings
+     * with stage functionality enabled.
+     */
     interface RtkParticipantsStageQueue {
         /**
           * Config
@@ -9545,6 +9614,11 @@ declare namespace LocalJSX {
          */
         "t"?: RtkI18n;
     }
+    /**
+     * A toggle button for enabling/disabling Picture-in-Picture mode.
+     * Allows users to switch the video display to a floating window that stays
+     * on top of other applications.
+     */
     interface RtkPipToggle {
         /**
           * Config
@@ -10154,6 +10228,11 @@ declare namespace LocalJSX {
          */
         "view"?: RtkSidebarView;
     }
+    /**
+     * A sidebar UI component with tabbed navigation.
+     * Provides a container for sidebar content with tab switching functionality.
+     * Can be displayed as a sidebar or in full-screen mode.
+     */
     interface RtkSidebarUi {
         /**
           * Default tab to open
@@ -10888,6 +10967,11 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
+            /**
+             * An AI assistant component for meeting interactions.
+             * Provides AI-powered features like transcription, summarization, and
+             * intelligent meeting assistance. Rendered inside rtk-sidebar as the 'ai' section.
+             */
             "rtk-ai": LocalJSX.RtkAi & JSXBase.HTMLAttributes<HTMLRtkAiElement>;
             "rtk-ai-toggle": LocalJSX.RtkAiToggle & JSXBase.HTMLAttributes<HTMLRtkAiToggleElement>;
             "rtk-ai-transcriptions": LocalJSX.RtkAiTranscriptions & JSXBase.HTMLAttributes<HTMLRtkAiTranscriptionsElement>;
@@ -10914,6 +10998,11 @@ declare module "@stencil/core" {
              * You need to pass the `meeting` object to it.
              */
             "rtk-breakout-rooms-toggle": LocalJSX.RtkBreakoutRoomsToggle & JSXBase.HTMLAttributes<HTMLRtkBreakoutRoomsToggleElement>;
+            /**
+             * A modal for sending broadcast messages to all meeting participants.
+             * Allows hosts and moderators to send important announcements that
+             * appear prominently to all users in the meeting.
+             */
             "rtk-broadcast-message-modal": LocalJSX.RtkBroadcastMessageModal & JSXBase.HTMLAttributes<HTMLRtkBroadcastMessageModalElement>;
             /**
              * A button that follows RTK Design System.
@@ -11093,6 +11182,11 @@ declare module "@stencil/core" {
             "rtk-leave-meeting": LocalJSX.RtkLeaveMeeting & JSXBase.HTMLAttributes<HTMLRtkLeaveMeetingElement>;
             "rtk-livestream-indicator": LocalJSX.RtkLivestreamIndicator & JSXBase.HTMLAttributes<HTMLRtkLivestreamIndicatorElement>;
             "rtk-livestream-player": LocalJSX.RtkLivestreamPlayer & JSXBase.HTMLAttributes<HTMLRtkLivestreamPlayerElement>;
+            /**
+             * A toggle button for starting/stopping livestream broadcasting.
+             * Only visible to users with livestream permissions. Allows hosts to
+             * broadcast the meeting to external streaming platforms.
+             */
             "rtk-livestream-toggle": LocalJSX.RtkLivestreamToggle & JSXBase.HTMLAttributes<HTMLRtkLivestreamToggleElement>;
             /**
              * A component which loads the logo from your config, or via the `logo-url` attribute.
@@ -11209,6 +11303,11 @@ declare module "@stencil/core" {
              * run privileged actions on each participant according to your permissions.
              */
             "rtk-participants-stage-list": LocalJSX.RtkParticipantsStageList & JSXBase.HTMLAttributes<HTMLRtkParticipantsStageListElement>;
+            /**
+             * A component that displays participants waiting in the stage queue.
+             * Shows users who are waiting to be promoted to the stage in meetings
+             * with stage functionality enabled.
+             */
             "rtk-participants-stage-queue": LocalJSX.RtkParticipantsStageQueue & JSXBase.HTMLAttributes<HTMLRtkParticipantsStageQueueElement>;
             /**
              * A button which toggles visibility of participants.
@@ -11226,6 +11325,11 @@ declare module "@stencil/core" {
              */
             "rtk-permissions-message": LocalJSX.RtkPermissionsMessage & JSXBase.HTMLAttributes<HTMLRtkPermissionsMessageElement>;
             "rtk-pinned-message-selector": LocalJSX.RtkPinnedMessageSelector & JSXBase.HTMLAttributes<HTMLRtkPinnedMessageSelectorElement>;
+            /**
+             * A toggle button for enabling/disabling Picture-in-Picture mode.
+             * Allows users to switch the video display to a floating window that stays
+             * on top of other applications.
+             */
             "rtk-pip-toggle": LocalJSX.RtkPipToggle & JSXBase.HTMLAttributes<HTMLRtkPipToggleElement>;
             /**
              * A component which loads a plugin.
@@ -11336,6 +11440,11 @@ declare module "@stencil/core" {
              * you can customize which sections you want, and which section you want as the default.
              */
             "rtk-sidebar": LocalJSX.RtkSidebar & JSXBase.HTMLAttributes<HTMLRtkSidebarElement>;
+            /**
+             * A sidebar UI component with tabbed navigation.
+             * Provides a container for sidebar content with tab switching functionality.
+             * Can be displayed as a sidebar or in full-screen mode.
+             */
             "rtk-sidebar-ui": LocalJSX.RtkSidebarUi & JSXBase.HTMLAttributes<HTMLRtkSidebarUiElement>;
             /**
              * A grid component which renders only the participants in a simple grid.

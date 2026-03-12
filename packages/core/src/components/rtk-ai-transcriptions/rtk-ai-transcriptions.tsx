@@ -155,7 +155,7 @@ export class RtkAiTranscriptions {
         <div class="search-bar">
           <input
             type="text"
-            placeholder="Search Participant"
+            placeholder="Search participant"
             value={this.participantQuery}
             onInput={(e) => (this.participantQuery = (e.target as HTMLInputElement).value)}
           />

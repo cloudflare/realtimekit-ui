@@ -1,4 +1,4 @@
-import { Component, Host, h, Prop, Watch, Event, EventEmitter } from '@stencil/core';
+import { Component, Host, h, Prop } from '@stencil/core';
 import { Meeting } from '../../types/rtk-client';
 import type { Size, States } from '../../types/props';
 import { UIConfig } from '../../types/ui-config';
@@ -6,7 +6,6 @@ import { defaultIconPack, IconPack } from '../../lib/icons';
 import { RtkI18n, useLanguage } from '../../lib/lang';
 import { createDefaultConfig } from '../../lib/default-ui-config';
 import { SyncWithStore } from '../../utils/sync-with-store';
-import { RTKPermissionsPreset } from '@cloudflare/realtimekit';
 
 export type AIView = 'default' | 'sidebar' | 'full-screen';
 
@@ -14,7 +13,7 @@ export type AIView = 'default' | 'sidebar' | 'full-screen';
  * An AI assistant component for meeting interactions.
  *
  * Provides AI-powered features like transcription, summarization, and
- * intelligent meeting assistance. Can be displayed in different view modes.
+ * intelligent meeting assistance. Rendered inside rtk-sidebar as the 'ai' section.
  */
 @Component({
   tag: 'rtk-ai',
@@ -22,8 +21,6 @@ export type AIView = 'default' | 'sidebar' | 'full-screen';
   shadow: true,
 })
 export class RtkAi {
-  private keydownListener: (e: KeyboardEvent) => void;
-
   /** Meeting object */
   @SyncWithStore()
   @Prop()
@@ -55,41 +52,8 @@ export class RtkAi {
   /** View type */
   @Prop({ reflect: true }) view: AIView = 'sidebar';
 
-  /** Emits updated state data */
-  @Event({ eventName: 'rtkStateUpdate' }) stateUpdate: EventEmitter<States>;
-
-  connectedCallback() {
-    this.viewChanged(this.view);
-  }
-
-  disconnectedCallback() {
-    this.keydownListener && document.removeEventListener('keydown', this.keydownListener);
-  }
-
-  @Watch('view')
-  viewChanged(view: AIView) {
-    if (view === 'full-screen') {
-      this.keydownListener = (e) => {
-        if (e.key === 'Escape') {
-          this.close();
-        }
-      };
-      document.addEventListener('keydown', this.keydownListener);
-    }
-  }
-
-  private close = () => {
-    this.stateUpdate.emit({ activeAI: false });
-  };
-
   render() {
     if (!this.meeting) return null;
-    if (
-      !(this.meeting?.self?.permissions as RTKPermissionsPreset).transcriptionEnabled ||
-      !this.states?.activeAI
-    ) {
-      return null;
-    }
 
     const defaults = {
       meeting: this.meeting,
@@ -102,20 +66,6 @@ export class RtkAi {
 
     return (
       <Host>
-        {/* Full screen view, shows the navigation header */}
-        <h3 class="title">{this.t('ai.transcriptions')}</h3>
-
-        {/* Close button */}
-        <rtk-button
-          variant="ghost"
-          kind="icon"
-          class="close"
-          onClick={this.close}
-          aria-label={this.t('close')}
-        >
-          <rtk-icon icon={this.iconPack.dismiss} />
-        </rtk-button>
-
         <rtk-ai-transcriptions {...defaults}></rtk-ai-transcriptions>
       </Host>
     );

@@ -87,7 +87,6 @@ export class RtkPluginsToggle {
       activeSidebar: this.pluginsActive,
       sidebar: this.pluginsActive ? 'plugins' : undefined,
       activeMoreMenu: false,
-      activeAI: false,
     });
   }
 

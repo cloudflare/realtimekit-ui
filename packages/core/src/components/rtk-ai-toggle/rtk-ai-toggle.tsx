@@ -44,20 +44,26 @@ export class RtkAiToggle {
   /** Emits updated state data */
   @Event({ eventName: 'rtkStateUpdate' }) stateUpdate: EventEmitter<States>;
 
-  @Watch('states')
-  statesChanged(s?: States) {
-    const states = s;
-    this.aiActive = states.activeAI;
+  connectedCallback() {
+    this.statesChanged(this.states);
   }
 
-  private toggleAI() {
-    this.aiActive = !this.states?.activeAI;
-    this.stateUpdate.emit({
-      activeAI: this.aiActive,
-      activeMoreMenu: false,
-      activeSidebar: false,
-    });
+  @Watch('states')
+  statesChanged(states?: States) {
+    if (states != null) {
+      this.aiActive = states.activeSidebar === true && states.sidebar === 'ai';
+    }
   }
+
+  private toggleAI = () => {
+    const states = this.states;
+    this.aiActive = !(states?.activeSidebar && states?.sidebar === 'ai');
+    this.stateUpdate.emit({
+      activeSidebar: this.aiActive,
+      sidebar: this.aiActive ? 'ai' : undefined,
+      activeMoreMenu: false,
+    });
+  };
 
   render() {
     if (!this.meeting) return null;
@@ -74,7 +80,7 @@ export class RtkAiToggle {
           size={this.size}
           iconPack={this.iconPack}
           class={{ active: this.aiActive }}
-          onClick={() => this.toggleAI()}
+          onClick={this.toggleAI}
           icon={this.iconPack.meeting_ai}
           label={text}
           variant={this.variant}

@@ -6,6 +6,7 @@ import { defaultIconPack, IconPack } from '../../lib/icons';
 import { RtkI18n, useLanguage } from '../../lib/lang';
 import { createDefaultConfig } from '../../lib/default-ui-config';
 import {
+  canViewAI,
   canViewChat,
   canViewParticipants,
   canViewPlugins,
@@ -16,7 +17,7 @@ import { SyncWithStore } from '../../utils/sync-with-store';
 import { StageStatus } from '@cloudflare/realtimekit';
 import { Render } from '../../lib/render';
 
-export type RtkSidebarSection = 'chat' | 'polls' | 'participants' | 'plugins';
+export type RtkSidebarSection = 'chat' | 'polls' | 'participants' | 'plugins' | 'ai';
 
 /**
  * A component which handles the sidebar and
@@ -124,7 +125,9 @@ export class RtkSidebar {
     }
 
     return this.enabledSections.filter(
-      (section) => this.meeting.self.config.controlBar.elements[section.id]
+      (section) =>
+        !(section.id in this.meeting.self.config.controlBar.elements) ||
+        this.meeting.self.config.controlBar.elements[section.id]
     );
   };
 
@@ -150,6 +153,9 @@ export class RtkSidebar {
     }
     if (canViewPlugins(meeting)) {
       list.push({ id: 'plugins', name: this.t('plugins') });
+    }
+    if (canViewAI(meeting)) {
+      list.push({ id: 'ai', name: this.t('ai.meeting_ai') });
     }
     this.enabledSections = list;
   }
@@ -212,6 +218,7 @@ export class RtkSidebar {
             />
           )}
           {defaults.states.sidebar === 'plugins' && <rtk-plugins {...defaults} slot="plugins" />}
+          {defaults.states.sidebar === 'ai' && <rtk-ai {...defaults} slot="ai" />}
         </rtk-sidebar-ui>
       </Host>
     );
