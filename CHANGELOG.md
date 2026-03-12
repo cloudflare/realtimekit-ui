@@ -1,3 +1,10 @@
+## [1.1.2-staging.1](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.1.1...@cloudflare/realtimekit-ui-v1.1.2-staging.1) (2026-03-12)
+
+
+### Bug Fixes
+
+* move Meeting AI into rtk-sidebar and fix tab selection states ([8e47bb0](https://github.com/cloudflare/realtimekit-ui/commit/8e47bb059a368f872a102d3bce0413c8e7b15bbf))
+
 ## [1.1.1](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.1.0...@cloudflare/realtimekit-ui-v1.1.1) (2026-03-10)
 
 
