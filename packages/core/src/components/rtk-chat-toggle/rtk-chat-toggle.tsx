@@ -118,7 +118,6 @@ export class RtkChatToggle {
       activeSidebar: this.chatActive,
       sidebar: this.chatActive ? 'chat' : undefined,
       activeMoreMenu: false,
-      activeAI: false,
     });
   };
 

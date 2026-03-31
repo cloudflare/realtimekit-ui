@@ -370,7 +370,7 @@ export const generateConfig = (
         // if using key value pair, provide the key in `state`
         // else provide array of states in `states`
         state: 'meeting',
-        states: ['activeSidebar', 'activeAI'],
+        states: ['activeSidebar'],
       },
       'rtk-meeting[meeting=idle]': ['rtk-idle-screen'],
       'rtk-meeting[meeting=waiting]': ['rtk-waiting-screen'],
@@ -382,19 +382,13 @@ export const generateConfig = (
       'rtk-meeting[meeting=joined].activeSidebar.md': {
         add: [['rtk-sidebar', { view: 'full-screen' }]],
       },
-      'rtk-meeting[meeting=joined].activeAI.sm': {
-        add: [['rtk-ai', { view: 'full-screen' }]],
-      },
-      'rtk-meeting[meeting=joined].activeAI.md': {
-        add: [['rtk-ai', { view: 'full-screen' }]],
-      },
       'rtk-meeting[meeting=ended]': ['rtk-ended-screen'],
 
       ...headerChildren,
       ...controlBarChildren,
 
       'rtk-stage': {
-        states: ['activeSidebar', 'activeAI'],
+        states: ['activeSidebar'],
         children: ['rtk-grid', 'rtk-notifications', 'rtk-transcripts'],
       },
 
@@ -404,13 +398,6 @@ export const generateConfig = (
 
       // hide sidebar for smaller screens
       'rtk-stage.activeSidebar.sm': { remove: ['rtk-sidebar'] },
-
-      'rtk-stage.activeAI': {
-        add: [['rtk-ai', { view: 'sidebar' }]],
-      },
-
-      // hide sidebar for smaller screens
-      'rtk-stage.activeAI.sm': { remove: ['rtk-ai'] },
 
       'rtk-grid': {
         states: ['activeScreenShare', 'activePlugin', 'activeSpotlight'],

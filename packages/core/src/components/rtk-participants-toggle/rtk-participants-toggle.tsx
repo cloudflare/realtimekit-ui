@@ -154,7 +154,6 @@ export class RtkParticipantsToggle {
       activeSidebar: this.participantsActive,
       sidebar: this.participantsActive ? 'participants' : undefined,
       activeMoreMenu: false,
-      activeAI: false,
     });
   }
 
