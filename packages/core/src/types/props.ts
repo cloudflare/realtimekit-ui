@@ -30,6 +30,15 @@ export interface PermissionSettings {
   kind?: 'audio' | 'video' | 'screenshare';
 }
 
+export interface CustomPlugin {
+  id: string;
+  name: string;
+  icon: string;
+  canOpenPlugin: boolean;
+  canClosePlugin: boolean;
+  component: HTMLElement;
+}
+
 /**
  * Global States object which are shared among components
  */

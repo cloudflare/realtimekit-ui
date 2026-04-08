@@ -151,7 +151,7 @@ export function useGridPositioning({
  * @returns The parsed value of aspect ratio
  */
 export const getAspectRatio = (ratio: string): number => {
-  const [width, height] = ratio.split(':');
+  const [width, height] = (ratio || '16:9').split(':');
   return Number.parseInt(height) / Number.parseInt(width);
 };
 

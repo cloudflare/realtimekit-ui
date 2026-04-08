@@ -6,7 +6,7 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { Meeting, RTKParticipant as Participant, Peer, WaitlistedParticipant } from "./types/rtk-client";
-import { Chat, Notification, PartialStateEvent, Poll, PollObject, Size, States, Transcript } from "./types/props";
+import { Chat, CustomPlugin, Notification, PartialStateEvent, Poll, PollObject, Size, States, Transcript } from "./types/props";
 import { UIConfig } from "./types/ui-config";
 import { IconPack } from "./lib/icons";
 import { RtkI18n } from "./lib/lang";
@@ -46,7 +46,7 @@ import { MeetingMode as MeetingMode1 } from "./components/rtk-meeting/rtk-meetin
 import { ViewerCountVariant } from "./components/rtk-viewer-count/rtk-viewer-count";
 import { Peer as Peer1 } from ".";
 export { Meeting, RTKParticipant as Participant, Peer, WaitlistedParticipant } from "./types/rtk-client";
-export { Chat, Notification, PartialStateEvent, Poll, PollObject, Size, States, Transcript } from "./types/props";
+export { Chat, CustomPlugin, Notification, PartialStateEvent, Poll, PollObject, Size, States, Transcript } from "./types/props";
 export { UIConfig } from "./types/ui-config";
 export { IconPack } from "./lib/icons";
 export { RtkI18n } from "./lib/lang";
@@ -1472,6 +1472,10 @@ export namespace Components {
          */
         "config": UIConfig;
         /**
+          * Custom Plugins
+         */
+        "customPlugins": CustomPlugin[];
+        /**
           * Gap between participants
          */
         "gap": number;
@@ -1875,6 +1879,10 @@ export namespace Components {
          */
         "config": UIConfig;
         /**
+          * Custom Plugins
+         */
+        "customPlugins": CustomPlugin[];
+        /**
           * Grid layout
          */
         "gridLayout": GridLayout1;
@@ -2152,6 +2160,10 @@ export namespace Components {
           * UI Config
          */
         "config": UIConfig;
+        /**
+          * Custom Plugins
+         */
+        "customPlugins": CustomPlugin[];
         /**
           * Gap between participant tiles
          */
@@ -2906,6 +2918,14 @@ export namespace Components {
      */
     interface RtkPluginMain {
         /**
+          * Custom Plugin (when rendering a custom plugin instead of an ordinary one)
+         */
+        "customPlugin": CustomPlugin | null;
+        /**
+          * Custom Plugins
+         */
+        "customPlugins": CustomPlugin[];
+        /**
           * Icon pack
          */
         "iconPack": IconPack;
@@ -2932,6 +2952,10 @@ export namespace Components {
          */
         "config": UIConfig;
         /**
+          * Custom Plugins
+         */
+        "customPlugins": CustomPlugin[];
+        /**
           * Icon pack
          */
         "iconPack": IconPack;
@@ -2943,6 +2967,10 @@ export namespace Components {
           * Size
          */
         "size": Size;
+        /**
+          * States
+         */
+        "states": States;
         /**
           * Language
          */
@@ -3871,6 +3899,10 @@ export namespace Components {
           * Config
          */
         "config": UIConfig1;
+        /**
+          * Custom Plugins
+         */
+        "customPlugins": CustomPlugin[];
         /**
           * Icon pack
          */
@@ -8123,6 +8155,10 @@ declare namespace LocalJSX {
          */
         "config"?: UIConfig;
         /**
+          * Custom Plugins
+         */
+        "customPlugins"?: CustomPlugin[];
+        /**
           * Gap between participants
          */
         "gap"?: number;
@@ -8580,6 +8616,10 @@ declare namespace LocalJSX {
          */
         "config"?: UIConfig;
         /**
+          * Custom Plugins
+         */
+        "customPlugins"?: CustomPlugin[];
+        /**
           * Grid layout
          */
         "gridLayout"?: GridLayout1;
@@ -8869,6 +8909,10 @@ declare namespace LocalJSX {
           * UI Config
          */
         "config"?: UIConfig;
+        /**
+          * Custom Plugins
+         */
+        "customPlugins"?: CustomPlugin[];
         /**
           * Gap between participant tiles
          */
@@ -9658,6 +9702,14 @@ declare namespace LocalJSX {
      */
     interface RtkPluginMain {
         /**
+          * Custom Plugin (when rendering a custom plugin instead of an ordinary one)
+         */
+        "customPlugin"?: CustomPlugin | null;
+        /**
+          * Custom Plugins
+         */
+        "customPlugins"?: CustomPlugin[];
+        /**
           * Icon pack
          */
         "iconPack"?: IconPack;
@@ -9668,7 +9720,7 @@ declare namespace LocalJSX {
         /**
           * Plugin
          */
-        "plugin": RTKPlugin;
+        "plugin"?: RTKPlugin;
         /**
           * Language
          */
@@ -9683,6 +9735,10 @@ declare namespace LocalJSX {
           * Config
          */
         "config"?: UIConfig;
+        /**
+          * Custom Plugins
+         */
+        "customPlugins"?: CustomPlugin[];
         /**
           * Icon pack
          */
@@ -9699,6 +9755,10 @@ declare namespace LocalJSX {
           * Size
          */
         "size"?: Size;
+        /**
+          * States
+         */
+        "states"?: States;
         /**
           * Language
          */
@@ -10734,6 +10794,10 @@ declare namespace LocalJSX {
           * Config
          */
         "config"?: UIConfig1;
+        /**
+          * Custom Plugins
+         */
+        "customPlugins"?: CustomPlugin[];
         /**
           * Icon pack
          */

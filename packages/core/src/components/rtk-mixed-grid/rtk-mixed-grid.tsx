@@ -7,7 +7,7 @@ import { defaultIconPack, IconPack } from '../../lib/icons';
 import { RtkI18n, useLanguage } from '../../lib/lang';
 import { Render } from '../../lib/render';
 import { Meeting, Peer } from '../../types/rtk-client';
-import { Size, States } from '../../types/props';
+import { CustomPlugin, Size, States } from '../../types/props';
 import { UIConfig } from '../../types/ui-config';
 import { GridLayout, GridSize } from '../rtk-grid/rtk-grid';
 import { SyncWithStore } from '../../utils/sync-with-store';
@@ -23,6 +23,8 @@ import type { Tab } from '../rtk-tab-bar/rtk-tab-bar';
 })
 export class RtkMixedGrid {
   private activeTabUpdateListener: (data: ActiveTab) => void;
+  private customPluginStoreSubscription: () => void;
+  private customPluginStoreRetryInterval: ReturnType<typeof setInterval>;
 
   /** Grid Layout */
   @Prop({ reflect: true }) layout: GridLayout = 'row';
@@ -38,6 +40,13 @@ export class RtkMixedGrid {
 
   /** Active Plugins */
   @Prop() plugins: RTKPlugin[] = [];
+
+  @State() activeCustomPlugins: CustomPlugin[] = [];
+
+  /** Custom Plugins */
+  @SyncWithStore()
+  @Prop()
+  customPlugins: CustomPlugin[] = [];
 
   /**
    * Aspect Ratio of participant tile
@@ -100,6 +109,15 @@ export class RtkMixedGrid {
 
   disconnectedCallback() {
     this.meeting.meta?.removeListener('activeTabUpdate', this.activeTabUpdateListener);
+    if (this.customPluginStoreRetryInterval) {
+      clearInterval(this.customPluginStoreRetryInterval);
+      this.customPluginStoreRetryInterval = null;
+    }
+    if (this.customPluginStoreSubscription) {
+      const store = this.meeting?.stores?.stores?.get('__internal_rtk_custom_plugins');
+      store?.unsubscribe('activePlugins', this.customPluginStoreSubscription);
+      this.customPluginStoreSubscription = null;
+    }
   }
 
   @Watch('meeting')
@@ -114,6 +132,7 @@ export class RtkMixedGrid {
       };
 
       meeting.meta?.addListener('activeTabUpdate', this.activeTabUpdateListener);
+      this.subscribeToCustomPluginStore(meeting);
     }
   }
 
@@ -142,11 +161,31 @@ export class RtkMixedGrid {
     }
   }
 
+  @Watch('activeCustomPlugins')
+  activeCustomPluginsChanged(activeCustomPlugins: CustomPlugin[]) {
+    if (!this.initialised && this.activeTab != null) return;
+
+    if (activeCustomPlugins.length > 0) {
+      const lastIndex = activeCustomPlugins.length - 1;
+      this.setActiveTab({
+        type: 'custom-plugin',
+        customPlugin: activeCustomPlugins[lastIndex],
+      });
+    } else {
+      this.revalidateActiveTab();
+    }
+  }
+
   private revalidateActiveTab() {
     if (this.activeTab != null) {
       if (this.activeTab.type === 'screenshare') {
         const { participant } = this.activeTab;
         if (!this.screenShareParticipants.some((p) => p.id === participant.id)) {
+          this.reassignActiveTab();
+        }
+      } else if (this.activeTab.type === 'custom-plugin') {
+        const { customPlugin } = this.activeTab;
+        if (!this.activeCustomPlugins.some((cp) => cp.id === customPlugin.id)) {
           this.reassignActiveTab();
         }
       } else {
@@ -160,13 +199,23 @@ export class RtkMixedGrid {
 
   private setActiveTab(activeTab: Tab, shouldUpdateSelfActiveTab: boolean = true) {
     this.activeTab = activeTab;
+    if (activeTab.type === 'custom-plugin') {
+      // Custom plugins don't use meeting.meta.setSelfActiveTab
+      return;
+    }
     const id = activeTab.type === 'screenshare' ? activeTab.participant.id : activeTab.plugin.id;
     if (shouldUpdateSelfActiveTab)
-      this.meeting.meta?.setSelfActiveTab({ type: activeTab.type, id }, 0);
+      this.meeting.meta?.setSelfActiveTab({ type: activeTab.type as ActiveTabType, id }, 0);
   }
 
   private reassignActiveTab() {
-    if (this.screenShareParticipants.length > 0) {
+    if (this.activeCustomPlugins.length > 0) {
+      const lastIndex = this.activeCustomPlugins.length - 1;
+      this.setActiveTab({
+        type: 'custom-plugin',
+        customPlugin: this.activeCustomPlugins[lastIndex],
+      });
+    } else if (this.screenShareParticipants.length > 0) {
       this.setActiveTab({ type: 'screenshare', participant: this.screenShareParticipants[0] });
     } else if (this.plugins.length > 0) {
       const lastIndex = this.plugins.length - 1;
@@ -189,14 +238,53 @@ export class RtkMixedGrid {
     }
   }
 
+  // NOTE(retry): The store should be available immediately since the SDK awaits
+  // storesManager.create('__internal_rtk_custom_plugins') in Controller.init().
+  // However, there is currently a timing issue where either the store or
+  // customPlugins (via @SyncWithStore) may not be ready when meetingChanged fires.
+  // Retry is a temporary workaround until the root cause is fixed.
+  private subscribeToCustomPluginStore(meeting: Meeting) {
+    const trySubscribe = () => {
+      const store = meeting.stores?.stores?.get('__internal_rtk_custom_plugins');
+      if (!store || !this.customPlugins?.length) return false;
+      const activeIds: string[] = store.get('activePlugins') || [];
+      this.activeCustomPlugins = (this.customPlugins || []).filter((cp) =>
+        activeIds.includes(cp.id)
+      );
+      this.customPluginStoreSubscription = () => {
+        const s = meeting.stores?.stores?.get('__internal_rtk_custom_plugins');
+        const ids: string[] = s?.get('activePlugins') || [];
+        this.activeCustomPlugins = (this.customPlugins || []).filter((cp) => ids.includes(cp.id));
+      };
+      store.subscribe('activePlugins', this.customPluginStoreSubscription);
+      return true;
+    };
+
+    if (trySubscribe()) return;
+
+    let attempts = 0;
+    this.customPluginStoreRetryInterval = setInterval(() => {
+      attempts++;
+      if (trySubscribe() || attempts >= 20) {
+        clearInterval(this.customPluginStoreRetryInterval);
+        this.customPluginStoreRetryInterval = null;
+      }
+    }, 500);
+  }
+
   private getTabs() {
+    const customPlugins = this.activeCustomPlugins.map((customPlugin) => ({
+      type: 'custom-plugin',
+      customPlugin,
+    }));
+
     const screenshares = this.screenShareParticipants.map((participant) => ({
       type: 'screenshare',
       participant,
     }));
 
     const plugins = this.plugins.map((plugin) => ({ type: 'plugin', plugin }));
-    return (screenshares as any[]).concat(plugins);
+    return (customPlugins as any[]).concat(screenshares).concat(plugins);
   }
 
   render() {
@@ -222,6 +310,20 @@ export class RtkMixedGrid {
             />
           )}
           <div id="tabs" key="tabs">
+            {this.activeCustomPlugins.map((cp) => (
+              <rtk-plugin-main
+                {...defaults}
+                customPlugin={cp}
+                key={cp.id}
+                style={{
+                  display:
+                    this.activeTab?.type === 'custom-plugin' &&
+                    this.activeTab?.customPlugin?.id === cp.id
+                      ? 'flex'
+                      : 'none',
+                }}
+              />
+            ))}
             {this.screenShareParticipants.map((participant) => (
               <Render
                 element="rtk-screenshare-view"

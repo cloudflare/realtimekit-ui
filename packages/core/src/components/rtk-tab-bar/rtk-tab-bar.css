@@ -23,12 +23,13 @@ rtk-button {
   @apply bg-brand;
 }
 
-.tab img {
+.tab img,
+.tab rtk-icon {
   @apply h-7 w-7 rounded-sm;
 }
 
 .tab .name {
-  @apply mt-0.5;
+  @apply mt-0.5 w-full overflow-hidden text-ellipsis whitespace-nowrap text-center;
 }
 
 :host([size='sm']) {

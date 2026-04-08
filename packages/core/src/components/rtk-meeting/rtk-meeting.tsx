@@ -1,6 +1,6 @@
 import { Component, h, Element, Prop, Watch, Event, EventEmitter } from '@stencil/core';
 import deepMerge from 'lodash-es/merge';
-import { PermissionSettings, Size, States } from '../../types/props';
+import { CustomPlugin, PermissionSettings, Size, States } from '../../types/props';
 import { getSize } from '../../utils/size';
 import { Meeting, RoomLeftState } from '../../types/rtk-client';
 import { RtkI18n, useLanguage } from '../../lib/lang';
@@ -120,6 +120,10 @@ export class RtkMeeting {
   @Prop()
   iconPack: IconPack = defaultIconPack;
 
+  /** Custom Plugins */
+  @Prop()
+  customPlugins: CustomPlugin[] = [];
+
   /** UI Kit Overrides */
   @Prop()
   overrides: Overrides = defaultOverrides;
@@ -155,6 +159,7 @@ export class RtkMeeting {
     this.iconPackChanged(this.iconPack);
     this.tChanged(this.t);
     this.configChanged(this.config);
+    this.customPluginsChanged(this.customPlugins);
     this.overridesChanged(this.overrides);
 
     this.resizeObserver = new ResizeObserver(() => this.handleResize());
@@ -258,6 +263,7 @@ export class RtkMeeting {
         t: this.t,
         providerId: this.providerId,
         overrides: deepMerge({ ...defaultOverrides }, this.overrides) as Overrides,
+        customPlugins: this.customPlugins,
       }) as RtkUiStoreExtended;
 
       // Notify components that peer specific store is now available
@@ -301,6 +307,7 @@ export class RtkMeeting {
     ) {
       provideRtkDesignSystem(document.documentElement, this.config.designTokens);
     }
+
     meeting.self.addListener('roomJoined', this.roomJoinedListener);
     meeting.self.addListener('waitlisted', this.waitlistedListener);
     meeting.self.addListener('roomLeft', this.roomLeftListener);
@@ -368,6 +375,13 @@ export class RtkMeeting {
       (this.peerStore || legacyGlobalUIStore).state.states.activeDebugger !== true
     ) {
       provideRtkDesignSystem(document.documentElement, config.designTokens);
+    }
+  }
+
+  @Watch('customPlugins')
+  customPluginsChanged(customPlugins: CustomPlugin[]) {
+    if (this.peerStore) {
+      this.peerStore.state.customPlugins = customPlugins;
     }
   }
 

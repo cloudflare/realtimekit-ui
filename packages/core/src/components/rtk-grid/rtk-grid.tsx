@@ -3,7 +3,7 @@ import { createDefaultConfig } from '../../lib/default-ui-config';
 import { defaultIconPack, IconPack } from '../../lib/icons';
 import { RtkI18n, useLanguage } from '../../lib/lang';
 import { Meeting, Peer } from '../../types/rtk-client';
-import { Size, States } from '../../types/props';
+import { CustomPlugin, Size, States } from '../../types/props';
 import { UIConfig } from '../../types/ui-config';
 import debounce from 'lodash/debounce';
 import { DefaultProps, Render } from '../../lib/render';
@@ -33,6 +33,8 @@ type RoomState = 'init' | 'joined' | 'waitlisted' | leaveRoomState;
 })
 export class RtkGrid {
   private hideSelf = false;
+  private customPluginStoreSubscription: () => void;
+  private customPluginStoreRetryInterval: ReturnType<typeof setInterval>;
 
   @State() participants: Peer[] = [];
 
@@ -55,6 +57,8 @@ export class RtkGrid {
   @State() hidden: boolean = false;
 
   @State() roomState: RoomState;
+
+  @State() activeCustomPlugins: CustomPlugin[] = [];
 
   /** Grid Layout */
   @Prop({ reflect: true }) layout: GridLayout = 'row';
@@ -92,6 +96,11 @@ export class RtkGrid {
   @SyncWithStore()
   @Prop()
   t: RtkI18n = useLanguage();
+
+  /** Custom Plugins */
+  @SyncWithStore()
+  @Prop()
+  customPlugins: CustomPlugin[] = [];
 
   /** Grid size */
   @Prop() gridSize: GridSize = defaultGridSize;
@@ -135,6 +144,16 @@ export class RtkGrid {
     participants.pinned.removeListener('participantLeft', this.onParticipantUnpinned);
     participants.joined.removeListener('screenShareUpdate', this.onScreenShareUpdate);
     participants.joined.removeListener('stageStatusUpdate', this.peerStageStatusListener);
+
+    if (this.customPluginStoreRetryInterval) {
+      clearInterval(this.customPluginStoreRetryInterval);
+      this.customPluginStoreRetryInterval = null;
+    }
+    if (this.customPluginStoreSubscription) {
+      const store = meeting?.stores?.stores?.get('__internal_rtk_custom_plugins');
+      store?.unsubscribe('activePlugins', this.customPluginStoreSubscription);
+      this.customPluginStoreSubscription = null;
+    }
   }
 
   @Watch('meeting')
@@ -204,6 +223,8 @@ export class RtkGrid {
       if (meeting.stage?.status) {
         this.stageStatusListener();
       }
+
+      this.subscribeToCustomPluginStore(meeting);
     }
   }
 
@@ -223,7 +244,16 @@ export class RtkGrid {
 
   @Watch('plugins')
   pluginsChanged(plugins: RTKPlugin[]) {
-    const activePlugin = plugins.length > 0;
+    this.updateActivePluginState(plugins, this.activeCustomPlugins);
+  }
+
+  @Watch('activeCustomPlugins')
+  activeCustomPluginsChanged(activeCustomPlugins: CustomPlugin[]) {
+    this.updateActivePluginState(this.plugins, activeCustomPlugins);
+  }
+
+  private updateActivePluginState(plugins: RTKPlugin[], activeCustomPlugins: CustomPlugin[]) {
+    const activePlugin = plugins.length > 0 || activeCustomPlugins.length > 0;
     if (!!this.states.activePlugin === activePlugin) return;
 
     this.stateUpdate.emit({ activePlugin });
@@ -388,6 +418,40 @@ export class RtkGrid {
     this.updateActiveParticipants();
   };
 
+  // NOTE(retry): The store should be available immediately since the SDK awaits
+  // storesManager.create('__internal_rtk_custom_plugins') in Controller.init().
+  // However, there is currently a timing issue where either the store or
+  // customPlugins (via @SyncWithStore) may not be ready when meetingChanged fires.
+  // Retry is a temporary workaround until the root cause is fixed.
+  private subscribeToCustomPluginStore(meeting: Meeting) {
+    const trySubscribe = () => {
+      const store = meeting.stores?.stores?.get('__internal_rtk_custom_plugins');
+      if (!store || !this.customPlugins?.length) return false;
+      const activeIds: string[] = store.get('activePlugins') || [];
+      this.activeCustomPlugins = (this.customPlugins || []).filter((cp) =>
+        activeIds.includes(cp.id)
+      );
+      this.customPluginStoreSubscription = () => {
+        const s = meeting.stores?.stores?.get('__internal_rtk_custom_plugins');
+        const ids: string[] = s?.get('activePlugins') || [];
+        this.activeCustomPlugins = (this.customPlugins || []).filter((cp) => ids.includes(cp.id));
+      };
+      store.subscribe('activePlugins', this.customPluginStoreSubscription);
+      return true;
+    };
+
+    if (trySubscribe()) return;
+
+    let attempts = 0;
+    this.customPluginStoreRetryInterval = setInterval(() => {
+      attempts++;
+      if (trySubscribe() || attempts >= 20) {
+        clearInterval(this.customPluginStoreRetryInterval);
+        this.customPluginStoreRetryInterval = null;
+      }
+    }, 500);
+  }
+
   private updateRoomStateListener = () => {
     this.roomState = this.meeting.self.roomState;
   };
@@ -480,6 +544,7 @@ export class RtkGrid {
             participants: this.participants,
             screenShareParticipants: this.screenShareParticipants,
             plugins: this.plugins,
+            activeCustomPlugins: this.activeCustomPlugins,
             pinnedParticipants: this.pinnedParticipants,
             aspectRatio: this.aspectRatio,
             gap: this.gap,

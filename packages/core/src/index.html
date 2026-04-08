@@ -359,14 +359,125 @@
     <script src="https://unpkg.com/alpinejs@3.8.1/dist/cdn.min.js" defer></script>
 
     <script>
+      const todoAppEl = document.createElement('iframe');
+      todoAppEl.id = 'todo-plugin';
+      todoAppEl.src = 'https://realtimekit-plugin-todo-app.cf-realtime.workers.dev/';
+      todoAppEl.style.cssText = 'width:100%;height:100%;border:none;';
+
+      function connectToDoListPluginToMeeting(meeting, iframe) {
+        var STORE_NAME = 'realtimekit-plugin-todo-store-' + iframe.id;
+        var store = null;
+
+        var methods = {
+          init: async function () {
+            store = await meeting.stores.create(STORE_NAME);
+          },
+          setTask: async function (data) {
+            return await store.set(data.id, data.task);
+          },
+          fetchTask: async function (data) {
+            return store.get(data.id);
+          },
+          fetchAllTasks: async function () {
+            return store.getAll();
+          },
+          addTaskToTrash: async function (data) {
+            var task = store.get(data.id);
+            if (!task) throw new Error('Task not found: ' + data.id);
+            return await store.set(data.id, Object.assign({}, task, { state: 'deleted' }));
+          },
+          removeTaskPermanently: async function (data) {
+            return store.delete(data.id);
+          },
+          subscribe: async function () {
+            store.subscribe('*', function (event) {
+              iframe.contentWindow.postMessage(
+                { type: 'plugin-event', event: 'data-update', data: event },
+                '*'
+              );
+            });
+          },
+        };
+
+        window.addEventListener('message', async function (event) {
+          if (event.source !== iframe.contentWindow) return;
+          var msg = event.data;
+          if (!msg || typeof msg !== 'object') return;
+
+          if (msg.type === 'rtk-plugin-ready') {
+            iframe.contentWindow.postMessage({ type: 'rtk-plugin-init' }, '*');
+            return;
+          }
+
+          if (msg.type === 'plugin-request') {
+            var fn = methods[msg.method];
+            if (!fn) {
+              iframe.contentWindow.postMessage(
+                { type: 'plugin-response', id: msg.id, error: 'Unknown method: ' + msg.method },
+                '*'
+              );
+              return;
+            }
+            try {
+              var result = await fn(msg.data);
+              iframe.contentWindow.postMessage(
+                { type: 'plugin-response', id: msg.id, result: result },
+                '*'
+              );
+            } catch (e) {
+              iframe.contentWindow.postMessage(
+                { type: 'plugin-response', id: msg.id, error: e.message },
+                '*'
+              );
+            }
+          }
+        });
+      }
+
+      const youtubeRickrollEl = document.createElement('iframe');
+      youtubeRickrollEl.src = 'https://www.youtube.com/embed/dQw4w9WgXcQ';
+      youtubeRickrollEl.style.cssText = 'width:100%;height:100%;border:none;';
+
+      const helloWorldEl = document.createElement('div');
+      helloWorldEl.style.cssText =
+        'display:flex;align-items:center;justify-content:center;height:100%;width:100%;background:#1a1a2e;color:#fff;font-family:sans-serif;flex-direction:column;gap:12px;';
+      helloWorldEl.innerHTML =
+        '<h1 style="font-size:2rem;margin:0;">👋 Hello World Plugin</h1><p style="color:#aaa;margin:0;">This is a custom plugin passed to rtk-meeting.</p>';
+
       const app = () => {
         return {
           meeting: null,
           joining: false,
           status: 'Joining...',
+          customPlugins: [
+            {
+              id: 'hello-world',
+              name: 'Hello World',
+              icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36"><rect width="36" height="36" rx="8" fill="#6366f1"/><g transform="translate(6,6)" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></g></svg>',
+              canOpenPlugin: true,
+              canClosePlugin: true,
+              component: helloWorldEl,
+            },
+            {
+              id: 'youtube-rickroll',
+              name: 'YouTube Rickroll',
+              icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36"><rect width="36" height="36" rx="8" fill="#ef4444"/><g transform="translate(6,6)" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></g></svg>',
+              canOpenPlugin: true,
+              canClosePlugin: true,
+              component: youtubeRickrollEl,
+            },
+            {
+              id: 'todo-app',
+              name: 'TODO List',
+              icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36"><rect width="36" height="36" rx="8" fill="#10b981"/><g transform="translate(6,6)" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></g></svg>',
+              canOpenPlugin: true,
+              canClosePlugin: true,
+              component: todoAppEl,
+            },
+          ],
           data: {
             authToken: '',
-            env: 'preprod',
+            env: 'prod',
             showSetupScreen: false,
             defaults: {
               audio: false,
@@ -377,8 +488,10 @@
           },
           async initialize() {
             const url = new URL(window.location.href);
-            const authToken = url.searchParams.get('authToken');
-            const env = url.searchParams.get('env');
+            const authToken =
+              url.searchParams.get('authToken') ||
+              'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJvcmdJZCI6ImJhMTU5YmUwLTI4YWMtNDllMi1hNWQzLTRiYzc3OGUzNzc1ZCIsIm1lZXRpbmdJZCI6ImJiYmY3NDFmLWU5NzgtNGY5MS1iN2RkLWQ4MGNlNGMzNzhjYyIsInBhcnRpY2lwYW50SWQiOiJhYWFlMDYwZi1lODZjLTRiYTctYmQwOS05NTY2MWI0NWM1ZDEiLCJwcmVzZXRJZCI6IjZmMTBiMzYyLWQ3YzMtNDE3Mi1hMzNjLTZkMTc3N2U0MjVkOCIsImlhdCI6MTc3NTU1MTYzOCwiZXhwIjoxNzg0MTkxNjM4fQ.ja1mN04mIjAECF5hhB07lqYe-bBsJ4puIiQ1hBQ80MGblxHsXCezzY7MLT9nhyo0M_6EeYsq_ECP4qVmcoz7B7CdJ0L74V9hCWMtecHlzGfWZqJE8lDu0PBvzh7w4i8GUO2x6H_5VTd3O-HEZxFJ9Vz8Vt_o58ZaieEGNfEHAgzFOfP6JarhZHOOz6XJLhVFfE8xO0KzJgCar2yXOIQm_A_en0rn3DDiKZ2vmrFac1p_WH_5e597Hm4z8FcaL85ESPYnVJQay4fQVCcNRRng_AjtzZUc08VpteuAQgRKf28pvgPEnRawtuCQ1THpkt3lAn_WRtzTfCfy5J5wNN5PDg';
+            const env = url.searchParams.get('env') || 'prod';
             const showSetupScreen = url.searchParams.get('showSetupScreen');
             const enableVideo = url.searchParams.get('enableVideo');
             const enableAudio = url.searchParams.get('enableAudio');
@@ -456,8 +569,12 @@
 
             const { env } = this.data;
 
-            const apiBase = env === 'prod' ? 'https://api.dyte.io' : `https://api.${env}.dyte.io`;
-            const baseURI = env === 'prod' ? 'dyte.io' : `${env}.dyte.io`;
+            const apiBase =
+              env === 'prod'
+                ? 'https://api.realtime.cloudflare.com'
+                : `https://api.${env}.realtime.cloudflare.com`;
+            const baseURI =
+              env === 'prod' ? 'realtime.cloudflare.com' : `${env}.realtime.cloudflare.com`;
 
             this.status = 'Getting meeting details...';
 
@@ -515,7 +632,9 @@
           attachMeetingObject(meeting, log = false) {
             this.meeting = meeting;
             this.$refs.meeting.meeting = meeting;
+            this.$refs.meeting.customPlugins = this.customPlugins;
             window.meeting = meeting;
+            connectToDoListPluginToMeeting(meeting, todoAppEl);
           },
         };
       };
