@@ -488,9 +488,7 @@
           },
           async initialize() {
             const url = new URL(window.location.href);
-            const authToken =
-              url.searchParams.get('authToken') ||
-              'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJvcmdJZCI6ImJhMTU5YmUwLTI4YWMtNDllMi1hNWQzLTRiYzc3OGUzNzc1ZCIsIm1lZXRpbmdJZCI6ImJiYmY3NDFmLWU5NzgtNGY5MS1iN2RkLWQ4MGNlNGMzNzhjYyIsInBhcnRpY2lwYW50SWQiOiJhYWFlMDYwZi1lODZjLTRiYTctYmQwOS05NTY2MWI0NWM1ZDEiLCJwcmVzZXRJZCI6IjZmMTBiMzYyLWQ3YzMtNDE3Mi1hMzNjLTZkMTc3N2U0MjVkOCIsImlhdCI6MTc3NTU1MTYzOCwiZXhwIjoxNzg0MTkxNjM4fQ.ja1mN04mIjAECF5hhB07lqYe-bBsJ4puIiQ1hBQ80MGblxHsXCezzY7MLT9nhyo0M_6EeYsq_ECP4qVmcoz7B7CdJ0L74V9hCWMtecHlzGfWZqJE8lDu0PBvzh7w4i8GUO2x6H_5VTd3O-HEZxFJ9Vz8Vt_o58ZaieEGNfEHAgzFOfP6JarhZHOOz6XJLhVFfE8xO0KzJgCar2yXOIQm_A_en0rn3DDiKZ2vmrFac1p_WH_5e597Hm4z8FcaL85ESPYnVJQay4fQVCcNRRng_AjtzZUc08VpteuAQgRKf28pvgPEnRawtuCQ1THpkt3lAn_WRtzTfCfy5J5wNN5PDg';
+            const authToken = url.searchParams.get('authToken');
             const env = url.searchParams.get('env') || 'prod';
             const showSetupScreen = url.searchParams.get('showSetupScreen');
             const enableVideo = url.searchParams.get('enableVideo');
