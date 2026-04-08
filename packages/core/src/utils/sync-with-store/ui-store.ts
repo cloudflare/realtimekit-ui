@@ -2,7 +2,7 @@ import { createStore, ObservableMap } from '@stencil/store';
 import { Meeting, RealtimeKitClient } from '../../types/rtk-client';
 import { useLanguage, type RtkI18n } from '../../lib/lang';
 import { defaultIconPack, type IconPack } from '../../lib/icons';
-import { type States } from '../../types/props';
+import { type States, type CustomPlugin } from '../../types/props';
 import { getUserPreferences } from '../user-prefs';
 import { createDefaultConfig, UIConfig } from '../../exports';
 import { type Overrides, defaultOverrides } from '../../lib/overrides';
@@ -19,6 +19,7 @@ export interface RtkUiStore {
   iconPack: IconPack;
   states: States;
   config: UIConfig;
+  customPlugins: CustomPlugin[];
   peerId: string | null;
   storeType: 'global' | 'peer';
   storeId: string;
@@ -36,6 +37,7 @@ const uiStore = createStore<RtkUiStore>({
   iconPack: defaultIconPack,
   states: getInitialStates(),
   config: createDefaultConfig(),
+  customPlugins: [],
   peerId: 'global',
   storeType: 'global',
   storeId: 'store-global',
@@ -79,6 +81,7 @@ export function createPeerStore({
   iconPack,
   t,
   overrides,
+  customPlugins,
 }: {
   meeting: RealtimeKitClient;
   config?: UIConfig;
@@ -86,6 +89,7 @@ export function createPeerStore({
   iconPack: IconPack;
   t: RtkI18n;
   overrides?: Overrides;
+  customPlugins?: CustomPlugin[];
 }): RtkUiStoreExtended {
   const store = createStore<RtkUiStore>({
     meeting: meeting,
@@ -93,6 +97,7 @@ export function createPeerStore({
     iconPack,
     states: getInitialStates(meeting.self.peerId),
     config: config || createDefaultConfig(),
+    customPlugins: customPlugins || [],
     peerId: meeting.self.id,
     storeType: 'peer',
     // Use provider id's numeric portion as store id for easier debugging

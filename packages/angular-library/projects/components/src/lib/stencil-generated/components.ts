@@ -1377,14 +1377,14 @@ export declare interface RtkFullscreenToggle extends Components.RtkFullscreenTog
 
 
 @ProxyCmp({
-  inputs: ['aspectRatio', 'config', 'gap', 'gridSize', 'iconPack', 'layout', 'meeting', 'overrides', 'size', 'states', 't']
+  inputs: ['aspectRatio', 'config', 'customPlugins', 'gap', 'gridSize', 'iconPack', 'layout', 'meeting', 'overrides', 'size', 'states', 't']
 })
 @Component({
   selector: 'rtk-grid',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: '<ng-content></ng-content>',
   // eslint-disable-next-line @angular-eslint/no-inputs-metadata-property
-  inputs: ['aspectRatio', 'config', 'gap', 'gridSize', 'iconPack', 'layout', 'meeting', 'overrides', 'size', 'states', 't'],
+  inputs: ['aspectRatio', 'config', 'customPlugins', 'gap', 'gridSize', 'iconPack', 'layout', 'meeting', 'overrides', 'size', 'states', 't'],
 })
 export class RtkGrid {
   protected el: HTMLRtkGridElement;
@@ -1829,14 +1829,14 @@ export declare interface RtkMarkdownView extends Components.RtkMarkdownView {}
 
 
 @ProxyCmp({
-  inputs: ['applyDesignSystem', 'config', 'gridLayout', 'iconPack', 'leaveOnUnmount', 'loadConfigFromPreset', 'meeting', 'mode', 'overrides', 'showSetupScreen', 'size', 't']
+  inputs: ['applyDesignSystem', 'config', 'customPlugins', 'gridLayout', 'iconPack', 'leaveOnUnmount', 'loadConfigFromPreset', 'meeting', 'mode', 'overrides', 'showSetupScreen', 'size', 't']
 })
 @Component({
   selector: 'rtk-meeting',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: '<ng-content></ng-content>',
   // eslint-disable-next-line @angular-eslint/no-inputs-metadata-property
-  inputs: ['applyDesignSystem', 'config', 'gridLayout', 'iconPack', 'leaveOnUnmount', 'loadConfigFromPreset', 'meeting', 'mode', 'overrides', 'showSetupScreen', 'size', 't'],
+  inputs: ['applyDesignSystem', 'config', 'customPlugins', 'gridLayout', 'iconPack', 'leaveOnUnmount', 'loadConfigFromPreset', 'meeting', 'mode', 'overrides', 'showSetupScreen', 'size', 't'],
 })
 export class RtkMeeting {
   protected el: HTMLRtkMeetingElement;
@@ -2050,14 +2050,14 @@ export declare interface RtkMicrophoneSelector extends Components.RtkMicrophoneS
 
 
 @ProxyCmp({
-  inputs: ['aspectRatio', 'config', 'gap', 'gridSize', 'iconPack', 'layout', 'meeting', 'participants', 'pinnedParticipants', 'plugins', 'screenShareParticipants', 'size', 'states', 't']
+  inputs: ['aspectRatio', 'config', 'customPlugins', 'gap', 'gridSize', 'iconPack', 'layout', 'meeting', 'participants', 'pinnedParticipants', 'plugins', 'screenShareParticipants', 'size', 'states', 't']
 })
 @Component({
   selector: 'rtk-mixed-grid',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: '<ng-content></ng-content>',
   // eslint-disable-next-line @angular-eslint/no-inputs-metadata-property
-  inputs: ['aspectRatio', 'config', 'gap', 'gridSize', 'iconPack', 'layout', 'meeting', 'participants', 'pinnedParticipants', 'plugins', 'screenShareParticipants', 'size', 'states', 't'],
+  inputs: ['aspectRatio', 'config', 'customPlugins', 'gap', 'gridSize', 'iconPack', 'layout', 'meeting', 'participants', 'pinnedParticipants', 'plugins', 'screenShareParticipants', 'size', 'states', 't'],
 })
 export class RtkMixedGrid {
   protected el: HTMLRtkMixedGridElement;
@@ -2684,14 +2684,14 @@ export declare interface RtkPipToggle extends Components.RtkPipToggle {
 
 
 @ProxyCmp({
-  inputs: ['iconPack', 'meeting', 'plugin', 't']
+  inputs: ['customPlugin', 'customPlugins', 'iconPack', 'meeting', 'plugin', 't']
 })
 @Component({
   selector: 'rtk-plugin-main',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: '<ng-content></ng-content>',
   // eslint-disable-next-line @angular-eslint/no-inputs-metadata-property
-  inputs: ['iconPack', 'meeting', 'plugin', 't'],
+  inputs: ['customPlugin', 'customPlugins', 'iconPack', 'meeting', 'plugin', 't'],
 })
 export class RtkPluginMain {
   protected el: HTMLRtkPluginMainElement;
@@ -2706,14 +2706,14 @@ export declare interface RtkPluginMain extends Components.RtkPluginMain {}
 
 
 @ProxyCmp({
-  inputs: ['config', 'iconPack', 'meeting', 'size', 't']
+  inputs: ['config', 'customPlugins', 'iconPack', 'meeting', 'size', 'states', 't']
 })
 @Component({
   selector: 'rtk-plugins',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: '<ng-content></ng-content>',
   // eslint-disable-next-line @angular-eslint/no-inputs-metadata-property
-  inputs: ['config', 'iconPack', 'meeting', 'size', 't'],
+  inputs: ['config', 'customPlugins', 'iconPack', 'meeting', 'size', 'states', 't'],
 })
 export class RtkPlugins {
   protected el: HTMLRtkPluginsElement;
@@ -3586,14 +3586,14 @@ export declare interface RtkTranscripts extends Components.RtkTranscripts {}
 
 
 @ProxyCmp({
-  inputs: ['config', 'iconPack', 'meeting', 'mode', 'overrides', 'showSetupScreen', 't']
+  inputs: ['config', 'customPlugins', 'iconPack', 'meeting', 'mode', 'overrides', 'showSetupScreen', 't']
 })
 @Component({
   selector: 'rtk-ui-provider',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: '<ng-content></ng-content>',
   // eslint-disable-next-line @angular-eslint/no-inputs-metadata-property
-  inputs: ['config', 'iconPack', 'meeting', 'mode', 'overrides', 'showSetupScreen', 't'],
+  inputs: ['config', 'customPlugins', 'iconPack', 'meeting', 'mode', 'overrides', 'showSetupScreen', 't'],
 })
 export class RtkUiProvider {
   protected el: HTMLRtkUiProviderElement;

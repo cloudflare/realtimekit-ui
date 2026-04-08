@@ -1,6 +1,6 @@
 import { Component, Host, h, Prop, State, Watch, Event, EventEmitter } from '@stencil/core';
 import { Meeting } from '../../types/rtk-client';
-import { Size, States } from '../../types/props';
+import { CustomPlugin, Size, States } from '../../types/props';
 import { UIConfig } from '../../types/ui-config';
 import { defaultIconPack, IconPack } from '../../lib/icons';
 import { RTKPlugin } from '@cloudflare/realtimekit';
@@ -19,6 +19,9 @@ import { createDefaultConfig } from '../../exports';
 })
 export class RtkPlugins {
   private updateActivePlugins: () => void;
+  private customPluginStoreSubscription: () => void;
+  private customPluginStoreRetryInterval: ReturnType<typeof setInterval>;
+
   /** Meeting object */
   @SyncWithStore()
   @Prop()
@@ -42,6 +45,16 @@ export class RtkPlugins {
   @Prop()
   t: RtkI18n = useLanguage();
 
+  /** States */
+  @SyncWithStore()
+  @Prop()
+  states: States;
+
+  /** Custom Plugins */
+  @SyncWithStore()
+  @Prop()
+  customPlugins: CustomPlugin[] = [];
+
   /** Emits updated state data */
   @Event({ eventName: 'rtkStateUpdate' }) stateUpdate: EventEmitter<States>;
 
@@ -53,12 +66,22 @@ export class RtkPlugins {
 
   @State() activatedPluginsId: string[] = [];
 
+  @State() activeCustomPluginIds: string[] = [];
+
   connectedCallback() {
     this.meetingChanged(this.meeting);
   }
 
   disconnectedCallback() {
     this.meeting?.plugins.all.removeListener('stateUpdate', this.updateActivePlugins);
+    if (this.customPluginStoreRetryInterval) {
+      clearInterval(this.customPluginStoreRetryInterval);
+      this.customPluginStoreRetryInterval = null;
+    }
+    if (this.customPluginStoreSubscription) {
+      const store = this.meeting?.stores?.stores?.get('__internal_rtk_custom_plugins');
+      store?.unsubscribe('activePlugins', this.customPluginStoreSubscription);
+    }
   }
 
   @Watch('meeting')
@@ -75,7 +98,60 @@ export class RtkPlugins {
       };
       this.updateActivePlugins();
       meeting.plugins.all.addListener('stateUpdate', this.updateActivePlugins);
+
+      this.subscribeToCustomPluginStore(meeting);
     }
+  }
+
+  private activateCustomPlugin = (plugin: CustomPlugin) => {
+    const store = this.meeting?.stores?.stores?.get('__internal_rtk_custom_plugins');
+    if (!store) return;
+    const current: string[] = store.get('activePlugins') || [];
+    if (!current.includes(plugin.id)) {
+      const newIds = [...current, plugin.id];
+      store.set('activePlugins', newIds, true, true);
+      this.activeCustomPluginIds = newIds;
+    }
+    this.close();
+  };
+
+  private deactivateCustomPlugin = (plugin: CustomPlugin) => {
+    const store = this.meeting?.stores?.stores?.get('__internal_rtk_custom_plugins');
+    if (!store) return;
+    const current: string[] = store.get('activePlugins') || [];
+    const newIds = current.filter((id) => id !== plugin.id);
+    store.set('activePlugins', newIds, true, true);
+    this.activeCustomPluginIds = newIds;
+  };
+
+  // NOTE(retry): The store should be available immediately since the SDK awaits
+  // storesManager.create('__internal_rtk_custom_plugins') in Controller.init().
+  // However, there is currently a timing issue where either the store or
+  // customPlugins (via @SyncWithStore) may not be ready when meetingChanged fires.
+  // Retry is a temporary workaround until the root cause is fixed.
+  private subscribeToCustomPluginStore(meeting: Meeting) {
+    const trySubscribe = () => {
+      const store = meeting.stores?.stores?.get('__internal_rtk_custom_plugins');
+      if (!store || !this.customPlugins?.length) return false;
+      this.activeCustomPluginIds = store.get('activePlugins') || [];
+      this.customPluginStoreSubscription = () => {
+        const s = meeting.stores?.stores?.get('__internal_rtk_custom_plugins');
+        this.activeCustomPluginIds = s?.get('activePlugins') || [];
+      };
+      store.subscribe('activePlugins', this.customPluginStoreSubscription);
+      return true;
+    };
+
+    if (trySubscribe()) return;
+
+    let attempts = 0;
+    this.customPluginStoreRetryInterval = setInterval(() => {
+      attempts++;
+      if (trySubscribe() || attempts >= 20) {
+        clearInterval(this.customPluginStoreRetryInterval);
+        this.customPluginStoreRetryInterval = null;
+      }
+    }, 500);
   }
 
   private close = () => {
@@ -86,6 +162,38 @@ export class RtkPlugins {
     return (
       <Host>
         <ul class="scrollbar">
+          {this.customPlugins?.map((cp) => (
+            <li key={cp.id} class="plugin">
+              <div class="metadata">
+                <rtk-icon icon={cp.icon} size="md" />
+                <div class="name">{cp.name}</div>
+              </div>
+              {!this.activeCustomPluginIds.includes(cp.id) && cp.canOpenPlugin && (
+                <div class="buttons">
+                  <rtk-button
+                    kind="icon"
+                    size="lg"
+                    onClick={() => this.activateCustomPlugin(cp)}
+                    aria-label={`${this.t('activate')} ${cp.name}`}
+                  >
+                    <rtk-icon icon={this.iconPack.rocket} tabIndex={-1} aria-hidden={true} />
+                  </rtk-button>
+                </div>
+              )}
+              {this.activeCustomPluginIds.includes(cp.id) && cp.canClosePlugin && (
+                <div class="buttons">
+                  <rtk-button
+                    kind="icon"
+                    size="lg"
+                    onClick={() => this.deactivateCustomPlugin(cp)}
+                    aria-label={`${this.t('close')} ${cp.name}`}
+                  >
+                    <rtk-icon icon={this.iconPack.dismiss} tabIndex={-1} aria-hidden={true} />
+                  </rtk-button>
+                </div>
+              )}
+            </li>
+          ))}
           {this.plugins.map((plugin) => (
             <li key={plugin.name} class="plugin">
               <div class="metadata">

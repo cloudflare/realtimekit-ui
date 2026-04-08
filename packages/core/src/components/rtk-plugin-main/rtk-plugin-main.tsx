@@ -2,6 +2,7 @@ import { defaultIconPack, IconPack } from '../../lib/icons';
 import { RTKPermissionsPreset, RTKPlugin } from '@cloudflare/realtimekit';
 import { Component, Host, h, Prop, Watch, State, writeTask } from '@stencil/core';
 import { Meeting } from '../../types/rtk-client';
+import { CustomPlugin } from '../../types/props';
 import { SyncWithStore } from '../../utils/sync-with-store';
 import { RtkI18n, useLanguage } from '../../lib/lang';
 
@@ -16,6 +17,7 @@ import { RtkI18n, useLanguage } from '../../lib/lang';
 export class RtkPluginMain {
   private iframeEl: HTMLIFrameElement;
   private toggleViewModeListener: (data: boolean) => void;
+  private customPluginContainerEl: HTMLDivElement;
 
   /** Meeting */
   @SyncWithStore()
@@ -23,7 +25,15 @@ export class RtkPluginMain {
   meeting: Meeting;
 
   /** Plugin */
-  @Prop() plugin!: RTKPlugin;
+  @Prop() plugin: RTKPlugin;
+
+  /** Custom Plugin (when rendering a custom plugin instead of an ordinary one) */
+  @Prop() customPlugin: CustomPlugin | null = null;
+
+  /** Custom Plugins */
+  @SyncWithStore()
+  @Prop()
+  customPlugins: CustomPlugin[] = [];
 
   /** Icon pack */
   @SyncWithStore()
@@ -53,6 +63,8 @@ export class RtkPluginMain {
   @Watch('meeting')
   meetingChanged(meeting: Meeting) {
     if (!meeting) return;
+    if (this.customPlugin != null) return;
+    if (this.plugin == null) return;
     const enabled = this.canInteractWithPlugin();
     this.viewModeEnabled = !enabled;
     writeTask(() => {
@@ -77,7 +89,29 @@ export class RtkPluginMain {
   disconnectedCallback() {
     this.plugin?.removePluginView('plugin-main');
     this.plugin?.removeListener('toggleViewMode', this.toggleViewModeListener);
+    if (this.customPluginContainerEl && this.customPlugin?.component) {
+      if (this.customPluginContainerEl.contains(this.customPlugin.component)) {
+        this.customPluginContainerEl.removeChild(this.customPlugin.component);
+      }
+    }
   }
+
+  private deactivateCustomPlugin = () => {
+    const store = this.meeting?.stores?.stores?.get('__internal_rtk_custom_plugins');
+    if (!this.customPlugin || !store) return;
+    const current: string[] = store.get('activePlugins') || [];
+    const newIds = current.filter((id) => id !== this.customPlugin.id);
+    store.set('activePlugins', newIds, true, true);
+  };
+
+  private onCustomPluginContainerRef = (el: HTMLDivElement) => {
+    if (!el || el === this.customPluginContainerEl) return;
+    this.customPluginContainerEl = el;
+    if (this.customPlugin?.component && !el.contains(this.customPlugin.component)) {
+      el.innerHTML = '';
+      el.appendChild(this.customPlugin.component);
+    }
+  };
 
   private canInteractWithPlugin = () => {
     const pluginId = this.plugin.id;
@@ -108,6 +142,27 @@ export class RtkPluginMain {
   };
 
   render() {
+    if (this.customPlugin != null) {
+      return (
+        <Host>
+          <header part="header">
+            <div>
+              <rtk-icon icon={this.customPlugin.icon} />
+              {this.customPlugin.name}
+            </div>
+            {this.customPlugin.canClosePlugin && (
+              <div>
+                <rtk-button kind="icon" onClick={this.deactivateCustomPlugin} part="button">
+                  <rtk-icon icon={this.iconPack.dismiss} />
+                </rtk-button>
+              </div>
+            )}
+          </header>
+          <div class="custom-plugin-container" ref={(el) => this.onCustomPluginContainerRef(el)} />
+        </Host>
+      );
+    }
+
     if (this.plugin == null) return null;
 
     return (

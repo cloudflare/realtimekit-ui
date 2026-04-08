@@ -1,6 +1,7 @@
 import { Component, Host, h, Prop, Event, EventEmitter } from '@stencil/core';
 import { RTKPlugin } from '@cloudflare/realtimekit';
 import type { ActiveTabType } from '@cloudflare/realtimekit';
+import { CustomPlugin } from '../../types/props';
 import { createDefaultConfig } from '../../lib/default-ui-config';
 import { defaultIconPack, IconPack } from '../../lib/icons';
 import { RtkI18n, useLanguage } from '../../lib/lang';
@@ -12,9 +13,10 @@ import { SyncWithStore } from '../../utils/sync-with-store';
 import { GridLayout } from '../rtk-grid/rtk-grid';
 
 export interface Tab {
-  type: ActiveTabType;
+  type: ActiveTabType | 'custom-plugin';
   participant?: Peer;
   plugin?: RTKPlugin;
+  customPlugin?: CustomPlugin;
 }
 
 @Component({
@@ -75,6 +77,12 @@ export class RtkTabBar {
         {this.tabs.map((tab: Tab) => {
           let isActive = false;
           if (
+            this.activeTab?.type === 'custom-plugin' &&
+            tab.customPlugin &&
+            this.activeTab?.customPlugin.id === tab.customPlugin.id
+          )
+            isActive = true;
+          else if (
             this.activeTab?.type === 'plugin' &&
             tab.plugin &&
             this.activeTab?.plugin.id === tab.plugin.id
@@ -106,6 +114,26 @@ export class RtkTabBar {
                   <span class="name">
                     {participant.id === this.meeting?.self.id ? this.t('you') : shorten(name, 6)}
                   </span>
+                </div>
+              </rtk-button>
+            );
+          } else if (tab.type === 'custom-plugin') {
+            const cp = tab.customPlugin;
+            return (
+              <rtk-button
+                title={cp.name}
+                key={cp.id}
+                kind="icon"
+                variant={isActive ? 'primary' : 'secondary'}
+                class={{
+                  tab: true,
+                  active: isActive,
+                }}
+                onClick={() => this.tabChange.emit(tab)}
+              >
+                <div class="center col">
+                  <rtk-icon icon={cp.icon} />
+                  <span class="name">{shorten(cp.name, 6)}</span>
                 </div>
               </rtk-button>
             );

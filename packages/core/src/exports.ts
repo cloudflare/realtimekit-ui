@@ -24,6 +24,7 @@ export {
   UserPreferences,
   PollObject,
   PartialStateEvent,
+  CustomPlugin,
 } from './types/props';
 export { Peer } from './types/rtk-client';
 
