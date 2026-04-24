@@ -4,7 +4,7 @@ import { defaultIconPack, IconPack } from '../../lib/icons';
 import { RtkI18n, useLanguage } from '../../lib/lang';
 import { Size } from '../../types/props';
 import { SyncWithStore } from '../../utils/sync-with-store';
-import { disableSettingSinkId } from '../../utils/flags';
+import { isFirefox } from '../../utils/browser';
 
 /**
  * A component which lets to manage your audio devices and audio preferences.
@@ -116,8 +116,8 @@ export class RtkMicrophoneSelector {
     });
   }
 
-  private setDevice(deviceId) {
-    if (disableSettingSinkId(this.meeting)) return;
+  private setDevice(deviceId: string) {
+    if (isFirefox(this.meeting)) return;
     const device = this.audioinputDevices.find((d) => d.deviceId === deviceId);
 
     if (device != null) {

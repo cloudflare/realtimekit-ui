@@ -15,7 +15,6 @@ import { DefaultProps, lenChildren, Render } from '../../lib/render';
 import { Meeting, Participant, Peer } from '../../types/rtk-client';
 import { formatName, shorten } from '../../utils/string';
 import { createDefaultConfig, States, UIConfig } from '../../exports';
-import { FlagsmithFeatureFlags } from '../../utils/flags';
 import { autoPlacement, computePosition, hide, offset, shift } from '@floating-ui/dom';
 import { SyncWithStore } from '../../utils/sync-with-store';
 import type { RTKParticipant, RTKSelf } from '@cloudflare/realtimekit';
@@ -135,26 +134,10 @@ export class RtkParticipant {
         self.permissions.canAllowParticipantAudio || self.permissions.canDisableParticipantAudio;
       this.canDisableParticipantVideo =
         self.permissions.canAllowParticipantVideo || self.permissions.canDisableParticipantVideo;
-      this.canKickParticipant =
-        self.permissions.kickParticipant &&
-        this.meeting?.__internals__.features.hasFeature(FlagsmithFeatureFlags.DISABLE_KICKING) !==
-          true &&
-        (this.meeting?.__internals__.features.hasFeature(
-          FlagsmithFeatureFlags.ADMIN_CANTREMOVE_ADMIN
-        ) !== true ||
-          this.participant?.presetName !== 'webinar_admin');
+      this.canKickParticipant = self.permissions.kickParticipant;
       this.canPinParticipant = self.permissions.pinParticipant;
       this.canAllowParticipantOnStage =
-        self.permissions.acceptStageRequests &&
-        self.permissions.stageEnabled &&
-        (this.meeting?.__internals__.features.hasFeature(
-          FlagsmithFeatureFlags.ADMIN_CANTREMOVE_ADMIN
-        ) !== true ||
-          this.participant?.presetName !== 'webinar_admin') &&
-        (this.meeting?.__internals__.features.hasFeature(
-          FlagsmithFeatureFlags.CANTINVITE_VIEWER
-        ) !== true ||
-          this.participant?.presetName !== 'webinar_viewer');
+        self.permissions.acceptStageRequests && self.permissions.stageEnabled;
 
       meeting.self.permissions.addListener('permissionsUpdate', this.permissionsUpdateListener);
     }
