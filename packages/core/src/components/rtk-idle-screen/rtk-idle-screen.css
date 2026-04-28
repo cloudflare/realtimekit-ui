@@ -17,6 +17,14 @@
   }
 }
 
+.error-state {
+  @apply flex w-full flex-col items-center;
+}
+
+.troubleshoot-link {
+  @apply text-brand-400 hover:text-brand-300 text-text-sm mt-1 underline underline-offset-2;
+}
+
 rtk-logo.loaded {
   @apply h-12;
 }

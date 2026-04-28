@@ -96,14 +96,26 @@ export class RtkIdleScreen {
           <div class="ctr" part="container">
             <rtk-logo meeting={this.meeting} config={this.config} t={this.t} part="logo" />
             {this.joinError || showSocketError ? (
-              <div class="no-network-badge" part="network-badge">
-                <rtk-icon
-                  size="md"
-                  variant="danger"
-                  icon={this.iconPack.disconnected}
-                  part="network-badge-icon"
-                ></rtk-icon>
-                {errorText}
+              <div class="error-state">
+                <div class="no-network-badge" part="network-badge">
+                  <rtk-icon
+                    size="md"
+                    variant="danger"
+                    icon={this.iconPack.disconnected}
+                    part="network-badge-icon"
+                  ></rtk-icon>
+                  {errorText}
+                </div>
+                {this.meeting && this.joinError && (
+                  <a
+                    class="troubleshoot-link"
+                    href={`https://test.realtime.cloudflare.com?authToken=${this.meeting.__internals__.authToken}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {this.t('network.troubleshoot')}
+                  </a>
+                )}
               </div>
             ) : (
               <rtk-spinner

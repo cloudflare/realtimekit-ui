@@ -290,6 +290,7 @@ export const defaultLanguage = {
   'network.delay': 'Taking too long to reconnect.',
   'network.lost': 'Connection lost',
   'network.lost_extended': 'Connection lost. Please check your network connection.',
+  'network.troubleshoot': 'Troubleshoot your connection',
 
   livestream: 'Livestream',
   'livestream.indicator': 'This meeting is being livestreamed.',
