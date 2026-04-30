@@ -1,5 +1,5 @@
 import { Meeting } from '../types/rtk-client';
-import { disableSettingSinkId } from '../utils/flags';
+import { isFirefox } from '../utils/browser';
 
 const SOUNDS = {
   joined: 'https://rtk-uploads.realtime.cloudflare.com/notification_join.mp3',
@@ -38,7 +38,7 @@ export default class RTKNotificationsAudio {
   }
 
   async setDevice(id: string) {
-    if (disableSettingSinkId(this.meeting)) return;
+    if (isFirefox(this.meeting)) return;
     await (this.audio as any)?.setSinkId?.(id)?.catch((_) => {});
   }
 }

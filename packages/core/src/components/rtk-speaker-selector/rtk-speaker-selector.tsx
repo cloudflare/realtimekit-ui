@@ -121,7 +121,7 @@ export class RtkSpeakerSelector {
     this.testAudioEl?.play();
   }
 
-  private setDevice(deviceId) {
+  private setDevice(deviceId: string) {
     if (isFirefox(this.meeting)) return;
     const device = this.speakerDevices.find((d) => d.deviceId === deviceId);
 
