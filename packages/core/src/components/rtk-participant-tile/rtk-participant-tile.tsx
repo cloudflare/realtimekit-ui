@@ -4,7 +4,6 @@ import { RtkI18n, useLanguage } from '../../lib/lang';
 import { Meeting, Peer } from '../../types/rtk-client';
 import { Size, States } from '../../types/props';
 import { UIConfig } from '../../types/ui-config';
-import { FlagsmithFeatureFlags } from '../../utils/flags';
 import { createDefaultConfig } from '../../exports';
 import { DefaultProps, Render } from '../../lib/render';
 import { SyncWithStore } from '../../utils/sync-with-store';
@@ -164,20 +163,6 @@ export class RtkParticipantTile {
     return false;
   }
 
-  private onPause = (event: Event) => {
-    if (
-      this.isSelf() &&
-      this.meeting?.__internals__.features.hasFeature(
-        FlagsmithFeatureFlags.PLAY_PARTICIPANT_TILE_VIDEO_ON_PAUSE
-      )
-    ) {
-      this.meeting.__internals__.logger.warn(
-        `Video player paused for ${this.participant.id} isSelf: ${this.isSelf()}`
-      );
-      // @ts-ignore
-      event?.target?.play();
-    }
-  };
   private onPlaying = () => {
     if (this.playTimeout) clearTimeout(this.playTimeout);
   };
@@ -202,7 +187,6 @@ export class RtkParticipantTile {
             [this.config?.config?.videoFit ?? 'cover']: true,
           }}
           onPlaying={this.onPlaying}
-          onPause={this.onPause}
           autoPlay
           playsInline
           muted

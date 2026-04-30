@@ -1,5 +1,5 @@
 import { Meeting } from '../types/rtk-client';
-import { disableSettingSinkId } from '../utils/flags';
+import { isFirefox } from '../utils/browser';
 
 interface PeerAudio {
   id: string;
@@ -64,7 +64,7 @@ export default class RTKAudio {
   }
 
   async setDevice(id: string) {
-    if (disableSettingSinkId(this.meeting)) return;
+    if (isFirefox(this.meeting)) return;
     await (this.audio as any).setSinkId?.(id)?.catch((err) => {
       this.logger.error('[rtk-audio] setSinkId() error\n', err);
     });

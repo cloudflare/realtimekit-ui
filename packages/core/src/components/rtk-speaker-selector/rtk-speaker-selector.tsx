@@ -6,7 +6,7 @@ import { Size, States } from '../../types/props';
 
 import { SyncWithStore } from '../../utils/sync-with-store';
 
-import { disableSettingSinkId } from '../../utils/flags';
+import { isFirefox } from '../../utils/browser';
 
 /**
  * A component which lets to manage your audio devices and audio preferences.
@@ -121,8 +121,8 @@ export class RtkSpeakerSelector {
     this.testAudioEl?.play();
   }
 
-  private setDevice(deviceId) {
-    if (disableSettingSinkId(this.meeting)) return;
+  private setDevice(deviceId: string) {
+    if (isFirefox(this.meeting)) return;
     const device = this.speakerDevices.find((d) => d.deviceId === deviceId);
 
     this.currentDevices = {
@@ -147,7 +147,7 @@ export class RtkSpeakerSelector {
           ref={(el) => (this.testAudioEl = el)}
         />
         <div class={'group ' + this.variant} part="speaker-selection">
-          {this.speakerDevices.length > 0 && !disableSettingSinkId(this.meeting) && (
+          {this.speakerDevices.length > 0 && !isFirefox(this.meeting) && (
             <div class="container">
               <label>
                 {this.variant !== 'inline' && this.t('settings.speaker_output')}
