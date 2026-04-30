@@ -1,3 +1,11 @@
+## [1.1.3-staging.1](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.1.2...@cloudflare/realtimekit-ui-v1.1.3-staging.1) (2026-04-30)
+
+
+### Bug Fixes
+
+* **ai-review:** fixed code around review comments ([8679c76](https://github.com/cloudflare/realtimekit-ui/commit/8679c76e1809f3714419ae09166db0eaedd383d4))
+* **flags:** remove feature flags and hardcoded preset name based configuration ([774b7b3](https://github.com/cloudflare/realtimekit-ui/commit/774b7b3de630c56013a4068ef0c8b37e03bf968c))
+
 ## [1.1.2](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.1.1...@cloudflare/realtimekit-ui-v1.1.2) (2026-03-31)
 
 
