@@ -25,6 +25,10 @@
   @apply text-brand-400 hover:text-brand-300 text-text-sm mt-1 underline underline-offset-2;
 }
 
+.error-code {
+  @apply text-text-xs text-text-600 mt-1;
+}
+
 rtk-logo.loaded {
   @apply h-12;
 }
