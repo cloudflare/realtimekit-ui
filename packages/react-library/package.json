@@ -1,6 +1,6 @@
 {
   "name": "@cloudflare/realtimekit-react-ui",
-  "version": "1.1.3-staging.1",
+  "version": "1.2.0-staging.1",
   "description": "Pre-built, ready-to-use React components, hooks and utilities for integrating with Cloudflare RealtimeKit",
   "repository": {
     "type": "git",

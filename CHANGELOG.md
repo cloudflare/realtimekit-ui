@@ -1,3 +1,16 @@
+# [1.2.0-staging.1](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.1.3-staging.1...@cloudflare/realtimekit-ui-v1.2.0-staging.1) (2026-05-12)
+
+
+### Bug Fixes
+
+* **release-pipeline:** picking correct types from compatible realtimekit version ([d7abcd0](https://github.com/cloudflare/realtimekit-ui/commit/d7abcd030b28b6478447f20d41dfc0cb54d1ac8f))
+* replace raw SDK error messages with user-friendly messages on join failures ([79a7561](https://github.com/cloudflare/realtimekit-ui/commit/79a7561dec1a3c5ac968aeedf237ea90a020581c))
+
+
+### Features
+
+* add troubleshoot link on join failure screens ([78466d6](https://github.com/cloudflare/realtimekit-ui/commit/78466d65acaf26243b0ddb19eda97c1c14a87024))
+
 ## [1.1.3-staging.1](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.1.2...@cloudflare/realtimekit-ui-v1.1.3-staging.1) (2026-04-30)
 
 
