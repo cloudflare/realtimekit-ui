@@ -20,6 +20,7 @@ import { RtkI18n, useLanguage } from '../../lib/lang';
 import gracefulStorage from '../../utils/graceful-storage';
 import { SyncWithStore } from '../../utils/sync-with-store';
 import { SocketConnectionState } from '@cloudflare/realtimekit';
+import { getJoinErrorInfo } from '../../utils/join-error';
 
 /**
  * A screen shown before joining the meeting, where you can edit your display name,
@@ -69,6 +70,8 @@ export class RtkSetupScreen {
 
   @State() joinError?: string;
 
+  @State() joinErrorCode?: string;
+
   @State() canEditName: boolean = true;
 
   @State() canProduceAudio: boolean = true;
@@ -101,6 +104,7 @@ export class RtkSetupScreen {
     this.connectionState = state;
     if (state === 'connected') {
       this.joinError = undefined;
+      this.joinErrorCode = undefined;
     }
     if (state === 'failed') this.isJoining = false;
   };
@@ -119,6 +123,7 @@ export class RtkSetupScreen {
 
       this.isJoining = true;
       this.joinError = undefined;
+      this.joinErrorCode = undefined;
       this.meeting?.self.setName(this.displayName);
 
       gracefulStorage.setItem('rtk-display-name', this.displayName);
@@ -126,7 +131,9 @@ export class RtkSetupScreen {
         await this.meeting?.joinRoom();
       } catch (e) {
         this.isJoining = false;
-        this.joinError = e?.message ? e.message : this.t('network.lost_extended');
+        const { message, code } = getJoinErrorInfo(this.t, e);
+        this.joinError = message;
+        this.joinErrorCode = code;
       }
     }
   };
@@ -213,7 +220,7 @@ export class RtkSetupScreen {
             </rtk-button>
 
             {(this.joinError || showSocketError) && (
-              <div class="no-network-badge">
+              <div class="no-network-badge" role="alert">
                 <rtk-icon size="md" variant="danger" icon={this.iconPack.disconnected}></rtk-icon>
                 {errorText}
               </div>
@@ -227,6 +234,11 @@ export class RtkSetupScreen {
               >
                 {this.t('network.troubleshoot')}
               </a>
+            )}
+            {this.joinErrorCode && (
+              <span class="error-code" part="error-code">
+                {this.t('join.error_code')}: {this.joinErrorCode}
+              </span>
             )}
           </div>
         </div>

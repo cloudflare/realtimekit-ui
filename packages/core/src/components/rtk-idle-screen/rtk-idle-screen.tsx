@@ -45,6 +45,8 @@ export class RtkIdleScreen {
 
   @State() joinError: string | undefined;
 
+  @State() joinErrorCode: string | undefined;
+
   @State() connectionState: SocketConnectionState['state'];
 
   connectedCallback() {
@@ -71,6 +73,7 @@ export class RtkIdleScreen {
     if (state === 'connected') {
       if (!this.states?.joinError) {
         this.joinError = undefined;
+        this.joinErrorCode = undefined;
       }
     }
   };
@@ -78,6 +81,7 @@ export class RtkIdleScreen {
   @Watch('states')
   statesChanged(states: States) {
     this.joinError = states?.joinError;
+    this.joinErrorCode = states?.joinErrorCode;
   }
 
   render() {
@@ -97,7 +101,7 @@ export class RtkIdleScreen {
             <rtk-logo meeting={this.meeting} config={this.config} t={this.t} part="logo" />
             {this.joinError || showSocketError ? (
               <div class="error-state">
-                <div class="no-network-badge" part="network-badge">
+                <div class="no-network-badge" part="network-badge" role="alert">
                   <rtk-icon
                     size="md"
                     variant="danger"
@@ -115,6 +119,11 @@ export class RtkIdleScreen {
                   >
                     {this.t('network.troubleshoot')}
                   </a>
+                )}
+                {this.joinErrorCode && (
+                  <span class="error-code" part="error-code">
+                    {this.t('join.error_code')}: {this.joinErrorCode}
+                  </span>
                 )}
               </div>
             ) : (

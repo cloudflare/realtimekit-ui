@@ -292,6 +292,15 @@ export const defaultLanguage = {
   'network.lost_extended': 'Connection lost. Please check your network connection.',
   'network.troubleshoot': 'Troubleshoot your connection',
 
+  'join.network_error':
+    "We couldn't connect to the meeting. Please check your internet connection and try again.",
+  'join.media_error':
+    "We're having trouble connecting to the meeting. Please try again, and if the problem continues, try using a different network.",
+  'join.media_firewall_error':
+    'Your network may be blocking this connection. Try using a different network, or contact your network administrator for help.',
+  'join.default_error': 'Something went wrong while joining the meeting. Please try again.',
+  'join.error_code': 'Error code',
+
   livestream: 'Livestream',
   'livestream.indicator': 'This meeting is being livestreamed.',
   'livestream.skip': 'Skip to Live',
