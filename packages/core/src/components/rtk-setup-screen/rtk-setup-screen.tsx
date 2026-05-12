@@ -218,6 +218,16 @@ export class RtkSetupScreen {
                 {errorText}
               </div>
             )}
+            {this.meeting && this.joinError && (
+              <a
+                class="troubleshoot-link"
+                href={`https://test.realtime.cloudflare.com?authToken=${this.meeting.__internals__.authToken}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {this.t('network.troubleshoot')}
+              </a>
+            )}
           </div>
         </div>
       </Host>
