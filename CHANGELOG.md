@@ -1,3 +1,10 @@
+# [1.2.0-staging.2](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.2.0-staging.1...@cloudflare/realtimekit-ui-v1.2.0-staging.2) (2026-05-13)
+
+
+### Bug Fixes
+
+* **language-pack:** fixed typos in language pack ([69e5e7e](https://github.com/cloudflare/realtimekit-ui/commit/69e5e7e351e62cf178e52193911ea75845e0822c))
+
 # [1.2.0-staging.1](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.1.3-staging.1...@cloudflare/realtimekit-ui-v1.2.0-staging.1) (2026-05-12)
 
 
