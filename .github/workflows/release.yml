@@ -7,6 +7,15 @@ on:
   repository_dispatch:
     types: [prod-release]
 
+# semantic-release creates GitHub releases (+ tags + release notes) and
+# updates the changelog commit; the "Update staging branch" step pushes
+# main onto staging. issues + pull-requests writes cover semantic-release's
+# comment-on-release-PR-and-issue behavior.
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
 jobs:
   release:
     name: Release
