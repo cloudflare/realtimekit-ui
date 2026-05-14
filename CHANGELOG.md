@@ -1,3 +1,10 @@
+# [1.2.0-staging.3](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.2.0-staging.2...@cloudflare/realtimekit-ui-v1.2.0-staging.3) (2026-05-14)
+
+
+### Bug Fixes
+
+* **transcripts:** show transcripts by default if preset allows them ([e9ac11b](https://github.com/cloudflare/realtimekit-ui/commit/e9ac11b7ad7aaab195e40631cdd74302bed7f113))
+
 # [1.2.0-staging.2](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.2.0-staging.1...@cloudflare/realtimekit-ui-v1.2.0-staging.2) (2026-05-13)
 
 
