@@ -59,6 +59,21 @@ export class RtkPluginMain {
   private attachView(plugin: RTKPlugin) {
     if (!this.viewContainerEl) return;
 
+    const view = (plugin as any).view;
+    if (!(view instanceof HTMLElement)) return;
+
+    // Avoid unnecessary DOM churn if the same view is already mounted
+    if (this.viewContainerEl.firstChild === view) return;
+
+    // Clear any existing children
+    while (this.viewContainerEl.firstChild) {
+      this.viewContainerEl.removeChild(this.viewContainerEl.firstChild);
+    }
+
+    this.viewContainerEl.appendChild(view);
+  }
+    if (!this.viewContainerEl) return;
+
     // Clear any existing children
     while (this.viewContainerEl.firstChild) {
       this.viewContainerEl.removeChild(this.viewContainerEl.firstChild);
