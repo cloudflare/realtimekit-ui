@@ -124,7 +124,7 @@ export class RtkTabBar {
                 onClick={() => this.tabChange.emit(tab)}
               >
                 <div class="center col">
-                  <img src={plugin.picture} />
+                  <img src={plugin.icon} />
                   <span class="name">{shorten(plugin.name, 6)}</span>
                 </div>
               </rtk-button>

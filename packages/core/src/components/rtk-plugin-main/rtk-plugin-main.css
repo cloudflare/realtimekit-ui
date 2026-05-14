@@ -22,22 +22,7 @@ rtk-button {
   }
 }
 
-iframe {
-  @apply block flex-1;
-  @apply m-0 border-none p-0 outline-none;
-
+.view-container {
+  @apply relative h-full w-full overflow-hidden;
   @apply bg-video-bg;
-}
-
-.iframe-container {
-  @apply relative h-full w-full;
-}
-
-.block-inputs {
-  @apply absolute z-10 h-full w-full;
-  @apply border-danger border-l-none border-t-lg border-solid;
-}
-
-iframe {
-  @apply h-full w-full;
 }

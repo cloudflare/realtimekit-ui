@@ -47,10 +47,6 @@ export class RtkPlugins {
 
   @State() plugins: RTKPlugin[] = [];
 
-  @State() canStartPlugins: boolean = false;
-
-  @State() canClosePlugins: boolean = false;
-
   @State() activatedPluginsId: string[] = [];
 
   connectedCallback() {
@@ -64,11 +60,7 @@ export class RtkPlugins {
   @Watch('meeting')
   meetingChanged(meeting: Meeting) {
     if (meeting != null) {
-      this.canStartPlugins = meeting.self.permissions.plugins.canStart;
-      this.canClosePlugins = meeting.self.permissions.plugins.canClose;
-      this.plugins = meeting.plugins.all
-        .toArray()
-        .filter((plugin) => !meeting.self.config.disabledPlugins?.includes(plugin.id));
+      this.plugins = meeting.plugins.all.toArray();
 
       this.updateActivePlugins = () => {
         this.activatedPluginsId = meeting.plugins.active.toArray().map((p) => p.id);
@@ -89,38 +81,40 @@ export class RtkPlugins {
           {this.plugins.map((plugin) => (
             <li key={plugin.name} class="plugin">
               <div class="metadata">
-                <img src={plugin.picture} />
+                <img src={plugin.icon} />
                 <div class="name">{plugin.name}</div>
               </div>
-              {!this.activatedPluginsId.includes(plugin.id) && this.canStartPlugins && (
-                <div class="buttons">
-                  <rtk-button
-                    kind="icon"
-                    size="lg"
-                    onClick={() => {
-                      plugin.activate();
-                      this.close();
-                    }}
-                    aria-label={`${this.t('activate')} ${plugin.name}`}
-                  >
-                    <rtk-icon icon={this.iconPack.rocket} tabIndex={-1} aria-hidden={true} />
-                  </rtk-button>
-                </div>
-              )}
-              {this.activatedPluginsId.includes(plugin.id) && this.canClosePlugins && (
-                <div class="buttons">
-                  <rtk-button
-                    kind="icon"
-                    size="lg"
-                    onClick={() => {
-                      plugin.deactivate();
-                    }}
-                    aria-label={`${this.t('close')} ${plugin.name}`}
-                  >
-                    <rtk-icon icon={this.iconPack.dismiss} tabIndex={-1} aria-hidden={true} />
-                  </rtk-button>
-                </div>
-              )}
+              {!this.activatedPluginsId.includes(plugin.id) &&
+                (plugin as any).permissions?.canActivate && (
+                  <div class="buttons">
+                    <rtk-button
+                      kind="icon"
+                      size="lg"
+                      onClick={() => {
+                        plugin.activate();
+                        this.close();
+                      }}
+                      aria-label={`${this.t('activate')} ${plugin.name}`}
+                    >
+                      <rtk-icon icon={this.iconPack.rocket} tabIndex={-1} aria-hidden={true} />
+                    </rtk-button>
+                  </div>
+                )}
+              {this.activatedPluginsId.includes(plugin.id) &&
+                (plugin as any).permissions?.canDeactivate && (
+                  <div class="buttons">
+                    <rtk-button
+                      kind="icon"
+                      size="lg"
+                      onClick={() => {
+                        plugin.deactivate();
+                      }}
+                      aria-label={`${this.t('close')} ${plugin.name}`}
+                    >
+                      <rtk-icon icon={this.iconPack.dismiss} tabIndex={-1} aria-hidden={true} />
+                    </rtk-button>
+                  </div>
+                )}
             </li>
           ))}
         </ul>

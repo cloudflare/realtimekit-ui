@@ -1,12 +1,12 @@
 import { defaultIconPack, IconPack } from '../../lib/icons';
-import { RTKPermissionsPreset, RTKPlugin } from '@cloudflare/realtimekit';
-import { Component, Host, h, Prop, Watch, State, writeTask } from '@stencil/core';
+import { RTKPlugin } from '@cloudflare/realtimekit';
+import { Component, Host, h, Prop, Watch, State } from '@stencil/core';
 import { Meeting } from '../../types/rtk-client';
 import { SyncWithStore } from '../../utils/sync-with-store';
 import { RtkI18n, useLanguage } from '../../lib/lang';
 
 /**
- * A component which loads a plugin.
+ * A component which renders a plugin's view.
  */
 @Component({
   tag: 'rtk-plugin-main',
@@ -14,8 +14,7 @@ import { RtkI18n, useLanguage } from '../../lib/lang';
   shadow: true,
 })
 export class RtkPluginMain {
-  private iframeEl: HTMLIFrameElement;
-  private toggleViewModeListener: (data: boolean) => void;
+  private viewContainerEl: HTMLDivElement;
 
   /** Meeting */
   @SyncWithStore()
@@ -35,77 +34,50 @@ export class RtkPluginMain {
   @Prop()
   t: RtkI18n = useLanguage();
 
-  @State() canClosePlugin: boolean = false;
-
-  @State() viewModeEnabled: boolean = false;
+  @State() canDeactivatePlugin: boolean = false;
 
   componentDidLoad() {
-    this.meetingChanged(this.meeting);
     this.pluginChanged(this.plugin);
-  }
-
-  private onIframeRef = (el: HTMLIFrameElement) => {
-    if (el === this.iframeEl) return;
-    this.iframeEl = el;
-    this.plugin?.addPluginView(el, 'plugin-main');
-  };
-
-  @Watch('meeting')
-  meetingChanged(meeting: Meeting) {
-    if (!meeting) return;
-    const enabled = this.canInteractWithPlugin();
-    this.viewModeEnabled = !enabled;
-    writeTask(() => {
-      this.canClosePlugin =
-        meeting.self.permissions.plugins.canClose || this.plugin.enabledBy === meeting.self.id;
-    });
   }
 
   @Watch('plugin')
   pluginChanged(plugin: RTKPlugin) {
-    this.toggleViewModeListener = (enable: boolean) => {
-      const enabled = this.canInteractWithPlugin();
-      if (enabled) return;
-      this.viewModeEnabled = enable;
-    };
-    if (plugin != null) {
-      this.iframeEl && plugin.addPluginView(this.iframeEl, 'plugin-main');
-      plugin.addListener('toggleViewMode', this.toggleViewModeListener);
+    if (plugin == null) return;
+
+    this.canDeactivatePlugin = !!(plugin as any).permissions?.canDeactivate;
+    this.attachView(plugin);
+  }
+
+  private onViewContainerRef = (el: HTMLDivElement) => {
+    if (el === this.viewContainerEl) return;
+    this.viewContainerEl = el;
+    if (this.plugin) {
+      this.attachView(this.plugin);
+    }
+  };
+
+  private attachView(plugin: RTKPlugin) {
+    if (!this.viewContainerEl) return;
+
+    // Clear any existing children
+    while (this.viewContainerEl.firstChild) {
+      this.viewContainerEl.removeChild(this.viewContainerEl.firstChild);
+    }
+
+    const view = (plugin as any).view;
+    if (view instanceof HTMLElement) {
+      this.viewContainerEl.appendChild(view);
     }
   }
 
   disconnectedCallback() {
-    this.plugin?.removePluginView('plugin-main');
-    this.plugin?.removeListener('toggleViewMode', this.toggleViewModeListener);
+    // Remove the view element from the container on cleanup
+    if (this.viewContainerEl) {
+      while (this.viewContainerEl.firstChild) {
+        this.viewContainerEl.removeChild(this.viewContainerEl.firstChild);
+      }
+    }
   }
-
-  private canInteractWithPlugin = () => {
-    const pluginId = this.plugin.id;
-    if (!pluginId) return true;
-
-    /**
-     * For v1 canStartPlugins is the controller
-     * For v2 the controller is within plugin config
-     */
-
-    const pluginConfig = (this.meeting.self.permissions.plugins as RTKPermissionsPreset['plugins'])
-      .config[pluginId];
-    /**
-     * In some cases plugin config is undefined, specifically seen in cases of self
-     * hosted plugins, in that case just return true
-     */
-    if (!pluginConfig) return true;
-    /**
-     * In V2 config currently in dev portal when a preset is saved without opening the
-     * config menu then it gets added with access control undefined, to handle this case
-     * the following has been done
-     */
-    if (!pluginConfig.accessControl) return true;
-    /**
-     * If access conrol is defined then return the permission
-     */
-    return pluginConfig.accessControl === 'FULL_ACCESS';
-  };
 
   render() {
     if (this.plugin == null) return null;
@@ -114,7 +86,7 @@ export class RtkPluginMain {
       <Host>
         <header part="header">
           <div>{this.plugin.name}</div>
-          {this.canClosePlugin && (
+          {this.canDeactivatePlugin && (
             <div>
               <rtk-button kind="icon" onClick={() => this.plugin.deactivate()} part="button">
                 <rtk-icon icon={this.iconPack.dismiss} />
@@ -122,12 +94,7 @@ export class RtkPluginMain {
             </div>
           )}
         </header>
-        <div class={'iframe-container'}>
-          {!(this.canInteractWithPlugin() || !this.viewModeEnabled) ? (
-            <div class="block-inputs" />
-          ) : null}
-          <iframe ref={(el) => this.onIframeRef(el)} part="iframe" />
-        </div>
+        <div class="view-container" ref={(el) => this.onViewContainerRef(el)} />
       </Host>
     );
   }

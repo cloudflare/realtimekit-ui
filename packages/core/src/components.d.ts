@@ -2902,7 +2902,7 @@ export namespace Components {
         "variant": ControlBarVariant;
     }
     /**
-     * A component which loads a plugin.
+     * A component which renders a plugin's view.
      */
     interface RtkPluginMain {
         /**
@@ -5752,7 +5752,7 @@ declare global {
         new (): HTMLRtkPipToggleElement;
     };
     /**
-     * A component which loads a plugin.
+     * A component which renders a plugin's view.
      */
     interface HTMLRtkPluginMainElement extends Components.RtkPluginMain, HTMLStencilElement {
     }
@@ -9654,7 +9654,7 @@ declare namespace LocalJSX {
         "variant"?: ControlBarVariant;
     }
     /**
-     * A component which loads a plugin.
+     * A component which renders a plugin's view.
      */
     interface RtkPluginMain {
         /**
@@ -11332,7 +11332,7 @@ declare module "@stencil/core" {
              */
             "rtk-pip-toggle": LocalJSX.RtkPipToggle & JSXBase.HTMLAttributes<HTMLRtkPipToggleElement>;
             /**
-             * A component which loads a plugin.
+             * A component which renders a plugin's view.
              */
             "rtk-plugin-main": LocalJSX.RtkPluginMain & JSXBase.HTMLAttributes<HTMLRtkPluginMainElement>;
             /**
