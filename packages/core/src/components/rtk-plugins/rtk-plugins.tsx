@@ -84,24 +84,23 @@ export class RtkPlugins {
                 <img src={plugin.icon} />
                 <div class="name">{plugin.name}</div>
               </div>
-              {!this.activatedPluginsId.includes(plugin.id) &&
-                (plugin as any).permissions?.canActivate && (
-                  <div class="buttons">
-                    <rtk-button
-                      kind="icon"
-                      size="lg"
-                      onClick={() => {
-                        plugin.activate();
-                        this.close();
-                      }}
-                      aria-label={`${this.t('activate')} ${plugin.name}`}
-                    >
-                      <rtk-icon icon={this.iconPack.rocket} tabIndex={-1} aria-hidden={true} />
-                    </rtk-button>
-                  </div>
-                )}
+              {!this.activatedPluginsId.includes(plugin.id) && plugin?.permissions?.canActivate && (
+                <div class="buttons">
+                  <rtk-button
+                    kind="icon"
+                    size="lg"
+                    onClick={() => {
+                      plugin.activate();
+                      this.close();
+                    }}
+                    aria-label={`${this.t('activate')} ${plugin.name}`}
+                  >
+                    <rtk-icon icon={this.iconPack.rocket} tabIndex={-1} aria-hidden={true} />
+                  </rtk-button>
+                </div>
+              )}
               {this.activatedPluginsId.includes(plugin.id) &&
-                (plugin as any).permissions?.canDeactivate && (
+                plugin?.permissions?.canDeactivate && (
                   <div class="buttons">
                     <rtk-button
                       kind="icon"

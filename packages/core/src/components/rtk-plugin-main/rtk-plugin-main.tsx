@@ -59,7 +59,7 @@ export class RtkPluginMain {
   private attachView(plugin: RTKPlugin) {
     if (!this.viewContainerEl) return;
 
-    const view = (plugin as any).view;
+    const view = plugin.view;
     if (!(view instanceof HTMLElement)) return;
 
     // Avoid unnecessary DOM churn if the same view is already mounted
@@ -71,18 +71,6 @@ export class RtkPluginMain {
     }
 
     this.viewContainerEl.appendChild(view);
-  }
-    if (!this.viewContainerEl) return;
-
-    // Clear any existing children
-    while (this.viewContainerEl.firstChild) {
-      this.viewContainerEl.removeChild(this.viewContainerEl.firstChild);
-    }
-
-    const view = (plugin as any).view;
-    if (view instanceof HTMLElement) {
-      this.viewContainerEl.appendChild(view);
-    }
   }
 
   disconnectedCallback() {
