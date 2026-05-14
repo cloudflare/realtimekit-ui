@@ -247,7 +247,7 @@ export class RtkMeeting {
   }
 
   @Watch('meeting')
-  meetingChanged(meeting: Meeting) {
+  meetingChanged(meeting: Meeting, oldMeeting?: Meeting) {
     if (!meeting) return;
 
     // Create peer specific store for this meeting peer instance
@@ -273,7 +273,16 @@ export class RtkMeeting {
       this.peerStore = null;
     }
 
-    this.updateStates({ viewType: meeting.meta.viewType });
+    const targetStore = this.peerStore || legacyGlobalUIStore;
+    /** Honor user's explicit choice for captions, but respect preset default if no explicit choice */
+    const desiredActiveCaptionsState = !oldMeeting
+      ? !!meeting.self.permissions.transcriptionEnabled
+      : !!targetStore.state.states.activeCaptions;
+
+    this.updateStates({
+      viewType: meeting.meta.viewType,
+      activeCaptions: desiredActiveCaptionsState,
+    });
 
     if (this.loadConfigFromPreset && meeting.self.config != null) {
       const theme = meeting.self.config;
@@ -287,8 +296,7 @@ export class RtkMeeting {
 
       if (
         meeting.connectedMeetings.supportsConnectedMeetings &&
-        (this.peerStore || legacyGlobalUIStore).state.states.activeBreakoutRoomsManager
-          ?.destinationMeetingId
+        targetStore.state.states.activeBreakoutRoomsManager?.destinationMeetingId
       ) {
         this.showSetupScreen = false;
       }
@@ -298,7 +306,7 @@ export class RtkMeeting {
       this.applyDesignSystem &&
       this.config?.designTokens != null &&
       typeof document !== 'undefined' &&
-      (this.peerStore || legacyGlobalUIStore).state.states.activeDebugger !== true
+      targetStore.state.states.activeDebugger !== true
     ) {
       provideRtkDesignSystem(document.documentElement, this.config.designTokens);
     }
