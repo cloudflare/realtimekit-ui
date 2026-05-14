@@ -168,7 +168,7 @@ export class RtkUiProvider {
   }
 
   @Watch('meeting')
-  meetingChanged(meeting: Meeting) {
+  meetingChanged(meeting: Meeting, oldMeeting?: Meeting) {
     if (meeting) {
       this.peerStore = createPeerStore({
         meeting,
@@ -196,7 +196,15 @@ export class RtkUiProvider {
       const targetStore = this.peerStore || legacyGlobalUIStore;
       targetStore.state.meeting = meeting;
 
-      this.updateStates({ viewType: meeting.meta.viewType });
+      /** Honor user's explicit choice for captions, but respect preset default if no explicit choice */
+      const desiredActiveCaptionsState = !oldMeeting
+        ? !!meeting.self.permissions.transcriptionEnabled
+        : !!targetStore.state.states.activeCaptions;
+
+      this.updateStates({
+        viewType: meeting.meta.viewType,
+        activeCaptions: desiredActiveCaptionsState,
+      });
 
       meeting.self.addListener('roomJoined', this.roomJoinedListener);
       meeting.self.addListener('waitlisted', this.waitlistedListener);
