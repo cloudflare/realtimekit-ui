@@ -58,12 +58,16 @@ export class RtkPlugins {
   }
 
   @Watch('meeting')
-  meetingChanged(meeting: Meeting) {
+  meetingChanged(meeting: Meeting, oldMeeting?: Meeting) {
+    if (oldMeeting) {
+      meeting.plugins.all.removeListener('stateUpdate', this.updateActivePlugins);
+    }
     if (meeting != null) {
       this.plugins = meeting.plugins.all.toArray();
 
       this.updateActivePlugins = () => {
-        this.activatedPluginsId = meeting.plugins.active.toArray().map((p) => p.id);
+        if (!this.meeting) return;
+        this.activatedPluginsId = this.meeting.plugins.active.toArray().map((p) => p.id);
       };
       this.updateActivePlugins();
       meeting.plugins.all.addListener('stateUpdate', this.updateActivePlugins);
@@ -81,7 +85,7 @@ export class RtkPlugins {
           {this.plugins.map((plugin) => (
             <li key={plugin.name} class="plugin">
               <div class="metadata">
-                <img src={plugin.icon} />
+                <img src={plugin.icon} alt={plugin.name} />
                 <div class="name">{plugin.name}</div>
               </div>
               {!this.activatedPluginsId.includes(plugin.id) && plugin?.permissions?.canActivate && (
