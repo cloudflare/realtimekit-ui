@@ -32,7 +32,6 @@
     "@types/node": "^22.10.10",
     "commitizen": "^4.2.4",
     "cz-conventional-changelog": "^3.3.0",
-    "@cloudflare/realtimekit": "../../realtimekit/core",
     "husky": "^7.0.0",
     "is-ci": "^3.0.1",
     "lerna": "^4.0.0",

@@ -44,7 +44,7 @@ export class RtkPluginMain {
   pluginChanged(plugin: RTKPlugin) {
     if (plugin == null) return;
 
-    this.canDeactivatePlugin = !!(plugin as any).permissions?.canDeactivate;
+    this.canDeactivatePlugin = plugin.permissions?.canDeactivate ?? false;
     this.attachView(plugin);
   }
 
