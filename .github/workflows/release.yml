@@ -11,14 +11,20 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: write
+      pull-requests: write
+      issues: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
-          node-version: 22
+          node-version: "24"
           registry-url: https://registry.npmjs.org/
+          package-manager-cache: false
 
       - name: Install dependencies
         run: npm install --no-fund --no-audit
@@ -29,24 +35,21 @@ jobs:
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
           ENVIRONMENT: ${{ github.ref }}
+          NPM_CONFIG_PROVENANCE: true
         run: npx semantic-release
 
       - name: Publish
         env:
-          NPM_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
           ENVIRONMENT: ${{ github.ref }}
-        run: npx lerna exec -- npm publish --access public
+        run: npx lerna exec -- npm publish --access public --provenance
 
       - name: Update staging branch
         if: |
           contains('refs/heads/main', github.ref)
         run: |
-          git config --global user.email "dev@dyte.io"
-          git config --global user.name "dyte-devel"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git pull
           git stash
           git checkout staging
