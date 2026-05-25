@@ -1,3 +1,11 @@
+# [1.2.0-staging.4](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.2.0-staging.3...@cloudflare/realtimekit-ui-v1.2.0-staging.4) (2026-05-25)
+
+
+### Bug Fixes
+
+* **trusted-publishing:** added ai suggested changes and added semantic release permissions ([a76adeb](https://github.com/cloudflare/realtimekit-ui/commit/a76adeb6806e837033ecc51f8fef9fbc8c9eaff6))
+* use trusted publishing for releases ([2cccc90](https://github.com/cloudflare/realtimekit-ui/commit/2cccc904c445fd3fa74ef390452808db0eed2c16))
+
 # [1.2.0-staging.3](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.2.0-staging.2...@cloudflare/realtimekit-ui-v1.2.0-staging.3) (2026-05-14)
 
 
