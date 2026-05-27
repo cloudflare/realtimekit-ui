@@ -40,7 +40,12 @@ jobs:
         run: npx semantic-release
 
       - name: Publish
+        env:
+          ENVIRONMENT: ${{ github.ref }}
         run: |
+          npm publish --access public --provenance -w packages/core
+          npm publish --access public --provenance -w packages/react-library
+          npm publish --access public --provenance ./packages/angular-library/projects/components/dist
           npm publish --access public --provenance -w packages/core
           npm publish --access public --provenance -w packages/react-library
           npm publish --access public --provenance ./packages/angular-library/projects/components/dist
