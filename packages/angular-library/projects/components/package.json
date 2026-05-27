@@ -25,5 +25,9 @@
   "bugs": {
     "url": "https://community.cloudflare.com"
   },
-  "homepage": "https://realtime.cloudflare.com"
+  "homepage": "https://realtime.cloudflare.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cloudflare/realtimekit-ui.git"
+  }
 }
