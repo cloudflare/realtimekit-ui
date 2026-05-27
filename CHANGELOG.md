@@ -1,3 +1,12 @@
+# [1.2.0-staging.5](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.2.0-staging.4...@cloudflare/realtimekit-ui-v1.2.0-staging.5) (2026-05-27)
+
+
+### Bug Fixes
+
+* **release-tagging:** added environment for proper tagging ([bbc5721](https://github.com/cloudflare/realtimekit-ui/commit/bbc572122c82d22298b44262c817d692ae7b8d52))
+* **release:** picking path instead of workspace for angular release ([f4d8220](https://github.com/cloudflare/realtimekit-ui/commit/f4d822067bd98596dfe75b39440e0f4574a97a75))
+* **trusted-publishing:** removed lerna to use native npm trusted publishing ([9ab27a2](https://github.com/cloudflare/realtimekit-ui/commit/9ab27a265de49dae86782bd647d6d7d9c5138a76))
+
 # [1.2.0-staging.4](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.2.0-staging.3...@cloudflare/realtimekit-ui-v1.2.0-staging.4) (2026-05-25)
 
 
