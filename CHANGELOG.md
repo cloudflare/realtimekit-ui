@@ -1,3 +1,10 @@
+# [1.2.0-staging.6](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.2.0-staging.5...@cloudflare/realtimekit-ui-v1.2.0-staging.6) (2026-05-27)
+
+
+### Bug Fixes
+
+* **trusted-publishing:** retriggering release ([503968f](https://github.com/cloudflare/realtimekit-ui/commit/503968f76a28f8bc813639a6d91709fa39702f97))
+
 # [1.2.0-staging.5](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.2.0-staging.4...@cloudflare/realtimekit-ui-v1.2.0-staging.5) (2026-05-27)
 
 
