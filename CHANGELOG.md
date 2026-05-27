@@ -1,3 +1,10 @@
+# [1.2.0-staging.7](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.2.0-staging.6...@cloudflare/realtimekit-ui-v1.2.0-staging.7) (2026-05-27)
+
+
+### Bug Fixes
+
+* **trusted-publishing:** adding repository for provenance check ([ee5fe4b](https://github.com/cloudflare/realtimekit-ui/commit/ee5fe4b7c62383617c7e1e2795d31cd34c0f497d))
+
 # [1.2.0-staging.6](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.2.0-staging.5...@cloudflare/realtimekit-ui-v1.2.0-staging.6) (2026-05-27)
 
 
