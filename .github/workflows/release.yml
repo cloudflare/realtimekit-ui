@@ -42,7 +42,10 @@ jobs:
       - name: Publish
         env:
           ENVIRONMENT: ${{ github.ref }}
-        run: npx lerna exec -- npm publish --access public --provenance
+        run: |
+          npm publish --access public --provenance -w packages/core
+          npm publish --access public --provenance -w packages/react-library
+          npm publish --access public --provenance ./packages/angular-library/projects/components/dist
 
       - name: Update staging branch
         if: |

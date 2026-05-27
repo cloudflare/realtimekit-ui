@@ -1,8 +1,0 @@
-{
-  "packages": [
-    "packages/core",
-    "packages/react-library",
-    "packages/angular-library/projects/components/dist"
-  ],
-  "version": "1.0.0"
-}
