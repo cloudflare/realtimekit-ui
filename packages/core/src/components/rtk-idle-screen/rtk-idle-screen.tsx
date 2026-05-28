@@ -45,6 +45,8 @@ export class RtkIdleScreen {
 
   @State() joinError: string | undefined;
 
+  @State() joinErrorCode: string | undefined;
+
   @State() connectionState: SocketConnectionState['state'];
 
   connectedCallback() {
@@ -71,6 +73,7 @@ export class RtkIdleScreen {
     if (state === 'connected') {
       if (!this.states?.joinError) {
         this.joinError = undefined;
+        this.joinErrorCode = undefined;
       }
     }
   };
@@ -78,6 +81,7 @@ export class RtkIdleScreen {
   @Watch('states')
   statesChanged(states: States) {
     this.joinError = states?.joinError;
+    this.joinErrorCode = states?.joinErrorCode;
   }
 
   render() {
@@ -96,14 +100,31 @@ export class RtkIdleScreen {
           <div class="ctr" part="container">
             <rtk-logo meeting={this.meeting} config={this.config} t={this.t} part="logo" />
             {this.joinError || showSocketError ? (
-              <div class="no-network-badge" part="network-badge">
-                <rtk-icon
-                  size="md"
-                  variant="danger"
-                  icon={this.iconPack.disconnected}
-                  part="network-badge-icon"
-                ></rtk-icon>
-                {errorText}
+              <div class="error-state">
+                <div class="no-network-badge" part="network-badge" role="alert">
+                  <rtk-icon
+                    size="md"
+                    variant="danger"
+                    icon={this.iconPack.disconnected}
+                    part="network-badge-icon"
+                  ></rtk-icon>
+                  {errorText}
+                </div>
+                {this.meeting && this.joinError && (
+                  <a
+                    class="troubleshoot-link"
+                    href={`https://test.realtime.cloudflare.com?authToken=${this.meeting.__internals__.authToken}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {this.t('network.troubleshoot')}
+                  </a>
+                )}
+                {this.joinErrorCode && (
+                  <span class="error-code" part="error-code">
+                    {this.t('join.error_code')}: {this.joinErrorCode}
+                  </span>
+                )}
               </div>
             ) : (
               <rtk-spinner

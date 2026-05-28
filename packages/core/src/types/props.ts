@@ -82,6 +82,7 @@ export interface States {
   sidebar?: RtkSidebarSection;
   roomLeftState?: RoomLeftState | 'unauthorized';
   joinError?: string;
+  joinErrorCode?: string;
   sidebarFloating?: boolean;
   participantsTabId?: ParticipantsTabId;
   [state: string]: any;

@@ -366,7 +366,7 @@
           status: 'Joining...',
           data: {
             authToken: '',
-            env: 'preprod',
+            env: 'staging',
             showSetupScreen: false,
             defaults: {
               audio: false,
@@ -456,8 +456,12 @@
 
             const { env } = this.data;
 
-            const apiBase = env === 'prod' ? 'https://api.dyte.io' : `https://api.${env}.dyte.io`;
-            const baseURI = env === 'prod' ? 'dyte.io' : `${env}.dyte.io`;
+            const apiBase =
+              env === 'prod'
+                ? 'https://api.realtime.cloudflare.com'
+                : `https://api.${env}.realtime.cloudflare.com`;
+            const baseURI =
+              env === 'prod' ? 'realtime.cloudflare.com' : `${env}.realtime.cloudflare.com`;
 
             this.status = 'Getting meeting details...';
 
@@ -507,7 +511,7 @@
               this.addConnectedMeetingListeners(meeting);
             } catch (err) {
               console.error(err);
-              alert('An error occured, check if the environment is correct.');
+              alert('An error occurred, check if the environment is correct.');
             } finally {
               this.joining = false;
             }
@@ -559,8 +563,7 @@
             <div class="form-group">
               <label for="env" class="label-styles">Environment</label>
               <select id="env" class="select-styles" x-model="data.env">
-                <option value="devel">Devel</option>
-                <option value="preprod">Pre-production</option>
+                <option value="staging">Staging</option>
                 <option value="prod">Production</option>
               </select>
             </div>

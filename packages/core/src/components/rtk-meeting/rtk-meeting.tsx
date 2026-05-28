@@ -18,6 +18,7 @@ import {
   type RtkUiStoreExtended,
 } from '../../utils/sync-with-store/ui-store';
 import { Overrides, defaultOverrides } from '../../lib/overrides';
+import { getJoinErrorInfo } from '../../utils/join-error';
 
 export type MeetingMode = 'fixed' | 'fill';
 
@@ -42,7 +43,7 @@ export class RtkMeeting {
   private providerId: string = 'provider-' + Math.floor(Math.random() * 100);
 
   private roomJoinedListener = () => {
-    this.updateStates({ meeting: 'joined', joinError: undefined });
+    this.updateStates({ meeting: 'joined', joinError: undefined, joinErrorCode: undefined });
   };
 
   private waitlistedListener = () => {
@@ -246,7 +247,7 @@ export class RtkMeeting {
   }
 
   @Watch('meeting')
-  meetingChanged(meeting: Meeting) {
+  meetingChanged(meeting: Meeting, oldMeeting?: Meeting) {
     if (!meeting) return;
 
     // Create peer specific store for this meeting peer instance
@@ -272,7 +273,16 @@ export class RtkMeeting {
       this.peerStore = null;
     }
 
-    this.updateStates({ viewType: meeting.meta.viewType });
+    const targetStore = this.peerStore || legacyGlobalUIStore;
+    /** Honor user's explicit choice for captions, but respect preset default if no explicit choice */
+    const desiredActiveCaptionsState = !oldMeeting
+      ? !!meeting.self.permissions.transcriptionEnabled
+      : !!targetStore.state.states.activeCaptions;
+
+    this.updateStates({
+      viewType: meeting.meta.viewType,
+      activeCaptions: desiredActiveCaptionsState,
+    });
 
     if (this.loadConfigFromPreset && meeting.self.config != null) {
       const theme = meeting.self.config;
@@ -286,8 +296,7 @@ export class RtkMeeting {
 
       if (
         meeting.connectedMeetings.supportsConnectedMeetings &&
-        (this.peerStore || legacyGlobalUIStore).state.states.activeBreakoutRoomsManager
-          ?.destinationMeetingId
+        targetStore.state.states.activeBreakoutRoomsManager?.destinationMeetingId
       ) {
         this.showSetupScreen = false;
       }
@@ -297,7 +306,7 @@ export class RtkMeeting {
       this.applyDesignSystem &&
       this.config?.designTokens != null &&
       typeof document !== 'undefined' &&
-      (this.peerStore || legacyGlobalUIStore).state.states.activeDebugger !== true
+      targetStore.state.states.activeDebugger !== true
     ) {
       provideRtkDesignSystem(document.documentElement, this.config.designTokens);
     }
@@ -320,11 +329,11 @@ export class RtkMeeting {
         meeting
           .joinRoom()
           .then(() => {
-            this.updateStates({ joinError: undefined });
+            this.updateStates({ joinError: undefined, joinErrorCode: undefined });
           })
           .catch((err) => {
-            const message = err?.message ? err.message : this.t('network.lost_extended');
-            this.updateStates({ joinError: message });
+            const { message, code } = getJoinErrorInfo(this.t, err);
+            this.updateStates({ joinError: message, joinErrorCode: code });
           });
       }
     }

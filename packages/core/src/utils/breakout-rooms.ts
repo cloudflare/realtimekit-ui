@@ -1,5 +1,4 @@
 import { Meeting } from '../types/rtk-client';
-import { isBreakoutRoomsEnabled } from './flags';
 
 let roomCount = 0;
 
@@ -68,7 +67,7 @@ export function getAllConnectedParticipants(meeting: Meeting) {
 }
 
 export const canToggleBreakout = (meeting: Meeting) => {
-  if (!isBreakoutRoomsEnabled(meeting)) return false;
+  if (!meeting?.connectedMeetings?.supportsConnectedMeetings) return false;
 
   const permissions = meeting.self.permissions.connectedMeetings;
 
