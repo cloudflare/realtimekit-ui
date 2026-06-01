@@ -60,7 +60,7 @@ export class RtkPlugins {
   @Watch('meeting')
   meetingChanged(meeting: Meeting, oldMeeting?: Meeting) {
     if (oldMeeting) {
-      meeting.plugins.all.removeListener('stateUpdate', this.updateActivePlugins);
+      oldMeeting.plugins.all.removeListener('stateUpdate', this.updateActivePlugins);
     }
     if (meeting != null) {
       this.plugins = meeting.plugins.all.toArray();
