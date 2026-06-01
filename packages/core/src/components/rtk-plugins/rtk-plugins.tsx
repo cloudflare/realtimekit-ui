@@ -18,7 +18,10 @@ import { createDefaultConfig } from '../../exports';
   shadow: true,
 })
 export class RtkPlugins {
-  private updateActivePlugins: () => void;
+  private updateActivePlugins = () => {
+    if (!this.meeting) return;
+    this.activatedPluginsId = this.meeting.plugins.active.toArray().map((p) => p.id);
+  };
   /** Meeting object */
   @SyncWithStore()
   @Prop()
@@ -65,10 +68,6 @@ export class RtkPlugins {
     if (meeting != null) {
       this.plugins = meeting.plugins.all.toArray();
 
-      this.updateActivePlugins = () => {
-        if (!this.meeting) return;
-        this.activatedPluginsId = this.meeting.plugins.active.toArray().map((p) => p.id);
-      };
       this.updateActivePlugins();
       meeting.plugins.all.addListener('stateUpdate', this.updateActivePlugins);
     }
