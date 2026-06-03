@@ -1,3 +1,58 @@
+# [1.2.0](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.1.2...@cloudflare/realtimekit-ui-v1.2.0) (2026-05-28)
+
+
+### Bug Fixes
+
+* **ai-review:** fixed code around review comments ([8679c76](https://github.com/cloudflare/realtimekit-ui/commit/8679c76e1809f3714419ae09166db0eaedd383d4))
+* **flags:** remove feature flags and hardcoded preset name based configuration ([774b7b3](https://github.com/cloudflare/realtimekit-ui/commit/774b7b3de630c56013a4068ef0c8b37e03bf968c))
+* **language-pack:** fixed typos in language pack ([69e5e7e](https://github.com/cloudflare/realtimekit-ui/commit/69e5e7e351e62cf178e52193911ea75845e0822c))
+* **release-pipeline:** picking correct types from compatible realtimekit version ([d7abcd0](https://github.com/cloudflare/realtimekit-ui/commit/d7abcd030b28b6478447f20d41dfc0cb54d1ac8f))
+* **release-tagging:** added environment for proper tagging ([bbc5721](https://github.com/cloudflare/realtimekit-ui/commit/bbc572122c82d22298b44262c817d692ae7b8d52))
+* **release:** picking path instead of workspace for angular release ([f4d8220](https://github.com/cloudflare/realtimekit-ui/commit/f4d822067bd98596dfe75b39440e0f4574a97a75))
+* replace raw SDK error messages with user-friendly messages on join failures ([79a7561](https://github.com/cloudflare/realtimekit-ui/commit/79a7561dec1a3c5ac968aeedf237ea90a020581c))
+* **transcripts:** show transcripts by default if preset allows them ([e9ac11b](https://github.com/cloudflare/realtimekit-ui/commit/e9ac11b7ad7aaab195e40631cdd74302bed7f113))
+* **trusted-publishing:** added ai suggested changes and added semantic release permissions ([a76adeb](https://github.com/cloudflare/realtimekit-ui/commit/a76adeb6806e837033ecc51f8fef9fbc8c9eaff6))
+* **trusted-publishing:** adding repository for provenance check ([ee5fe4b](https://github.com/cloudflare/realtimekit-ui/commit/ee5fe4b7c62383617c7e1e2795d31cd34c0f497d))
+* **trusted-publishing:** removed lerna to use native npm trusted publishing ([9ab27a2](https://github.com/cloudflare/realtimekit-ui/commit/9ab27a265de49dae86782bd647d6d7d9c5138a76))
+* **trusted-publishing:** retriggering release ([503968f](https://github.com/cloudflare/realtimekit-ui/commit/503968f76a28f8bc813639a6d91709fa39702f97))
+* use trusted publishing for releases ([2cccc90](https://github.com/cloudflare/realtimekit-ui/commit/2cccc904c445fd3fa74ef390452808db0eed2c16))
+
+
+### Features
+
+* add troubleshoot link on join failure screens ([78466d6](https://github.com/cloudflare/realtimekit-ui/commit/78466d65acaf26243b0ddb19eda97c1c14a87024))
+
+# [1.2.0-staging.7](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.2.0-staging.6...@cloudflare/realtimekit-ui-v1.2.0-staging.7) (2026-05-27)
+
+
+### Bug Fixes
+
+* **trusted-publishing:** adding repository for provenance check ([ee5fe4b](https://github.com/cloudflare/realtimekit-ui/commit/ee5fe4b7c62383617c7e1e2795d31cd34c0f497d))
+
+# [1.2.0-staging.6](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.2.0-staging.5...@cloudflare/realtimekit-ui-v1.2.0-staging.6) (2026-05-27)
+
+
+### Bug Fixes
+
+* **trusted-publishing:** retriggering release ([503968f](https://github.com/cloudflare/realtimekit-ui/commit/503968f76a28f8bc813639a6d91709fa39702f97))
+
+# [1.2.0-staging.5](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.2.0-staging.4...@cloudflare/realtimekit-ui-v1.2.0-staging.5) (2026-05-27)
+
+
+### Bug Fixes
+
+* **release-tagging:** added environment for proper tagging ([bbc5721](https://github.com/cloudflare/realtimekit-ui/commit/bbc572122c82d22298b44262c817d692ae7b8d52))
+* **release:** picking path instead of workspace for angular release ([f4d8220](https://github.com/cloudflare/realtimekit-ui/commit/f4d822067bd98596dfe75b39440e0f4574a97a75))
+* **trusted-publishing:** removed lerna to use native npm trusted publishing ([9ab27a2](https://github.com/cloudflare/realtimekit-ui/commit/9ab27a265de49dae86782bd647d6d7d9c5138a76))
+
+# [1.2.0-staging.4](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.2.0-staging.3...@cloudflare/realtimekit-ui-v1.2.0-staging.4) (2026-05-25)
+
+
+### Bug Fixes
+
+* **trusted-publishing:** added ai suggested changes and added semantic release permissions ([a76adeb](https://github.com/cloudflare/realtimekit-ui/commit/a76adeb6806e837033ecc51f8fef9fbc8c9eaff6))
+* use trusted publishing for releases ([2cccc90](https://github.com/cloudflare/realtimekit-ui/commit/2cccc904c445fd3fa74ef390452808db0eed2c16))
+
 # [1.2.0-staging.3](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.2.0-staging.2...@cloudflare/realtimekit-ui-v1.2.0-staging.3) (2026-05-14)
 
 
