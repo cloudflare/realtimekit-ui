@@ -1,3 +1,16 @@
+## [1.2.1-staging.1](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.2.0...@cloudflare/realtimekit-ui-v1.2.1-staging.1) (2026-06-03)
+
+
+### Bug Fixes
+
+* closure for updateActivePlugins ([b00b9eb](https://github.com/cloudflare/realtimekit-ui/commit/b00b9eb2c9c412cef4ca32d81b2f42ae92509178))
+* potential memory leak ([b959bca](https://github.com/cloudflare/realtimekit-ui/commit/b959bca0241faa93663fe83f36404dc47d5c2c61))
+* remove dead code after code merge ([d9be765](https://github.com/cloudflare/realtimekit-ui/commit/d9be765fe26c4aed65425497955ec65f26332d91))
+* remove hardcodings ([2888bee](https://github.com/cloudflare/realtimekit-ui/commit/2888bee3a514ff61dc66968edfcde969fa19711d))
+* render plugin in a slot to allow css to work ([643ac04](https://github.com/cloudflare/realtimekit-ui/commit/643ac04dd60f04e14e6a94fd38f81d0c08a3682b))
+* support for adding plugins via client sdk ([f01cd0a](https://github.com/cloudflare/realtimekit-ui/commit/f01cd0a71bf442fe8ae9119f6a3dc503a962afcb))
+* update package version and add empty state message ([abcf7f0](https://github.com/cloudflare/realtimekit-ui/commit/abcf7f0434620bae99dfa4d56c07f7ad8399e86e))
+
 # [1.2.0](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.1.2...@cloudflare/realtimekit-ui-v1.2.0) (2026-05-28)
 
 
