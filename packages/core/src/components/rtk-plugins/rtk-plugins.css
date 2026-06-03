@@ -37,7 +37,7 @@ ul {
 }
 
 .empty-plugins {
-  @apply text-ba text-text-700 flex h-full w-full items-center justify-center px-4;
+  @apply text-text-700 flex h-full w-full items-center justify-center px-4;
 }
 
 rtk-button:hover {
