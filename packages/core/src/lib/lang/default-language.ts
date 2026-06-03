@@ -95,6 +95,7 @@ export const defaultLanguage = {
   'screenshare.error.unknown': 'An error occurred while starting screenshare.',
   'screenshare.error.max_count': 'Maximum screen share limit reached.',
   plugins: 'Plugins',
+  'plugins.empty': 'No plugins available',
   perm_denied: 'Permission denied by browser.',
   'perm_denied.audio': 'Mic permission denied by browser',
   'perm_denied.video': 'Camera permission denied by browser',

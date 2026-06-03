@@ -36,6 +36,10 @@ ul {
   }
 }
 
+.empty-plugins {
+  @apply text-text-700 flex h-full w-full items-center justify-center px-4;
+}
+
 rtk-button:hover {
   @apply ring-brand-500 ring-offset-background-1000 ring-2 ring-offset-2;
 }
