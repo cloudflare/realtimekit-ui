@@ -470,23 +470,33 @@
             const modules = {
               spotlight: true,
               devTools: {
-                plugins: [
-                  {
-                    port: 5000,
-                    name: 'Localhost',
-                    id: 'localhost-plugin',
-                  },
-                ],
                 logs: true,
               },
             };
+
+            // Create a dummy plugin view element
+            const pluginView = document.createElement('div');
+            pluginView.textContent = 'Hello World';
+            pluginView.style.cssText =
+              'display:flex;align-items:center;justify-content:center;height:100%;width:100%;color:white;font-size:24px;background-color:#1a1a2e;';
 
             try {
               const meeting = await RealtimeKitClient.init({
                 roomName,
                 baseURI,
                 authToken,
-                defaults,
+                defaults: {
+                  ...defaults,
+                  plugins: [
+                    {
+                      id: 'hello-world-plugin',
+                      name: 'Hello World',
+                      icon: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%234f46e5'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Ctext x='12' y='16' text-anchor='middle' fill='white' font-size='12'%3EHW%3C/text%3E%3C/svg%3E",
+                      permissions: { canActivate: true, canDeactivate: true },
+                      view: pluginView,
+                    },
+                  ],
+                },
                 modules,
               });
 
