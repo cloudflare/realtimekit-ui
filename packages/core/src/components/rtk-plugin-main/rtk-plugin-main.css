@@ -26,3 +26,9 @@ rtk-button {
   @apply relative h-full w-full overflow-hidden;
   @apply bg-video-bg;
 }
+
+.view-container ::slotted(*) {
+  width: 100%;
+  height: 100%;
+  display: block;
+}

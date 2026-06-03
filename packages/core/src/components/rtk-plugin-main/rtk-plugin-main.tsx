@@ -1,12 +1,17 @@
 import { defaultIconPack, IconPack } from '../../lib/icons';
 import { RTKPlugin } from '@cloudflare/realtimekit';
-import { Component, Host, h, Prop, Watch, State } from '@stencil/core';
+import { Component, Host, h, Prop, Watch, State, Element } from '@stencil/core';
 import { Meeting } from '../../types/rtk-client';
 import { SyncWithStore } from '../../utils/sync-with-store';
 import { RtkI18n, useLanguage } from '../../lib/lang';
 
 /**
- * A component which renders a plugin's view.
+ * A component which renders a plugin's UI.
+ *
+ * The plugin's `component` (an HTMLElement) is placed into this element's
+ * light DOM and projected into the shadow DOM layout via a `<slot>`.
+ * This ensures external CSS from the consuming application continues
+ * to apply to the plugin content.
  */
 @Component({
   tag: 'rtk-plugin-main',
@@ -14,7 +19,7 @@ import { RtkI18n, useLanguage } from '../../lib/lang';
   shadow: true,
 })
 export class RtkPluginMain {
-  private viewContainerEl: HTMLDivElement;
+  @Element() host: HTMLRtkPluginMainElement;
 
   /** Meeting */
   @SyncWithStore()
@@ -36,49 +41,36 @@ export class RtkPluginMain {
 
   @State() canDeactivatePlugin: boolean = false;
 
-  componentDidLoad() {
+  connectedCallback() {
     this.pluginChanged(this.plugin);
   }
 
   @Watch('plugin')
   pluginChanged(plugin: RTKPlugin) {
     if (plugin == null) return;
-
     this.canDeactivatePlugin = plugin.permissions?.canDeactivate ?? false;
     this.attachView(plugin);
   }
 
-  private onViewContainerRef = (el: HTMLDivElement) => {
-    if (el === this.viewContainerEl) return;
-    this.viewContainerEl = el;
-    if (this.plugin) {
-      this.attachView(this.plugin);
-    }
-  };
-
   private attachView(plugin: RTKPlugin) {
-    if (!this.viewContainerEl) return;
+    const component = plugin.component;
+    if (!(component instanceof HTMLElement)) return;
 
-    const view = plugin.view;
-    if (!(view instanceof HTMLElement)) return;
+    // Avoid unnecessary DOM churn if the same element is already mounted
+    if (this.host.firstElementChild === component) return;
 
-    // Avoid unnecessary DOM churn if the same view is already mounted
-    if (this.viewContainerEl.firstChild === view) return;
-
-    // Clear any existing children
-    while (this.viewContainerEl.firstChild) {
-      this.viewContainerEl.removeChild(this.viewContainerEl.firstChild);
+    // Clear any existing light DOM children
+    while (this.host.firstChild) {
+      this.host.removeChild(this.host.firstChild);
     }
 
-    this.viewContainerEl.appendChild(view);
+    // Place in light DOM — the <slot> projects it into the shadow DOM layout
+    this.host.appendChild(component);
   }
 
   disconnectedCallback() {
-    // Remove the view element from the container on cleanup
-    if (this.viewContainerEl) {
-      while (this.viewContainerEl.firstChild) {
-        this.viewContainerEl.removeChild(this.viewContainerEl.firstChild);
-      }
+    while (this.host.firstChild) {
+      this.host.removeChild(this.host.firstChild);
     }
   }
 
@@ -97,7 +89,9 @@ export class RtkPluginMain {
             </div>
           )}
         </header>
-        <div class="view-container" ref={(el) => this.onViewContainerRef(el)} />
+        <div class="view-container">
+          <slot></slot>
+        </div>
       </Host>
     );
   }

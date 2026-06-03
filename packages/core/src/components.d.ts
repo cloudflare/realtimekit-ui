@@ -2902,7 +2902,11 @@ export namespace Components {
         "variant": ControlBarVariant;
     }
     /**
-     * A component which renders a plugin's view.
+     * A component which renders a plugin's UI.
+     * The plugin's `component` (an HTMLElement) is placed into this element's
+     * light DOM and projected into the shadow DOM layout via a `<slot>`.
+     * This ensures external CSS from the consuming application continues
+     * to apply to the plugin content.
      */
     interface RtkPluginMain {
         /**
@@ -5752,7 +5756,11 @@ declare global {
         new (): HTMLRtkPipToggleElement;
     };
     /**
-     * A component which renders a plugin's view.
+     * A component which renders a plugin's UI.
+     * The plugin's `component` (an HTMLElement) is placed into this element's
+     * light DOM and projected into the shadow DOM layout via a `<slot>`.
+     * This ensures external CSS from the consuming application continues
+     * to apply to the plugin content.
      */
     interface HTMLRtkPluginMainElement extends Components.RtkPluginMain, HTMLStencilElement {
     }
@@ -9654,7 +9662,11 @@ declare namespace LocalJSX {
         "variant"?: ControlBarVariant;
     }
     /**
-     * A component which renders a plugin's view.
+     * A component which renders a plugin's UI.
+     * The plugin's `component` (an HTMLElement) is placed into this element's
+     * light DOM and projected into the shadow DOM layout via a `<slot>`.
+     * This ensures external CSS from the consuming application continues
+     * to apply to the plugin content.
      */
     interface RtkPluginMain {
         /**
@@ -11332,7 +11344,11 @@ declare module "@stencil/core" {
              */
             "rtk-pip-toggle": LocalJSX.RtkPipToggle & JSXBase.HTMLAttributes<HTMLRtkPipToggleElement>;
             /**
-             * A component which renders a plugin's view.
+             * A component which renders a plugin's UI.
+             * The plugin's `component` (an HTMLElement) is placed into this element's
+             * light DOM and projected into the shadow DOM layout via a `<slot>`.
+             * This ensures external CSS from the consuming application continues
+             * to apply to the plugin content.
              */
             "rtk-plugin-main": LocalJSX.RtkPluginMain & JSXBase.HTMLAttributes<HTMLRtkPluginMainElement>;
             /**
