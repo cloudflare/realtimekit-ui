@@ -80,6 +80,7 @@ export class RtkPlugins {
   render() {
     return (
       <Host>
+        {this.plugins.length === 0 && <div class="empty-plugins">{this.t('plugins.empty')}</div>}
         <ul class="scrollbar">
           {this.plugins.map((plugin) => (
             <li key={plugin.name} class="plugin">
