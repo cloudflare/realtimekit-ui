@@ -1,3 +1,10 @@
+## [1.2.1-staging.2](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.2.1-staging.1...@cloudflare/realtimekit-ui-v1.2.1-staging.2) (2026-06-04)
+
+
+### Bug Fixes
+
+* do not check connected-meeting permissions for getting transfer between meetings ([0af61e3](https://github.com/cloudflare/realtimekit-ui/commit/0af61e372a6af877dff6cf024a7c9b053b6baf4e))
+
 ## [1.2.1-staging.1](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.2.0...@cloudflare/realtimekit-ui-v1.2.1-staging.1) (2026-06-03)
 
 
