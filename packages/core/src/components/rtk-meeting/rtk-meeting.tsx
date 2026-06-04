@@ -294,10 +294,7 @@ export class RtkMeeting {
         this.showSetupScreen = data.showSetupScreen;
       }
 
-      if (
-        meeting.connectedMeetings.supportsConnectedMeetings &&
-        targetStore.state.states.activeBreakoutRoomsManager?.destinationMeetingId
-      ) {
+      if (targetStore.state.states.activeBreakoutRoomsManager?.destinationMeetingId) {
         this.showSetupScreen = false;
       }
     }
@@ -315,10 +312,7 @@ export class RtkMeeting {
     meeting.self.addListener('roomLeft', this.roomLeftListener);
     meeting.self.addListener('mediaPermissionUpdate', this.mediaPermissionUpdateListener);
     meeting.meta.addListener('socketConnectionUpdate', this.socketConnectionUpdateListener);
-
-    if (meeting.connectedMeetings.supportsConnectedMeetings) {
-      meeting.connectedMeetings.once('changingMeeting', this.handleChangingMeeting);
-    }
+    meeting.connectedMeetings.once('changingMeeting', this.handleChangingMeeting);
 
     if (meeting.self.roomJoined) {
       this.updateStates({ meeting: 'joined' });
