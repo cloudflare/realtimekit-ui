@@ -43,6 +43,7 @@
   @apply max-w-[90%] p-2;
   @apply bg-brand-500 text-text-on-brand border-brand-600 border-[1px] border-solid;
   @apply rounded-md;
+  line-height: 1;
 }
 
 .incoming {
