@@ -33,12 +33,11 @@ export default class RTKAudio {
   }
 
   addTrack(id: string, track: MediaStreamTrack) {
-    if (!this.audioTracks.some((a) => a.id === id)) {
-      this.audioTracks.push({ id, track });
-      this.audioStream.addTrack(track);
-
-      this.play();
-    }
+    // Remove the track if it already exists, with the same id
+    this.removeTrack(id);
+    this.audioTracks.push({ id, track });
+    this.audioStream.addTrack(track);
+    this.play();
   }
 
   removeTrack(id: string) {
