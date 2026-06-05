@@ -149,6 +149,10 @@ export namespace Components {
     }
     interface RtkAiTranscriptions {
         /**
+          * Icon pack
+         */
+        "iconPack": IconPack;
+        /**
           * Initial transcriptions
          */
         "initialTranscriptions": Transcript[];
@@ -6611,6 +6615,10 @@ declare namespace LocalJSX {
         "variant"?: ControlBarVariant;
     }
     interface RtkAiTranscriptions {
+        /**
+          * Icon pack
+         */
+        "iconPack"?: IconPack;
         /**
           * Initial transcriptions
          */

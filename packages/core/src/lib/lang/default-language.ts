@@ -268,6 +268,10 @@ export const defaultLanguage = {
   'ai.chat.tooltip': 'This conversation will just be visible to you and not to others in the call.',
   'ai.chat.summarize': 'Hey AI, summarize this call',
   'ai.chat.agenda': "Hey AI, what is today's agenda?",
+  'ai.transcriptions.search_placeholder': 'Search by participant name or transcript',
+  'ai.transcriptions.no_transcripts_found':
+    'No transcripts found. Try searching for a different participant or transcript.',
+  'ai.transcriptions.no_transcripts_yet': 'No transcripts yet.',
   search: 'Search',
   'search.could_not_find': "Couldn't find a participant with the specified name or ID.",
   'search.empty': 'It looks like nobody is here.',

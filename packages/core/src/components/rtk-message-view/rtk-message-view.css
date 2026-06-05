@@ -52,14 +52,14 @@
 }
 
 .metadata {
-  @apply mt-2 flex flex-row items-center gap-1;
+  @apply mt-1 flex flex-row items-center gap-1;
   @apply self-end;
   @apply text-text-on-brand text-[11px];
 }
 
 .incoming {
   .metadata {
-    @apply mt-2 flex flex-row items-center gap-1;
+    @apply mt-1 flex flex-row items-center gap-1;
     @apply self-end;
     @apply text-text-800 text-[11px];
   }

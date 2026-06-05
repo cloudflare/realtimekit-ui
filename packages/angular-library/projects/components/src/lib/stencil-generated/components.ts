@@ -60,14 +60,14 @@ export declare interface RtkAiToggle extends Components.RtkAiToggle {
 
 
 @ProxyCmp({
-  inputs: ['initialTranscriptions', 'meeting', 't']
+  inputs: ['iconPack', 'initialTranscriptions', 'meeting', 't']
 })
 @Component({
   selector: 'rtk-ai-transcriptions',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: '<ng-content></ng-content>',
   // eslint-disable-next-line @angular-eslint/no-inputs-metadata-property
-  inputs: ['initialTranscriptions', 'meeting', 't'],
+  inputs: ['iconPack', 'initialTranscriptions', 'meeting', 't'],
 })
 export class RtkAiTranscriptions {
   protected el: HTMLRtkAiTranscriptionsElement;

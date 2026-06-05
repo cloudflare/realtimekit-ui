@@ -1,7 +1,7 @@
 @import '../../styles/reset.css';
 
 :host {
-  @apply max-w-80 relative box-border flex w-full flex-col;
+  @apply relative box-border flex w-full flex-col;
   @apply text-text-1000 bg-background-1000;
   @apply overflow-hidden;
 }
@@ -19,7 +19,7 @@ rtk-ai-transcriptions {
 }
 
 :host([view='sidebar']) {
-  @apply bg-background-900 mx-2 rounded-lg;
+  @apply bg-background-900;
 }
 
 :host([view='full-screen']) {
