@@ -1,3 +1,11 @@
+## [1.2.1-staging.5](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.2.1-staging.4...@cloudflare/realtimekit-ui-v1.2.1-staging.5) (2026-06-05)
+
+
+### Bug Fixes
+
+* bumped up realtimekit version for removal of supportsConnectedMeetings API ([e3b075c](https://github.com/cloudflare/realtimekit-ui/commit/e3b075c13c7bf01b7cb66404dffebb559eaeb0e9))
+* removed supportsConnectedMeetings references from ui-kit components ([2304096](https://github.com/cloudflare/realtimekit-ui/commit/23040965b397d1a06fae2d43e0fce3b774580801))
+
 ## [1.2.1-staging.4](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.2.1-staging.3...@cloudflare/realtimekit-ui-v1.2.1-staging.4) (2026-06-05)
 
 
