@@ -260,7 +260,7 @@ export const defaultLanguage = {
     'Are you sure you want to leave the call? You are in a breakout room, you can join the main room too.',
   'breakout_rooms.leave_confirmation.main_room_btn': 'Go back to main room',
   ai: 'AI',
-  'ai.meeting_ai': 'MeetingAI',
+  'ai.meeting_ai': 'Meeting AI',
   'ai.home': 'Home',
   'ai.transcriptions': 'Transcriptions',
   'ai.personal': 'Personal',
