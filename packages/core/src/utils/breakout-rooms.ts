@@ -67,8 +67,6 @@ export function getAllConnectedParticipants(meeting: Meeting) {
 }
 
 export const canToggleBreakout = (meeting: Meeting) => {
-  if (!meeting?.connectedMeetings?.supportsConnectedMeetings) return false;
-
   const permissions = meeting.self.permissions.connectedMeetings;
 
   // for host - always show toggle
