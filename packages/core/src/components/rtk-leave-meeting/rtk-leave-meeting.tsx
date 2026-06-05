@@ -68,15 +68,11 @@ export class RtkLeaveMeeting {
   @Watch('meeting')
   meetingChanged(meeting: Meeting) {
     if (meeting != null) {
-      this.isBreakoutRoomsActive =
-        this.meeting.connectedMeetings.supportsConnectedMeetings &&
-        this.meeting.connectedMeetings.isActive;
+      this.isBreakoutRoomsActive = this.meeting.connectedMeetings.isActive;
 
-      this.isChildMeeting =
-        this.meeting.connectedMeetings.supportsConnectedMeetings &&
-        this.meeting.connectedMeetings.meetings.some(
-          (cMeet) => cMeet.id === meeting.meta.meetingId
-        );
+      this.isChildMeeting = this.meeting.connectedMeetings.meetings.some(
+        (cMeet) => cMeet.id === meeting.meta.meetingId
+      );
 
       this.meeting.self.permissions.addListener(
         'permissionsUpdate',
