@@ -1,3 +1,13 @@
+## [1.2.1-staging.4](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.2.1-staging.3...@cloudflare/realtimekit-ui-v1.2.1-staging.4) (2026-06-05)
+
+
+### Bug Fixes
+
+* **ai-review:** rewrote rtk-ai-transcription iife and fixed prop ordering ([71400a8](https://github.com/cloudflare/realtimekit-ui/commit/71400a8c7b8014eafbbd550ff8f0650da0aa869a))
+* **ai-transcriptions-ui:** fixed search ui, added transcript search ([36c79f3](https://github.com/cloudflare/realtimekit-ui/commit/36c79f3e8209ae2cba3777dbea9aabed76e363f5))
+* **chat-bubble-spacing:** reduce line height for better vertical spacing ([f2cba51](https://github.com/cloudflare/realtimekit-ui/commit/f2cba515835acb274562f4a9baa68b5e536f5020))
+* **meeting-ai-typo:** fixed typo in the header ([a3ed801](https://github.com/cloudflare/realtimekit-ui/commit/a3ed80146b3fe4fbe59c73327c161da1c4e499f1))
+
 ## [1.2.1-staging.3](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.2.1-staging.2...@cloudflare/realtimekit-ui-v1.2.1-staging.3) (2026-06-05)
 
 
