@@ -20,20 +20,20 @@ export class RtkAiTranscriptions {
 
   @State() isProcessing = false;
 
-  /** Language */
+  /** Meeting object */
   @SyncWithStore()
   @Prop()
-  t: RtkI18n = useLanguage();
+  meeting: Meeting;
 
   /** Icon pack */
   @SyncWithStore()
   @Prop()
   iconPack: IconPack = defaultIconPack;
 
-  /** Meeting object */
+  /** Language */
   @SyncWithStore()
   @Prop()
-  meeting: Meeting;
+  t: RtkI18n = useLanguage();
 
   @State() transcriptions: Transcript[] = [];
 
@@ -110,6 +110,23 @@ export class RtkAiTranscriptions {
     this.transcriptions = this.transcriptionsReducer(this.transcriptions, data);
   };
 
+  private renderContent() {
+    const transcripts = this.renderTranscripts();
+    return (
+      <div class="content scrollbar" ref={(el) => (this.contentContainer = el as HTMLDivElement)}>
+        {this.transcriptions.length === 0 && (
+          <div class="started-message">{this.t('ai.transcriptions.no_transcripts_yet')}</div>
+        )}
+
+        {transcripts}
+
+        {this.transcriptions.length > 0 && this.searchQuery && transcripts.length === 0 && (
+          <div class="started-message">{this.t('ai.transcriptions.no_transcripts_found')}</div>
+        )}
+      </div>
+    );
+  }
+
   private renderTranscripts() {
     const query = this.searchQuery?.toLowerCase();
     const transcripts = this.transcriptions.filter((t) =>
@@ -176,30 +193,7 @@ export class RtkAiTranscriptions {
           </div>
         )}
 
-        {!this.isProcessing &&
-          (() => {
-            const transcripts = this.renderTranscripts();
-            return (
-              <div
-                class="content scrollbar"
-                ref={(el) => (this.contentContainer = el as HTMLDivElement)}
-              >
-                {this.transcriptions.length === 0 && (
-                  <div class="started-message">
-                    {this.t('ai.transcriptions.no_transcripts_yet')}
-                  </div>
-                )}
-
-                {transcripts}
-
-                {this.transcriptions.length > 0 && this.searchQuery && transcripts.length === 0 && (
-                  <div class="started-message">
-                    {this.t('ai.transcriptions.no_transcripts_found')}
-                  </div>
-                )}
-              </div>
-            );
-          })()}
+        {!this.isProcessing && this.renderContent()}
       </Host>
     );
   }
