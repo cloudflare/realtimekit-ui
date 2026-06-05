@@ -1,3 +1,10 @@
+## [1.2.1-staging.3](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.2.1-staging.2...@cloudflare/realtimekit-ui-v1.2.1-staging.3) (2026-06-05)
+
+
+### Bug Fixes
+
+* **media-reconnection:** fixed missing audio and abrupt disconnection screen ([92fd38b](https://github.com/cloudflare/realtimekit-ui/commit/92fd38b7d1b0a678d972d255b20c2c9b97966332))
+
 ## [1.2.1-staging.2](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.2.1-staging.1...@cloudflare/realtimekit-ui-v1.2.1-staging.2) (2026-06-04)
 
 
