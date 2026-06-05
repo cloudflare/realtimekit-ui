@@ -1,4 +1,5 @@
 import { Component, Host, Prop, State, Watch, h } from '@stencil/core';
+import { defaultIconPack, IconPack } from '../../lib/icons';
 import { RtkI18n, useLanguage } from '../../lib/lang';
 import { ChatHead } from '../rtk-chat/components/ChatHead';
 import { Meeting } from '../../types/rtk-client';
@@ -15,19 +16,24 @@ import clone from '../../utils/clone';
 export class RtkAiTranscriptions {
   private contentContainer!: HTMLDivElement;
 
-  @State() participantQuery = '';
+  @State() searchQuery = '';
 
   @State() isProcessing = false;
-
-  /** Language */
-  @SyncWithStore()
-  @Prop()
-  t: RtkI18n = useLanguage();
 
   /** Meeting object */
   @SyncWithStore()
   @Prop()
   meeting: Meeting;
+
+  /** Icon pack */
+  @SyncWithStore()
+  @Prop()
+  iconPack: IconPack = defaultIconPack;
+
+  /** Language */
+  @SyncWithStore()
+  @Prop()
+  t: RtkI18n = useLanguage();
 
   @State() transcriptions: Transcript[] = [];
 
@@ -104,10 +110,28 @@ export class RtkAiTranscriptions {
     this.transcriptions = this.transcriptionsReducer(this.transcriptions, data);
   };
 
+  private renderContent() {
+    const transcripts = this.renderTranscripts();
+    return (
+      <div class="content scrollbar" ref={(el) => (this.contentContainer = el as HTMLDivElement)}>
+        {this.transcriptions.length === 0 && (
+          <div class="started-message">{this.t('ai.transcriptions.no_transcripts_yet')}</div>
+        )}
+
+        {transcripts}
+
+        {this.transcriptions.length > 0 && this.searchQuery && transcripts.length === 0 && (
+          <div class="started-message">{this.t('ai.transcriptions.no_transcripts_found')}</div>
+        )}
+      </div>
+    );
+  }
+
   private renderTranscripts() {
+    const query = this.searchQuery?.toLowerCase();
     const transcripts = this.transcriptions.filter((t) =>
-      this.participantQuery
-        ? t.name.toLowerCase().includes(this.participantQuery.toLowerCase())
+      query
+        ? t.name?.toLowerCase().includes(query) || t.transcript?.toLowerCase().includes(query)
         : true
     );
 
@@ -152,12 +176,14 @@ export class RtkAiTranscriptions {
   render() {
     return (
       <Host>
-        <div class="search-bar">
+        <div class="search">
+          <rtk-icon icon={this.iconPack.search} />
           <input
-            type="text"
-            placeholder="Search participant"
-            value={this.participantQuery}
-            onInput={(e) => (this.participantQuery = (e.target as HTMLInputElement).value)}
+            type="search"
+            autocomplete="off"
+            placeholder={this.t('ai.transcriptions.search_placeholder')}
+            value={this.searchQuery}
+            onInput={(e) => (this.searchQuery = (e.target as HTMLInputElement).value)}
           />
         </div>
 
@@ -167,16 +193,7 @@ export class RtkAiTranscriptions {
           </div>
         )}
 
-        {!this.isProcessing && (
-          <div
-            class="content scrollbar"
-            ref={(el) => (this.contentContainer = el as HTMLDivElement)}
-          >
-            <div class="started-message">Transcription started</div>
-
-            {this.renderTranscripts()}
-          </div>
-        )}
+        {!this.isProcessing && this.renderContent()}
       </Host>
     );
   }

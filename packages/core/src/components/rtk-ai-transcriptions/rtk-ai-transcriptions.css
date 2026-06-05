@@ -27,13 +27,19 @@
   @apply text-text-700 text-text-sm my-5 text-center;
 }
 
-.search-bar {
-  @apply border-b-sm border-background-600 h-14 w-full p-3;
-}
+.search {
+  @apply bg-background-700 sticky box-border flex items-center rounded-sm;
+  @apply mx-3 my-4;
 
-input {
-  @apply bg-background-600 text-text-md h-full w-full px-3;
-  @apply text-text rounded-sm;
+  rtk-icon {
+    @apply text-text-600 mx-2 h-5 w-5;
+  }
+
+  input {
+    @apply box-border h-9 w-full pr-2;
+    @apply bg-background-700 text-text-1000 border-none outline-none;
+    @apply text-text-md placeholder:text-text-800 rounded-sm;
+  }
 }
 
 .caption-view {

@@ -43,6 +43,7 @@
   @apply max-w-[90%] p-2;
   @apply bg-brand-500 text-text-on-brand border-brand-600 border-[1px] border-solid;
   @apply rounded-md;
+  line-height: 1;
 }
 
 .incoming {
@@ -52,14 +53,14 @@
 }
 
 .metadata {
-  @apply mt-2 flex flex-row items-center gap-1;
+  @apply mt-1 flex flex-row items-center gap-1;
   @apply self-end;
   @apply text-text-on-brand text-[11px];
 }
 
 .incoming {
   .metadata {
-    @apply mt-2 flex flex-row items-center gap-1;
+    @apply mt-1 flex flex-row items-center gap-1;
     @apply self-end;
     @apply text-text-800 text-[11px];
   }
