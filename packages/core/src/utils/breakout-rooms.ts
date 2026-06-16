@@ -42,7 +42,7 @@ export function splitCollection<T>(collection: T[], parts: number) {
 }
 
 export function participantIdentifier(participant) {
-  return participant.customParticipantId ?? participant.clientSpecificId;
+  return participant.customParticipantId;
 }
 
 export function getAllConnectedParticipants(meeting: Meeting) {

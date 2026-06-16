@@ -415,7 +415,7 @@ export class RtkParticipant {
                           t={this.t}
                           class="red"
                           onClick={() => {
-                            this.meeting?.participants.kick(this.participant?.id);
+                            this.meeting?.participants.joined.get(this.participant?.id)?.kick();
                           }}
                         >
                           <rtk-icon icon={this.iconPack.dismiss} slot="start" />

@@ -34,13 +34,9 @@ export class RtkChatSearchResults {
 
   private pageSize = 50;
 
-  private searchMessages = async (timestamp: number, size: number, reversed: boolean) => {
-    return this.meeting.chat.searchMessages(this.query, {
-      channelId: this.channelId,
-      timestamp,
-      size,
-      reversed,
-    });
+  /** NOTE(ikabra): Core APIs need to be implemented for this, this component is not being used inside chat UI and was broken as standalone. */
+  private searchMessages = async () => {
+    return [];
   };
 
   private nodeRenderer = (messages: Message[]) => {
