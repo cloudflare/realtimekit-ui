@@ -35,7 +35,7 @@ export class RtkChatSearchResults {
   private pageSize = 50;
 
   /** NOTE(ikabra): Core APIs need to be implemented for this, this component is not being used inside chat UI and was broken as standalone. */
-  private searchMessages = async () => {
+  private searchMessages = async (_timestamp: number, _size: number, _reversed: boolean) => {
     return [];
   };
 
