@@ -1,3 +1,12 @@
+## [1.2.1-staging.6](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.2.1-staging.5...@cloudflare/realtimekit-ui-v1.2.1-staging.6) (2026-06-17)
+
+
+### Bug Fixes
+
+* preserve type signature for searchMessages ([25ff314](https://github.com/cloudflare/realtimekit-ui/commit/25ff3142b33779114cd44be1b4449b854406b6f0))
+* remove usage of deprecated core apis ([7eb39c3](https://github.com/cloudflare/realtimekit-ui/commit/7eb39c308a309e6812ff0fb5f42d974233c18d4d))
+* update deps ([910c832](https://github.com/cloudflare/realtimekit-ui/commit/910c8328264ed483706b53cd116c9ba2db5a3278))
+
 ## [1.2.1-staging.5](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.2.1-staging.4...@cloudflare/realtimekit-ui-v1.2.1-staging.5) (2026-06-05)
 
 
