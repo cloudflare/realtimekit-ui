@@ -352,7 +352,7 @@ export class RtkNotifications {
               button: {
                 text: this.t('end'),
                 variant: 'danger',
-                onClick: () => this.meeting?.leaveRoom(),
+                onClick: () => this.meeting?.leave(),
               },
             });
           } else if (reconnectionAttempt >= 4) {
@@ -374,7 +374,7 @@ export class RtkNotifications {
             button: {
               text: this.t('end'),
               variant: 'danger',
-              onClick: () => this.meeting?.leaveRoom(),
+              onClick: () => this.meeting?.leave(),
             },
           });
           break;

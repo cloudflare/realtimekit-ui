@@ -128,7 +128,7 @@ export class RtkSetupScreen {
 
       gracefulStorage.setItem('rtk-display-name', this.displayName);
       try {
-        await this.meeting?.joinRoom();
+        await this.meeting?.join();
       } catch (e) {
         this.isJoining = false;
         const { message, code } = getJoinErrorInfo(this.t, e);

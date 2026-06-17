@@ -172,7 +172,7 @@ export class RtkMeeting {
 
   disconnectedCallback() {
     if (this.leaveOnUnmount) {
-      this.meeting?.leaveRoom();
+      this.meeting?.leave();
     }
     this.resizeObserver.disconnect();
     window.removeEventListener('rtkError', this.authErrorListener);
@@ -321,7 +321,7 @@ export class RtkMeeting {
         this.updateStates({ meeting: 'setup' });
       } else {
         meeting
-          .joinRoom()
+          .join()
           .then(() => {
             this.updateStates({ joinError: undefined, joinErrorCode: undefined });
           })

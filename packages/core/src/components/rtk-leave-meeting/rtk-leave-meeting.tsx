@@ -92,7 +92,7 @@ export class RtkLeaveMeeting {
   };
 
   private handleLeave = () => {
-    this.meeting?.leaveRoom();
+    this.meeting?.leave();
     this.close();
   };
 

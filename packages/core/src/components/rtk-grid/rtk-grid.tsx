@@ -175,7 +175,11 @@ export class RtkGrid {
       this.plugins = plugins?.active.toArray() || [];
 
       if (permissions?.stageEnabled) {
-        this.canCurrentPeerHost = permissions.acceptStageRequests || permissions.canPresent;
+        this.canCurrentPeerHost =
+          permissions.acceptStageRequests ||
+          permissions.canProduceAudio === 'ALLOWED' ||
+          permissions.canProduceVideo === 'ALLOWED' ||
+          permissions.canProduceScreenshare === 'ALLOWED';
         this.updateStage();
       }
 

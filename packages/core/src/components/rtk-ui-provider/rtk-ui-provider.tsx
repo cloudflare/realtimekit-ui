@@ -219,7 +219,7 @@ export class RtkUiProvider {
         if (this.showSetupScreen) {
           this.updateStates({ meeting: 'setup' });
         } else {
-          meeting.joinRoom();
+          meeting.join();
         }
       }
 
