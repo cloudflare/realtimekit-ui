@@ -175,7 +175,11 @@ export class RtkGrid {
       this.plugins = plugins?.active.toArray() || [];
 
       if (permissions?.stageEnabled) {
-        this.canCurrentPeerHost = permissions.acceptStageRequests || permissions.canPresent;
+        this.canCurrentPeerHost =
+          permissions.acceptStageRequests ||
+          permissions.canProduceAudio === 'ALLOWED' ||
+          permissions.canProduceVideo === 'ALLOWED' ||
+          permissions.canProduceScreenshare === 'ALLOWED';
         this.updateStage();
       }
 
@@ -414,15 +418,26 @@ export class RtkGrid {
       );
     }
     if (this.roomState === 'disconnected') {
-      return (
-        <Host>
-          <div class="offline-grid">
-            <rtk-icon icon={this.iconPack.disconnected} size="xl" />
-            <h3>{this.t('offline')}</h3>
-            <p>{this.t('offline.description')}</p>
-          </div>
-        </Host>
-      );
+      /**
+       * NOTE(ravindra-cloudflare): When disconnected but WebRTC transports are
+       * still healthy, skip the offline screen — media is still flowing.
+       * The grid stays visible for seamless reconnection.
+       */
+      const mediaState = this.meeting?.meta?.mediaState;
+      const transportsHealthy =
+        mediaState?.send?.state === 'connected' && mediaState?.recv?.state === 'connected';
+
+      if (!transportsHealthy) {
+        return (
+          <Host>
+            <div class="offline-grid">
+              <rtk-icon icon={this.iconPack.disconnected} size="xl" />
+              <h3>{this.t('offline')}</h3>
+              <p>{this.t('offline.description')}</p>
+            </div>
+          </Host>
+        );
+      }
     }
     if (this.roomState === 'failed') {
       return (

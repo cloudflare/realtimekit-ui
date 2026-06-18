@@ -42,7 +42,7 @@ export function splitCollection<T>(collection: T[], parts: number) {
 }
 
 export function participantIdentifier(participant) {
-  return participant.customParticipantId ?? participant.clientSpecificId;
+  return participant.customParticipantId;
 }
 
 export function getAllConnectedParticipants(meeting: Meeting) {
@@ -67,8 +67,6 @@ export function getAllConnectedParticipants(meeting: Meeting) {
 }
 
 export const canToggleBreakout = (meeting: Meeting) => {
-  if (!meeting?.connectedMeetings?.supportsConnectedMeetings) return false;
-
   const permissions = meeting.self.permissions.connectedMeetings;
 
   // for host - always show toggle

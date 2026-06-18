@@ -18,7 +18,10 @@ import { createDefaultConfig } from '../../exports';
   shadow: true,
 })
 export class RtkPlugins {
-  private updateActivePlugins: () => void;
+  private updateActivePlugins = () => {
+    if (!this.meeting) return;
+    this.activatedPluginsId = this.meeting.plugins.active.toArray().map((p) => p.id);
+  };
   /** Meeting object */
   @SyncWithStore()
   @Prop()
@@ -47,10 +50,6 @@ export class RtkPlugins {
 
   @State() plugins: RTKPlugin[] = [];
 
-  @State() canStartPlugins: boolean = false;
-
-  @State() canClosePlugins: boolean = false;
-
   @State() activatedPluginsId: string[] = [];
 
   connectedCallback() {
@@ -62,17 +61,13 @@ export class RtkPlugins {
   }
 
   @Watch('meeting')
-  meetingChanged(meeting: Meeting) {
+  meetingChanged(meeting: Meeting, oldMeeting?: Meeting) {
+    if (oldMeeting) {
+      oldMeeting.plugins.all.removeListener('stateUpdate', this.updateActivePlugins);
+    }
     if (meeting != null) {
-      this.canStartPlugins = meeting.self.permissions.plugins.canStart;
-      this.canClosePlugins = meeting.self.permissions.plugins.canClose;
-      this.plugins = meeting.plugins.all
-        .toArray()
-        .filter((plugin) => !meeting.self.config.disabledPlugins?.includes(plugin.id));
+      this.plugins = meeting.plugins.all.toArray();
 
-      this.updateActivePlugins = () => {
-        this.activatedPluginsId = meeting.plugins.active.toArray().map((p) => p.id);
-      };
       this.updateActivePlugins();
       meeting.plugins.all.addListener('stateUpdate', this.updateActivePlugins);
     }
@@ -85,14 +80,15 @@ export class RtkPlugins {
   render() {
     return (
       <Host>
+        {this.plugins.length === 0 && <div class="empty-plugins">{this.t('plugins.empty')}</div>}
         <ul class="scrollbar">
           {this.plugins.map((plugin) => (
             <li key={plugin.name} class="plugin">
               <div class="metadata">
-                <img src={plugin.picture} />
+                <img src={plugin.icon} alt={plugin.name} />
                 <div class="name">{plugin.name}</div>
               </div>
-              {!this.activatedPluginsId.includes(plugin.id) && this.canStartPlugins && (
+              {!this.activatedPluginsId.includes(plugin.id) && plugin?.permissions?.canActivate && (
                 <div class="buttons">
                   <rtk-button
                     kind="icon"
@@ -107,20 +103,21 @@ export class RtkPlugins {
                   </rtk-button>
                 </div>
               )}
-              {this.activatedPluginsId.includes(plugin.id) && this.canClosePlugins && (
-                <div class="buttons">
-                  <rtk-button
-                    kind="icon"
-                    size="lg"
-                    onClick={() => {
-                      plugin.deactivate();
-                    }}
-                    aria-label={`${this.t('close')} ${plugin.name}`}
-                  >
-                    <rtk-icon icon={this.iconPack.dismiss} tabIndex={-1} aria-hidden={true} />
-                  </rtk-button>
-                </div>
-              )}
+              {this.activatedPluginsId.includes(plugin.id) &&
+                plugin?.permissions?.canDeactivate && (
+                  <div class="buttons">
+                    <rtk-button
+                      kind="icon"
+                      size="lg"
+                      onClick={() => {
+                        plugin.deactivate();
+                      }}
+                      aria-label={`${this.t('close')} ${plugin.name}`}
+                    >
+                      <rtk-icon icon={this.iconPack.dismiss} tabIndex={-1} aria-hidden={true} />
+                    </rtk-button>
+                  </div>
+                )}
             </li>
           ))}
         </ul>

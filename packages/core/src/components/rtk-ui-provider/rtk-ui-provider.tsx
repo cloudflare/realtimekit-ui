@@ -211,10 +211,7 @@ export class RtkUiProvider {
       meeting.self.addListener('roomLeft', this.roomLeftListener);
       meeting.self.addListener('mediaPermissionUpdate', this.mediaPermissionUpdateListener);
       meeting.meta.addListener('socketConnectionUpdate', this.socketConnectionUpdateListener);
-
-      if (meeting.connectedMeetings.supportsConnectedMeetings) {
-        meeting.connectedMeetings.once('changingMeeting', this.handleChangingMeeting);
-      }
+      meeting.connectedMeetings.once('changingMeeting', this.handleChangingMeeting);
 
       if (meeting.self.roomJoined) {
         this.updateStates({ meeting: 'joined' });
@@ -222,7 +219,7 @@ export class RtkUiProvider {
         if (this.showSetupScreen) {
           this.updateStates({ meeting: 'setup' });
         } else {
-          meeting.joinRoom();
+          meeting.join();
         }
       }
 
