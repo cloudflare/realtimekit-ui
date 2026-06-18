@@ -1,3 +1,37 @@
+# [2.0.0](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.2.0...@cloudflare/realtimekit-ui-v2.0.0) (2026-06-18)
+
+
+### Bug Fixes
+
+* **ai-review:** rewrote rtk-ai-transcription iife and fixed prop ordering ([71400a8](https://github.com/cloudflare/realtimekit-ui/commit/71400a8c7b8014eafbbd550ff8f0650da0aa869a))
+* **ai-transcriptions-ui:** fixed search ui, added transcript search ([36c79f3](https://github.com/cloudflare/realtimekit-ui/commit/36c79f3e8209ae2cba3777dbea9aabed76e363f5))
+* bumped up realtimekit version for removal of supportsConnectedMeetings API ([e3b075c](https://github.com/cloudflare/realtimekit-ui/commit/e3b075c13c7bf01b7cb66404dffebb559eaeb0e9))
+* **chat-bubble-spacing:** reduce line height for better vertical spacing ([f2cba51](https://github.com/cloudflare/realtimekit-ui/commit/f2cba515835acb274562f4a9baa68b5e536f5020))
+* closure for updateActivePlugins ([b00b9eb](https://github.com/cloudflare/realtimekit-ui/commit/b00b9eb2c9c412cef4ca32d81b2f42ae92509178))
+* do not check connected-meeting permissions for getting transfer between meetings ([0af61e3](https://github.com/cloudflare/realtimekit-ui/commit/0af61e372a6af877dff6cf024a7c9b053b6baf4e))
+* **media-reconnection:** fixed missing audio and abrupt disconnection screen ([92fd38b](https://github.com/cloudflare/realtimekit-ui/commit/92fd38b7d1b0a678d972d255b20c2c9b97966332))
+* **meeting-ai-typo:** fixed typo in the header ([a3ed801](https://github.com/cloudflare/realtimekit-ui/commit/a3ed80146b3fe4fbe59c73327c161da1c4e499f1))
+* potential memory leak ([b959bca](https://github.com/cloudflare/realtimekit-ui/commit/b959bca0241faa93663fe83f36404dc47d5c2c61))
+* preserve type signature for searchMessages ([25ff314](https://github.com/cloudflare/realtimekit-ui/commit/25ff3142b33779114cd44be1b4449b854406b6f0))
+* remove dead code after code merge ([d9be765](https://github.com/cloudflare/realtimekit-ui/commit/d9be765fe26c4aed65425497955ec65f26332d91))
+* remove hardcodings ([2888bee](https://github.com/cloudflare/realtimekit-ui/commit/2888bee3a514ff61dc66968edfcde969fa19711d))
+* remove usage of deprecated core apis ([7eb39c3](https://github.com/cloudflare/realtimekit-ui/commit/7eb39c308a309e6812ff0fb5f42d974233c18d4d))
+* removed supportsConnectedMeetings references from ui-kit components ([2304096](https://github.com/cloudflare/realtimekit-ui/commit/23040965b397d1a06fae2d43e0fce3b774580801))
+* render plugin in a slot to allow css to work ([643ac04](https://github.com/cloudflare/realtimekit-ui/commit/643ac04dd60f04e14e6a94fd38f81d0c08a3682b))
+* support for adding plugins via client sdk ([f01cd0a](https://github.com/cloudflare/realtimekit-ui/commit/f01cd0a71bf442fe8ae9119f6a3dc503a962afcb))
+* update deps ([910c832](https://github.com/cloudflare/realtimekit-ui/commit/910c8328264ed483706b53cd116c9ba2db5a3278))
+* update package version and add empty state message ([abcf7f0](https://github.com/cloudflare/realtimekit-ui/commit/abcf7f0434620bae99dfa4d56c07f7ad8399e86e))
+
+
+### Features
+
+* trigger major version bump ([cc53637](https://github.com/cloudflare/realtimekit-ui/commit/cc53637569447d77d6720d9cf33efae05937a94c))
+
+
+### BREAKING CHANGES
+
+* remove prebuilt plugins, their APIs, and all deprecated methods
+
 # [2.0.0-staging.1](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.2.1-staging.6...@cloudflare/realtimekit-ui-v2.0.0-staging.1) (2026-06-18)
 
 
