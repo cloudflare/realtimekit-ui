@@ -1,3 +1,15 @@
+# [2.0.0-staging.1](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.2.1-staging.6...@cloudflare/realtimekit-ui-v2.0.0-staging.1) (2026-06-18)
+
+
+### Features
+
+* trigger major version bump ([cc53637](https://github.com/cloudflare/realtimekit-ui/commit/cc53637569447d77d6720d9cf33efae05937a94c))
+
+
+### BREAKING CHANGES
+
+* remove prebuilt plugins, their APIs, and all deprecated methods
+
 ## [1.2.1-staging.6](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.2.1-staging.5...@cloudflare/realtimekit-ui-v1.2.1-staging.6) (2026-06-17)
 
 
