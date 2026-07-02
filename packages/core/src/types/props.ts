@@ -31,6 +31,17 @@ export interface PermissionSettings {
 }
 
 /**
+ * Error info for failures during the pre-join phase (init or join).
+ * Set by rtk-meeting / rtk-ui-provider, displayed by rtk-idle-screen.
+ */
+export interface PreJoinError {
+  /** Localized, user-friendly message suitable for display to end users. */
+  message: string;
+  /** Raw SDK error code (e.g. '0004'), displayed as a support reference. */
+  code?: string;
+}
+
+/**
  * Global States object which are shared among components
  */
 export interface States {
@@ -81,8 +92,7 @@ export interface States {
   prefs?: UserPreferences;
   sidebar?: RtkSidebarSection;
   roomLeftState?: RoomLeftState | 'unauthorized';
-  joinError?: string;
-  joinErrorCode?: string;
+  preJoinError?: PreJoinError | null;
   sidebarFloating?: boolean;
   participantsTabId?: ParticipantsTabId;
   [state: string]: any;

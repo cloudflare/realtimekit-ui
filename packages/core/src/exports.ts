@@ -19,6 +19,7 @@ export { registerAddons, Addon } from './lib/addons';
 export { UIConfig } from './types/ui-config';
 export {
   States,
+  PreJoinError,
   Notification,
   Size,
   UserPreferences,

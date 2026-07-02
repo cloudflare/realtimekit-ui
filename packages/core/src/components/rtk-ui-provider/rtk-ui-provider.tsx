@@ -19,6 +19,8 @@ import {
   type RtkUiStoreExtended,
 } from '../../utils/sync-with-store/ui-store';
 import deepMerge from 'lodash-es/merge';
+import { getInitErrorInfo } from '../../utils/init-error';
+import { getJoinErrorInfo } from '../../utils/join-error';
 import { PermissionSettings } from '../../types/props';
 
 const LEAVE_ROOM_TIMER = 10000;
@@ -68,16 +70,15 @@ export class RtkUiProvider {
    */
   @Event({ eventName: 'rtkStatesUpdate' }) statesUpdate: EventEmitter<States>;
 
-  private authErrorListener: (ev: CustomEvent<Error>) => void;
+  private initErrorListener: (ev: CustomEvent) => void;
 
   connectedCallback() {
     if (typeof window !== 'undefined') {
-      this.authErrorListener = (ev) => {
-        if (ev.detail.message.includes('401')) {
-          this.updateStates({ meeting: 'ended', roomLeftState: 'unauthorized' });
-        }
+      this.initErrorListener = (ev) => {
+        const { message, code } = getInitErrorInfo(this.t, ev.detail);
+        this.updateStates({ preJoinError: { message, code } });
       };
-      window.addEventListener('rtkError', this.authErrorListener);
+      window.addEventListener('ClientError', this.initErrorListener);
     }
 
     // Listen for store requests from child components
@@ -91,7 +92,7 @@ export class RtkUiProvider {
   }
 
   disconnectedCallback() {
-    window.removeEventListener('rtkError', this.authErrorListener);
+    window.removeEventListener('ClientError', this.initErrorListener);
 
     // Remove event listeners
     if (this.storeRequestListener) {
@@ -219,11 +220,19 @@ export class RtkUiProvider {
         if (this.showSetupScreen) {
           this.updateStates({ meeting: 'setup' });
         } else {
-          meeting.join();
+          meeting
+            .join()
+            .then(() => {
+              this.updateStates({ preJoinError: null });
+            })
+            .catch((err) => {
+              const { message, code } = getJoinErrorInfo(this.t, err);
+              this.updateStates({ preJoinError: { message, code } });
+            });
         }
       }
 
-      window.removeEventListener('rtkError', this.authErrorListener);
+      window.removeEventListener('ClientError', this.initErrorListener);
     }
   }
 
@@ -264,7 +273,7 @@ export class RtkUiProvider {
   }
 
   private roomJoinedListener = () => {
-    this.updateStates({ meeting: 'joined' });
+    this.updateStates({ meeting: 'joined', preJoinError: null });
   };
 
   private waitlistedListener = () => {
