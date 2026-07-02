@@ -20,6 +20,7 @@ import {
 } from '../../utils/sync-with-store/ui-store';
 import deepMerge from 'lodash-es/merge';
 import { getInitErrorInfo } from '../../utils/init-error';
+import { getJoinErrorInfo } from '../../utils/join-error';
 import { PermissionSettings } from '../../types/props';
 
 const LEAVE_ROOM_TIMER = 10000;
@@ -219,7 +220,15 @@ export class RtkUiProvider {
         if (this.showSetupScreen) {
           this.updateStates({ meeting: 'setup' });
         } else {
-          meeting.join();
+          meeting
+            .join()
+            .then(() => {
+              this.updateStates({ preJoinError: null });
+            })
+            .catch((err) => {
+              const { message, code } = getJoinErrorInfo(this.t, err);
+              this.updateStates({ preJoinError: { message, code } });
+            });
         }
       }
 
@@ -264,7 +273,7 @@ export class RtkUiProvider {
   }
 
   private roomJoinedListener = () => {
-    this.updateStates({ meeting: 'joined' });
+    this.updateStates({ meeting: 'joined', preJoinError: null });
   };
 
   private waitlistedListener = () => {
