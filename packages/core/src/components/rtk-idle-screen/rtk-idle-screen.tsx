@@ -6,7 +6,7 @@ import { UIConfig } from '../../types/ui-config';
 import { SyncWithStore } from '../../utils/sync-with-store';
 import { Meeting } from '../../types/rtk-client';
 import { SocketConnectionState } from '@cloudflare/realtimekit';
-import { States } from '../../types/props';
+import { States, PreJoinError } from '../../types/props';
 
 /**
  * A screen that handles the idle state,
@@ -43,9 +43,7 @@ export class RtkIdleScreen {
   @Prop()
   t: RtkI18n = useLanguage();
 
-  @State() joinError: string | undefined;
-
-  @State() joinErrorCode: string | undefined;
+  @State() preJoinError: PreJoinError | null | undefined;
 
   @State() connectionState: SocketConnectionState['state'];
 
@@ -71,25 +69,26 @@ export class RtkIdleScreen {
   private socketStateUpdate = ({ state }: SocketConnectionState) => {
     this.connectionState = state;
     if (state === 'connected') {
-      if (!this.states?.joinError) {
-        this.joinError = undefined;
-        this.joinErrorCode = undefined;
+      if (!this.states?.preJoinError) {
+        this.preJoinError = undefined;
       }
     }
   };
 
   @Watch('states')
   statesChanged(states: States) {
-    this.joinError = states?.joinError;
-    this.joinErrorCode = states?.joinErrorCode;
+    this.preJoinError = states?.preJoinError;
   }
 
   render() {
-    const showSocketError =
-      !!this.connectionState && this.connectionState !== 'connected' && !this.joinError;
+    const errorMessage = this.preJoinError?.message;
+    const errorCode = this.preJoinError?.code;
 
-    const errorText = this.joinError
-      ? this.joinError
+    const showSocketError =
+      !!this.connectionState && this.connectionState !== 'connected' && !errorMessage;
+
+    const errorText = errorMessage
+      ? errorMessage
       : this.connectionState === 'failed'
       ? this.t('network.lost_extended')
       : this.t('network.lost');
@@ -99,7 +98,7 @@ export class RtkIdleScreen {
         <slot>
           <div class="ctr" part="container">
             <rtk-logo meeting={this.meeting} config={this.config} t={this.t} part="logo" />
-            {this.joinError || showSocketError ? (
+            {errorMessage || showSocketError ? (
               <div class="error-state">
                 <div class="no-network-badge" part="network-badge" role="alert">
                   <rtk-icon
@@ -110,7 +109,7 @@ export class RtkIdleScreen {
                   ></rtk-icon>
                   {errorText}
                 </div>
-                {this.meeting && this.joinError && (
+                {this.meeting && errorMessage && (
                   <a
                     class="troubleshoot-link"
                     href={`https://test.realtime.cloudflare.com?authToken=${this.meeting.__internals__.authToken}`}
@@ -120,9 +119,9 @@ export class RtkIdleScreen {
                     {this.t('network.troubleshoot')}
                   </a>
                 )}
-                {this.joinErrorCode && (
+                {errorCode && (
                   <span class="error-code" part="error-code">
-                    {this.t('join.error_code')}: {this.joinErrorCode}
+                    {this.t('join.error_code')}: {errorCode}
                   </span>
                 )}
               </div>

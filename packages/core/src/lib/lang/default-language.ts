@@ -296,6 +296,13 @@ export const defaultLanguage = {
   'network.lost_extended': 'Connection lost. Please check your network connection.',
   'network.troubleshoot': 'Troubleshoot your connection',
 
+  'init.auth_error':
+    "We couldn't verify your access to this meeting. The meeting may have ended, or you may not have permission to join.",
+  'init.network_error':
+    "We couldn't connect to the meeting. Please try again, and if the problem continues, check your internet connection.",
+  'init.browser_error': 'Your browser is not supported. Please try a different or updated browser.',
+  'init.default_error': 'Something went wrong while connecting to the meeting. Please try again.',
+
   'join.network_error':
     "We couldn't connect to the meeting. Please check your internet connection and try again.",
   'join.media_error':
