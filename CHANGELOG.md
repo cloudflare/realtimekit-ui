@@ -1,3 +1,11 @@
+## [2.0.1-staging.1](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.0.0...@cloudflare/realtimekit-ui-v2.0.1-staging.1) (2026-07-02)
+
+
+### Bug Fixes
+
+* **idle-screen:** show user-friendly errors on init failure ([c1ccadf](https://github.com/cloudflare/realtimekit-ui/commit/c1ccadf54ec883b5b032898c10f46096395b6f38))
+* **ui-provider:** handle join errors when setup screen is skipped ([c7ced34](https://github.com/cloudflare/realtimekit-ui/commit/c7ced34f63c76cc9a8331e92c315e15fc7983354))
+
 # [2.0.0](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v1.2.0...@cloudflare/realtimekit-ui-v2.0.0) (2026-06-18)
 
 
