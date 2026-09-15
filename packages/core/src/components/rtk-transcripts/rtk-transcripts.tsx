@@ -8,6 +8,9 @@ import { createDefaultConfig } from '../../exports';
 import { SyncWithStore } from '../../utils/sync-with-store';
 import clone from '../../utils/clone';
 
+/** Maximum character length of a single rendered caption group. */
+const MAX_GROUP_LENGTH = 400;
+
 /**
  * A component which handles transcripts.
  *
@@ -120,9 +123,59 @@ export class RtkTranscripts {
   }
 
   private add(transcript: Transcript) {
-    // show transcripts only if tab is in focus and a maximum of 3 at a time
-    // this.transcripts.splice(0, this.transcripts.length - 2);
     this.transcripts = this.transcriptionsReducer(this.transcripts, transcript);
+    this.pruneToLatestTwoGroups();
+  }
+
+  /**
+   * Groups raw transcript entries using the same merging rules as the renderer:
+   * consecutive entries from the same peer are combined with a separator space
+   * until the accumulated text exceeds MAX_GROUP_LENGTH, at which point a new
+   * group begins. Assigns renderedId on each entry as a side effect so that
+   * pruning and rendering stay in sync.
+   */
+  private buildGroups() {
+    const groups: Array<{
+      renderedId: string;
+      peerId: string;
+      combinedText: string;
+      entries: Array<Transcript & { renderedId?: string }>;
+    }> = [];
+
+    this.transcripts.forEach((transcript) => {
+      const last = groups[groups.length - 1];
+      if (
+        !last ||
+        last.peerId !== transcript.peerId ||
+        last.combinedText.length + transcript.transcript.length > MAX_GROUP_LENGTH
+      ) {
+        groups.push({
+          renderedId: transcript.id,
+          peerId: transcript.peerId,
+          combinedText: transcript.transcript,
+          entries: [transcript],
+        });
+        transcript.renderedId = transcript.id;
+      } else {
+        last.combinedText += ' ' + transcript.transcript;
+        transcript.renderedId = last.renderedId;
+        last.entries.push(transcript);
+      }
+    });
+
+    return groups;
+  }
+
+  /**
+   * Keeps only the raw entries that belong to the latest two rendered groups.
+   * Entries that fall outside the visible two groups are removed immediately
+   * so they cannot resurface after current captions expire.
+   */
+  private pruneToLatestTwoGroups() {
+    const groups = this.buildGroups();
+    if (groups.length <= 2) return;
+    const visible = new Set(groups.slice(-2).flatMap((g) => g.entries));
+    this.transcripts = this.transcripts.filter((t) => visible.has(t));
   }
 
   private remove(renderedId: string) {
@@ -147,51 +200,32 @@ export class RtkTranscripts {
   }
 
   private renderTranscripts() {
-    const renderedTranscripts = [];
-    this.transcripts.forEach((transcript) => {
-      const t = {
-        name: transcript.name,
-        date: transcript.date,
-        peerId: transcript.peerId,
-        transcript: transcript.transcript,
-        id: transcript.id,
-        renderedId: transcript.id,
-      };
-
-      if (!renderedTranscripts.length) {
-        transcript.renderedId = t.renderedId;
-        renderedTranscripts.push(t);
-        return;
-      }
-
-      const lastTranscript = renderedTranscripts[renderedTranscripts.length - 1];
-
-      const maxTranscriptLength = 400;
-      if (
-        lastTranscript.transcript.length + t.transcript.length > maxTranscriptLength ||
-        lastTranscript.peerId !== transcript.peerId
-      ) {
-        transcript.renderedId = t.renderedId;
-        renderedTranscripts.push(t);
-        return;
-      }
-
-      lastTranscript.transcript += ' ' + transcript.transcript;
-      transcript.renderedId = lastTranscript.renderedId;
-    });
-
-    renderedTranscripts.splice(0, renderedTranscripts.length - 2);
-    return renderedTranscripts?.map((transcript) => (
-      <rtk-transcript
-        key={transcript.id}
-        data-id={transcript.id}
-        transcript={transcript}
-        onRtkTranscriptDismiss={(e: CustomEvent<{ id: string; renderedId: string }>) =>
-          this.handleDismiss(e)
-        }
-        t={this.t}
-      />
-    ));
+    return this.buildGroups()
+      .slice(-2)
+      .map((group) => {
+        const first = group.entries[0];
+        const transcript = {
+          name: first.name,
+          date: first.date,
+          peerId: group.peerId,
+          userId: first.userId,
+          customParticipantId: first.customParticipantId,
+          transcript: group.combinedText,
+          id: first.id,
+          renderedId: group.renderedId,
+        };
+        return (
+          <rtk-transcript
+            key={first.id}
+            data-id={first.id}
+            transcript={transcript}
+            onRtkTranscriptDismiss={(e: CustomEvent<{ id: string; renderedId: string }>) =>
+              this.handleDismiss(e)
+            }
+            t={this.t}
+          />
+        );
+      });
   }
 
   render() {
