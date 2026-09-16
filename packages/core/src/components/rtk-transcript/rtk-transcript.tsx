@@ -35,6 +35,10 @@ export class RtkTranscript {
     this.transcriptChanged(this.transcript);
   }
 
+  disconnectedCallback() {
+    clearTimeout(this.timeout);
+  }
+
   @Watch('transcript')
   transcriptChanged(
     transcript: Transcript & { renderedId?: string },
