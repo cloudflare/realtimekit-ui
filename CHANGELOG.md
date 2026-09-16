@@ -1,3 +1,10 @@
+## [2.0.3-staging.1](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.0.2...@cloudflare/realtimekit-ui-v2.0.3-staging.1) (2026-09-16)
+
+
+### Bug Fixes
+
+* live transcripts start replaying stale transcripts randomly ([6058760](https://github.com/cloudflare/realtimekit-ui/commit/6058760057a73a8426377f63087f8ff8bd1925f0))
+
 ## [2.0.2](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.0.1...@cloudflare/realtimekit-ui-v2.0.2) (2026-08-24)
 
 
