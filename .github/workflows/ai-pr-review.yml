@@ -30,7 +30,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run Bonk
-        uses: Cloudflare-Studio/ask-bonk/github@5d4fe8f4a557afb1b73ec8c0ffcf60359a28865f # main
+        uses: Cloudflare-Studio/ask-bonk/github@main
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_AI_GATEWAY_ACCOUNT_ID }}
           CLOUDFLARE_GATEWAY_ID: ${{ secrets.CF_AI_GATEWAY_NAME }}
@@ -39,6 +39,8 @@ jobs:
           # Allow only OpenCode's scratch directory outside the repository.
           OPENCODE_CONFIG_CONTENT: '{"permission":{"external_directory":{"*":"deny","/tmp/opencode":"allow","/tmp/opencode/**":"allow"},"doom_loop":"deny"}}'
         with:
+          # Stop Bonk before the job's timeout-minutes so it can report the outcome itself.
+          timeout: '25m'
           oidc_base_url: https://ask-bonk.cloudflare-exponent.workers.dev/auth
           model: 'cloudflare-ai-gateway/anthropic/claude-opus-5'
           variant: 'high'
