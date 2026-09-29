@@ -1,3 +1,10 @@
+## [2.0.3-staging.2](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.0.3-staging.1...@cloudflare/realtimekit-ui-v2.0.3-staging.2) (2026-09-29)
+
+
+### Bug Fixes
+
+* fall back to lodash cloneDeep when structuredClone is not defined ([76094ba](https://github.com/cloudflare/realtimekit-ui/commit/76094ba36f2a95853dd5e200c8850316a4720d58))
+
 ## [2.0.3-staging.1](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.0.2...@cloudflare/realtimekit-ui-v2.0.3-staging.1) (2026-09-16)
 
 
