@@ -31,7 +31,7 @@ audio.play();                  // triggers playback; handles autoplay NotAllowed
 audio.onError((err) => {});    // register error callback
 ```
 
-Used only by `rtk-participants-audio` — instantiated per meeting, tracks added/removed as participants join/leave.
+Used only by `rtk-participants-audio` — instantiated per meeting, tracks added/removed as participants join/leave. Logical participant/screen-share IDs and physical tracks are stored in separate maps, with an idempotent `Set` of logical owners per physical track, keeping add/remove O(1). During peer-ID handover, old and new logical IDs may temporarily reference the same `MediaStreamTrack`; removing the old ID must not remove the physical track until the final logical reference is gone.
 
 ### `useGrid` / grid math (`grid.ts`)
 
