@@ -1,3 +1,10 @@
+## [2.0.3-staging.3](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.0.3-staging.2...@cloudflare/realtimekit-ui-v2.0.3-staging.3) (2026-10-01)
+
+
+### Bug Fixes
+
+* **missing-audio:** post reconnect, some participants were not able to hear others ([56cc4e6](https://github.com/cloudflare/realtimekit-ui/commit/56cc4e61d4ad85f13e60189268a7acc1d4956707))
+
 ## [2.0.3-staging.2](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.0.3-staging.1...@cloudflare/realtimekit-ui-v2.0.3-staging.2) (2026-09-29)
 
 
