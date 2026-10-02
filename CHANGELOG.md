@@ -1,3 +1,11 @@
+## [2.0.3-staging.4](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.0.3-staging.3...@cloudflare/realtimekit-ui-v2.0.3-staging.4) (2026-10-02)
+
+
+### Bug Fixes
+
+* **rtk-grid:** rtk grid was not updating on mass action on active participants map ([2b9ae6e](https://github.com/cloudflare/realtimekit-ui/commit/2b9ae6e49135e166f5c8cbb37be6110a3bcf0fb3))
+* **rtk-grid:** using common debounce for peer leave/joins as suggested by ai ([66510e6](https://github.com/cloudflare/realtimekit-ui/commit/66510e62ba1698b703ac179a129403b83918be0f))
+
 ## [2.0.3-staging.3](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.0.3-staging.2...@cloudflare/realtimekit-ui-v2.0.3-staging.3) (2026-10-01)
 
 
