@@ -131,6 +131,7 @@ export class RtkGrid {
     participants.removeListener('viewModeChanged', this.onViewModeChanged);
     participants.active.removeListener('participantLeft', this.onParticipantLeft);
     participants.active.removeListener('participantJoined', this.onParticipantJoined);
+    participants.active.removeListener('participantsUpdate', this.onParticipantsUpdate);
     participants.pinned.removeListener('participantJoined', this.onParticipantPinned);
     participants.pinned.removeListener('participantLeft', this.onParticipantUnpinned);
     participants.joined.removeListener('screenShareUpdate', this.onScreenShareUpdate);
@@ -202,6 +203,7 @@ export class RtkGrid {
       participants?.joined?.on('stageStatusUpdate', this.peerStageStatusListener);
       participants.joined.addListener('screenShareUpdate', this.onScreenShareUpdate);
       participants.active.addListener('participantJoined', this.onParticipantJoined);
+      participants.active.addListener('participantsUpdate', this.onParticipantsUpdate);
       participants.pinned.addListener('participantJoined', this.onParticipantPinned);
       participants.pinned.addListener('participantLeft', this.onParticipantUnpinned);
 
@@ -332,6 +334,10 @@ export class RtkGrid {
   }, MASS_ACTIONS_DEBOUNCE_TIMER);
 
   private onParticipantLeft = debounce(() => {
+    this.updateActiveParticipants();
+  }, MASS_ACTIONS_DEBOUNCE_TIMER);
+
+  private onParticipantsUpdate = debounce(() => {
     this.updateActiveParticipants();
   }, MASS_ACTIONS_DEBOUNCE_TIMER);
 
