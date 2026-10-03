@@ -191,6 +191,20 @@ describe('Breakout rooms manager', () => {
     expect(updatedConnectedMeeting.title).toEqual(updatedTitle);
   });
 
+  it('should flag a title change of an existing meeting as a local change', () => {
+    const manager = new BreakoutRoomsManager();
+    manager.updateCurrentState(MOCK_STATE_LIVE);
+    expect(manager.hasLocalChanges).toBe(false);
+
+    manager.updateMeetingTitle(MOCK_ROOM_1.id, 'Renamed room');
+    expect(manager.hasLocalChanges).toBe(true);
+    expect(manager.meetingsToUpdate).toEqual([{ id: MOCK_ROOM_1.id, title: 'Renamed room' }]);
+
+    // a state update from the server must not discard the pending rename
+    manager.updateCurrentState(MOCK_STATE_LIVE);
+    expect(manager.meetingsToUpdate).toEqual([{ id: MOCK_ROOM_1.id, title: 'Renamed room' }]);
+  });
+
   it('should shuffle assign participants', () => {
     const manager = new BreakoutRoomsManager();
     manager.updateCurrentState(MOCK_STATE);
