@@ -17,6 +17,7 @@ import { createDefaultConfig } from '../../lib/default-ui-config';
 import { Render } from '../../lib/render';
 import { defaultIconPack, IconPack } from '../../lib/icons';
 import { RtkI18n, useLanguage } from '../../lib/lang';
+import { Overrides, defaultOverrides } from '../../lib/overrides';
 import gracefulStorage from '../../utils/graceful-storage';
 import { SyncWithStore } from '../../utils/sync-with-store';
 import { SocketConnectionState } from '@cloudflare/realtimekit';
@@ -63,6 +64,11 @@ export class RtkSetupScreen {
   @SyncWithStore()
   @Prop()
   t: RtkI18n = useLanguage();
+
+  /** UI Overrides */
+  @SyncWithStore()
+  @Prop()
+  overrides: Overrides = defaultOverrides;
 
   @State() displayName: string;
 
@@ -184,7 +190,15 @@ export class RtkSetupScreen {
             </div>
           </div>
           <div class="metadata">
-            {meetingTitle && meetingTitle !== '' && <div class="meeting-title">{meetingTitle}</div>}
+            {!this.overrides?.disableParticipantsPreview && (
+              <rtk-participants-preview {...defaults} overrides={this.overrides} />
+            )}
+
+            {meetingTitle && meetingTitle !== '' && (
+              <div class="meeting-title" title={meetingTitle}>
+                {meetingTitle}
+              </div>
+            )}
 
             {this.canEditName ? (
               <Fragment>
