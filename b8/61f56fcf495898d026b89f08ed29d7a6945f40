@@ -1,0 +1,19 @@
+packages/core/src/components/rtk-setup-screen/rtk-setup-screen.css
+  s_7404a85a6175cb::t_443fc5e6839198 26,55-58
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "b861f56fcf495898d026b89f08ed29d7a6945f40",
+  "prompts": {},
+  "sessions": {
+    "s_7404a85a6175cb": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_ef49a24e1ffehunINA9DN34dEN",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Aman Kumar <amankumar@cloudflare.com>"
+    }
+  }
+}
