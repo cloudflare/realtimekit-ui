@@ -14,6 +14,11 @@ export interface Overrides {
    * Recommended: Disable private chat via preset.
    */
   disablePrivateChat?: boolean;
+  /**
+   * Hides the "participants already in the meeting" avatars on the setup screen
+   * and stops the pre-join participant polling.
+   */
+  disableParticipantsPreview?: boolean;
 }
 
 /**
@@ -22,4 +27,5 @@ export interface Overrides {
 export const defaultOverrides: Overrides = {
   disableEmojiPicker: false,
   disablePrivateChat: false,
+  disableParticipantsPreview: false,
 };
