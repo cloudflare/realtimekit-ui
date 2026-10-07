@@ -1,3 +1,11 @@
+## [2.0.3-staging.5](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.0.3-staging.4...@cloudflare/realtimekit-ui-v2.0.3-staging.5) (2026-10-07)
+
+
+### Bug Fixes
+
+* **rtk-debugger-ui:** rtk debugger was shifting as per the content of the nav bar and content ([c050aca](https://github.com/cloudflare/realtimekit-ui/commit/c050acafef90e2b97efcb59e952a1aec51e197f0))
+* **rtk-debugger:** brought consistency in colors with settings modal ([e2b8414](https://github.com/cloudflare/realtimekit-ui/commit/e2b8414166b645b4fcb086f2a7323590673ffd3b))
+
 ## [2.0.3-staging.4](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.0.3-staging.3...@cloudflare/realtimekit-ui-v2.0.3-staging.4) (2026-10-02)
 
 
