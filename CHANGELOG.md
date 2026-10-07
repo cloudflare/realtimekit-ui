@@ -1,3 +1,10 @@
+## [2.0.3-staging.6](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.0.3-staging.5...@cloudflare/realtimekit-ui-v2.0.3-staging.6) (2026-10-07)
+
+
+### Bug Fixes
+
+* stop the previous audio analyser in rtk-audio-tile on each audio update ([b6dd670](https://github.com/cloudflare/realtimekit-ui/commit/b6dd670192a31f7385f5f7f48551682e0aba0871))
+
 ## [2.0.3-staging.5](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.0.3-staging.4...@cloudflare/realtimekit-ui-v2.0.3-staging.5) (2026-10-07)
 
 
