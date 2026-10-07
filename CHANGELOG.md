@@ -1,3 +1,26 @@
+## [2.0.3-staging.5](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.0.3-staging.4...@cloudflare/realtimekit-ui-v2.0.3-staging.5) (2026-10-07)
+
+
+### Bug Fixes
+
+* **rtk-debugger-ui:** rtk debugger was shifting as per the content of the nav bar and content ([c050aca](https://github.com/cloudflare/realtimekit-ui/commit/c050acafef90e2b97efcb59e952a1aec51e197f0))
+* **rtk-debugger:** brought consistency in colors with settings modal ([e2b8414](https://github.com/cloudflare/realtimekit-ui/commit/e2b8414166b645b4fcb086f2a7323590673ffd3b))
+
+## [2.0.3-staging.4](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.0.3-staging.3...@cloudflare/realtimekit-ui-v2.0.3-staging.4) (2026-10-02)
+
+
+### Bug Fixes
+
+* **rtk-grid:** rtk grid was not updating on mass action on active participants map ([2b9ae6e](https://github.com/cloudflare/realtimekit-ui/commit/2b9ae6e49135e166f5c8cbb37be6110a3bcf0fb3))
+* **rtk-grid:** using common debounce for peer leave/joins as suggested by ai ([66510e6](https://github.com/cloudflare/realtimekit-ui/commit/66510e62ba1698b703ac179a129403b83918be0f))
+
+## [2.0.3-staging.3](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.0.3-staging.2...@cloudflare/realtimekit-ui-v2.0.3-staging.3) (2026-10-01)
+
+
+### Bug Fixes
+
+* **missing-audio:** post reconnect, some participants were not able to hear others ([56cc4e6](https://github.com/cloudflare/realtimekit-ui/commit/56cc4e61d4ad85f13e60189268a7acc1d4956707))
+
 ## [2.0.3-staging.2](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.0.3-staging.1...@cloudflare/realtimekit-ui-v2.0.3-staging.2) (2026-09-29)
 
 

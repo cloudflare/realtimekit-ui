@@ -112,6 +112,7 @@ export class RtkGrid {
 
   private disconnectMeeting(meeting: Meeting) {
     if (!meeting) return;
+    this.refreshParticipants.cancel();
     this.participants = [];
     this.plugins = [];
 
@@ -129,8 +130,9 @@ export class RtkGrid {
     meeting.stage?.removeListener('stageStatusUpdate', this.stageStatusListener);
 
     participants.removeListener('viewModeChanged', this.onViewModeChanged);
-    participants.active.removeListener('participantLeft', this.onParticipantLeft);
-    participants.active.removeListener('participantJoined', this.onParticipantJoined);
+    participants.active.removeListener('participantLeft', this.refreshParticipants);
+    participants.active.removeListener('participantJoined', this.refreshParticipants);
+    participants.active.removeListener('participantsUpdate', this.refreshParticipants);
     participants.pinned.removeListener('participantJoined', this.onParticipantPinned);
     participants.pinned.removeListener('participantLeft', this.onParticipantUnpinned);
     participants.joined.removeListener('screenShareUpdate', this.onScreenShareUpdate);
@@ -198,10 +200,11 @@ export class RtkGrid {
       plugins?.all.addListener('stateUpdate', this.onPluginStateUpdate);
 
       participants.addListener('viewModeChanged', this.onViewModeChanged);
-      participants.active.addListener('participantLeft', this.onParticipantLeft);
+      participants.active.addListener('participantLeft', this.refreshParticipants);
       participants?.joined?.on('stageStatusUpdate', this.peerStageStatusListener);
       participants.joined.addListener('screenShareUpdate', this.onScreenShareUpdate);
-      participants.active.addListener('participantJoined', this.onParticipantJoined);
+      participants.active.addListener('participantJoined', this.refreshParticipants);
+      participants.active.addListener('participantsUpdate', this.refreshParticipants);
       participants.pinned.addListener('participantJoined', this.onParticipantPinned);
       participants.pinned.addListener('participantLeft', this.onParticipantUnpinned);
 
@@ -327,11 +330,7 @@ export class RtkGrid {
     this.pinnedParticipants = this.pinnedParticipants.filter((p) => p.id !== participant.id);
   }
 
-  private onParticipantJoined = debounce(() => {
-    this.updateActiveParticipants();
-  }, MASS_ACTIONS_DEBOUNCE_TIMER);
-
-  private onParticipantLeft = debounce(() => {
+  private refreshParticipants = debounce(() => {
     this.updateActiveParticipants();
   }, MASS_ACTIONS_DEBOUNCE_TIMER);
 
