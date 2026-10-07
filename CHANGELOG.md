@@ -1,3 +1,10 @@
+## [2.0.3-staging.8](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.0.3-staging.7...@cloudflare/realtimekit-ui-v2.0.3-staging.8) (2026-10-07)
+
+
+### Bug Fixes
+
+* **asset-split:** using assets from single bucket across repos to support single allowlist entry ([027f74f](https://github.com/cloudflare/realtimekit-ui/commit/027f74f7c2c05df2b1b1591bb4983e94c727818a))
+
 ## [2.0.3-staging.7](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.0.3-staging.6...@cloudflare/realtimekit-ui-v2.0.3-staging.7) (2026-10-07)
 
 
