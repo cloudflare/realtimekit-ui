@@ -1,3 +1,10 @@
+## [2.0.3-staging.7](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.0.3-staging.6...@cloudflare/realtimekit-ui-v2.0.3-staging.7) (2026-10-07)
+
+
+### Bug Fixes
+
+* remove the mediaPermissionUpdate listener when rtk-speaker-selector disconnects ([867d9ac](https://github.com/cloudflare/realtimekit-ui/commit/867d9ac42ee51bfd49880cbbafe5a2e6dd2fd236))
+
 ## [2.0.3-staging.6](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.0.3-staging.5...@cloudflare/realtimekit-ui-v2.0.3-staging.6) (2026-10-07)
 
 
