@@ -2,13 +2,15 @@
 @import '../../styles//scrollbar.css';
 
 :host {
-  @apply relative flex overflow-hidden rounded-md;
-  @apply w-full;
-  @apply text-text-1000 bg-background-900;
+  @apply relative flex w-full overflow-hidden rounded-md;
+  @apply text-text-1000 bg-background-800;
+  max-width: calc(100vw - theme('spacing.8'));
+  max-height: calc(100dvh - theme('spacing.8'));
 }
 
 header {
-  @apply mr-2 flex items-center justify-between py-0 px-2;
+  @apply flex items-center justify-between px-2 py-0;
+
   h3 {
     @apply my-4;
   }
@@ -19,10 +21,10 @@ header {
 }
 
 aside {
-  @apply bg-background-1000 !max-w-56 box-border flex flex-col pl-2;
+  @apply bg-background-900 box-border flex w-56 flex-none flex-col px-2;
 
   button {
-    @apply mt-4 box-border flex w-full items-center justify-between rounded-l-sm px-4 py-3;
+    @apply box-border flex w-full items-center justify-between rounded-sm px-4 py-3;
     @apply text-text-900 bg-transparent;
     @apply text-text-md cursor-default shadow-none;
 
@@ -35,6 +37,10 @@ aside {
         @apply h-5 w-5 last:ml-4;
       }
     }
+  }
+
+  nav {
+    @apply flex flex-col gap-2;
   }
 
   button[type='button'] {
@@ -52,20 +58,17 @@ aside {
 }
 
 main {
-  @apply relative box-border flex h-full w-full flex-col;
+  --rtk-colors-background-600: var(--rtk-colors-background-800);
+  @apply relative box-border flex h-full min-h-0 min-w-0 flex-1 flex-col;
 }
 
 :host([size='sm']) aside {
-  @apply bg-background-900;
+  @apply bg-background-800;
 }
 
 :host([size='sm']) {
   aside {
-    @apply !w-full !max-w-full pl-0;
-
-    button {
-      @apply rounded-none;
-    }
+    @apply !w-full !max-w-full px-2;
 
     button.active {
       @apply hover:bg-background-700 border-none bg-transparent;
