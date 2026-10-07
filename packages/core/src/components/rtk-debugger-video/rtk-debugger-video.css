@@ -5,7 +5,7 @@
   @apply relative flex flex-col overflow-hidden;
   @apply h-full w-full;
   @apply text-text-1000;
-  @apply bg-background-600;
+  @apply bg-background-800;
 }
 
 .tab-body::-webkit-scrollbar {
@@ -21,11 +21,11 @@ h3 {
 }
 
 .tab-body {
-  @apply flex min-h-0 flex-1 flex-col justify-between overflow-y-auto m-4;
+  @apply m-4 flex min-h-0 flex-1 flex-col justify-between overflow-y-auto;
 }
 
 .status-container {
-  border: theme('borderWidth.sm') solid theme('colors.background.600');
+  border: theme('borderWidth.sm') solid theme('colors.background.800');
   border-radius: 8px;
   padding: 16px;
 }
@@ -43,11 +43,11 @@ h3 {
   padding: 8px 0;
 }
 
-.section-header.only-child{
+.section-header.only-child {
   justify-content: center;
 }
 
-.section-body.missing-stats{
+.section-body.missing-stats {
   display: flex;
   text-align: center;
   justify-content: center;
@@ -63,7 +63,7 @@ h3 {
 }
 
 .network-table {
-  border: theme('borderWidth.sm') solid theme('colors.background.600');
+  border: theme('borderWidth.sm') solid theme('colors.background.800');
   border-radius: 8px;
   margin-top: 8px;
   overflow: hidden;
@@ -73,7 +73,7 @@ h3 {
   display: flex;
   justify-content: space-between;
   padding: 12px;
-  border-bottom: theme('borderWidth.sm') solid theme('colors.background.600');
+  border-bottom: theme('borderWidth.sm') solid theme('colors.background.800');
 }
 
 .network-row:last-child {

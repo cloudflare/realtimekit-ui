@@ -58,7 +58,6 @@ aside {
 }
 
 main {
-  --rtk-colors-background-600: var(--rtk-colors-background-800);
   @apply relative box-border flex h-full min-h-0 min-w-0 flex-1 flex-col;
 }
 
@@ -88,7 +87,7 @@ main {
   }
 
   main.active {
-    @apply block;
+    @apply flex;
   }
 
   header {
@@ -103,12 +102,15 @@ main {
 ::-webkit-scrollbar {
   width: 8px;
 }
+
 ::-webkit-scrollbar-track {
   @apply bg-background-800 rounded-lg;
 }
+
 ::-webkit-scrollbar-thumb {
   @apply bg-background-1000 rounded-lg;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   @apply bg-background-1000 rounded-lg;
 }
@@ -116,6 +118,7 @@ main {
 .progress-bar {
   @apply bg-background-600 h-1 w-full overflow-hidden;
 }
+
 .progress-indicator {
   @apply bg-brand-500 h-full;
 }

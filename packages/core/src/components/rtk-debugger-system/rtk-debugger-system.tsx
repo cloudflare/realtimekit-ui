@@ -143,7 +143,6 @@ export class RtkDebuggerSystem {
                     {this.t(`debugger.quality.${this.batterySectionHealth?.toLowerCase()}`)}
                   </span>
                 )}
-                {/* <span class="arrow">{this.isBatterySectionOpen ? '▾' : '▸'}</span> */}
               </div>
               {!!this.batteryFormattedStats.length && (
                 <div class="section-body battery-table">
