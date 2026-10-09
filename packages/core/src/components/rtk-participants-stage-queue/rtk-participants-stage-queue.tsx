@@ -13,10 +13,8 @@ import { SyncWithStore } from '../../utils/sync-with-store';
 import { ParticipantsViewMode } from '../rtk-participants/rtk-participants';
 
 /**
- * A component that displays participants waiting in the stage queue.
- *
- * Shows users who are waiting to be promoted to the stage in meetings
- * with stage functionality enabled.
+ * Displays participants who have requested access to the stage. The list includes
+ * controls for accepting or denying their requests.
  */
 @Component({
   tag: 'rtk-participants-stage-queue',

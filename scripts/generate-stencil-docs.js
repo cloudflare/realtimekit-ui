@@ -145,7 +145,7 @@ class StencilDocGenerator {
     while ((match = interfaceRegex.exec(componentsContent)) !== null) {
       const [, jsDocComment, componentName, propsContent] = match;
       const props = this.parseProps(propsContent, componentName);
-      const description = this.parseComponentDescription(jsDocComment);
+      const description = this.parseComponentDescription(jsDocComment, componentName);
 
       // Set name and tagName based on framework
       const isReact = this.libraryName === 'React';
@@ -180,11 +180,17 @@ class StencilDocGenerator {
 
   parseProps(propsContent, componentName) {
     const props = [];
-    const propRegex = /\/\*\*\s*\n\s*\*\s*(.*?)\s*\n\s*\*\/\s*\n\s*"([^"]+)":\s*/g;
+    // Match the full JSDoc block so tags do not hide properties.
+    const propRegex = /\/\*\*((?:[^*]|\*(?!\/))*)\*\/[ \t]*\n[ \t]*"([^"]+)":\s*/g;
 
     let match;
     while ((match = propRegex.exec(propsContent)) !== null) {
-      const [, description, name] = match;
+      const [, jsDoc, name] = match;
+      const description = jsDoc
+        .split('\n')
+        .map((line) => line.replace(/^[ \t]*\*[ \t]?/, '').trim())
+        .filter((line) => line && (!line.startsWith('@') || line.startsWith('@deprecated')))
+        .join(' ');
       const typeStartIndex = propRegex.lastIndex;
       const { value: typeWithDefault, endIndex } = this.readUntilTopLevelSemicolon(
         propsContent,
@@ -277,8 +283,8 @@ class StencilDocGenerator {
   }
 
   parseTypeAndDefault(typeString) {
-    // Check if there's a default value (pattern: Type = defaultValue)
-    const defaultMatch = typeString.match(/^(.+?)\s*=\s*(.+)$/);
+    // Check for a default assignment without mistaking an arrow-function type for one.
+    const defaultMatch = typeString.match(/^(.+?)\s*=(?!>)\s*(.+)$/);
 
     if (defaultMatch) {
       return {
@@ -293,21 +299,44 @@ class StencilDocGenerator {
     };
   }
 
-  parseComponentDescription(jsDocComment) {
-    if (!jsDocComment) return null;
+  parseComponentDescription(jsDocComment, componentName) {
+    const parseComment = (comment) => {
+      if (!comment) return null;
 
-    // Extract the description from JSDoc comment
-    // Remove /** and */ and extract the main description
-    const cleanComment = jsDocComment
-      .replace(/\/\*\*/, '')
-      .replace(/\*\//, '')
-      .replace(/^\s*\*/gm, '') // Remove leading * from each line
-      .trim();
+      // Extract the description from JSDoc comment
+      // Remove /** and */ and extract the main description
+      const cleanComment = comment
+        .replace(/\/\*\*/, '')
+        .replace(/\*\//, '')
+        .replace(/^\s*\*/gm, '') // Remove leading * from each line
+        .trim();
 
-    // Return the first paragraph (before any @tags)
-    const description = cleanComment.split(/\n\s*@/)[0].trim();
+      // Return the description before any @tags
+      return cleanComment.split(/\n\s*@/)[0].trim() || null;
+    };
+    const declarationDescription = parseComment(jsDocComment);
+    const kebabName = this.camelToKebab(componentName);
+    const sourceFilePath = path.join(
+      path.dirname(this.filePath),
+      'components',
+      kebabName,
+      `${kebabName}.tsx`
+    );
+    if (!fs.existsSync(sourceFilePath)) return declarationDescription;
 
-    return description || null;
+    const sourceContent = fs.readFileSync(sourceFilePath, 'utf8');
+    // Only use JSDoc directly attached to the component decorator.
+    const sourceComment = sourceContent.match(
+      /(\/\*\*(?:[^*]|\*(?!\/))*\*\/)[ \t\r\n]*@Component\(/
+    );
+    const sourceDescription = parseComment(sourceComment?.[1]);
+    if (!sourceDescription) return declarationDescription;
+
+    // Preserve declaration formatting when only whitespace or punctuation spacing differs.
+    const normalize = (text) => text?.replace(/\s+/g, ' ').replace(/\s+(?=[.,;:!?])/g, '');
+    return normalize(sourceDescription) === normalize(declarationDescription)
+      ? declarationDescription
+      : sourceDescription.replace(/\n[ \t]*\n/g, '\n');
   }
 
   // for web-components and angular components (converts CamelCase to kebab-case)
@@ -334,12 +363,14 @@ class StencilDocGenerator {
 
   async generateIndex() {
     const content = `---
-pcx_content_type: reference
+pcx_content_type: navigation
 title: ${this.libraryName}
 description: Complete API reference for ${this.libraryName} library components
 sidebar:
   group:
     hideIndex: true
+products:
+  - realtime
 ---`;
 
     fs.writeFileSync(path.join(this.outputDir, 'index.mdx'), content);
@@ -349,9 +380,11 @@ sidebar:
     const { name, tagName, props = [], events = [], description } = component;
 
     let content = `---
-pcx_content_type: reference
+pcx_content_type: navigation
 title: ${name}
 description: API reference for ${name} component (${this.libraryName} Library)
+products:
+  - realtime
 ---
 `;
 
