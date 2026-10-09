@@ -28,7 +28,7 @@ export class RtkMessageListView {
 
   /**
    * Function to load more messages.
-   * Messages returned from this will be preprended
+   * Messages returned from this will be prepended
    */
   @Prop() loadMore: (lastMessage: Message) => Promise<Message[]>;
 

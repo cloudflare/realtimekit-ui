@@ -10,10 +10,8 @@ export interface RtkSidebarTab {
 export type RtkSidebarView = 'sidebar' | 'full-screen';
 
 /**
- * A sidebar UI component with tabbed navigation.
- *
- * Provides a container for sidebar content with tab switching functionality.
- * Can be displayed as a sidebar or in full-screen mode.
+ * A tabbed container for meeting panels, such as chat and participants. It shows
+ * the selected panel in a sidebar or full-screen view.
  */
 @Component({
   tag: 'rtk-sidebar-ui',

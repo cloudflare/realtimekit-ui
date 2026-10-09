@@ -13,7 +13,7 @@ import { GridLayout, GridSize } from '../rtk-grid/rtk-grid';
 /**
  * A grid component that renders two lists of participants: `pinnedParticipants` and `participants`.
  *
- * You can customize the layout to a `column` view, by default is is `row`.
+ * You can customize the layout to a `column` view, by default is `row`.
  *
  * - Participants from `pinnedParticipants[]` are rendered inside a larger grid.
  * - Participants from `participants[]` array are rendered in a smaller grid.
