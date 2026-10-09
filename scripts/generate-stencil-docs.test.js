@@ -1,4 +1,6 @@
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const os = require('node:os');
 const path = require('node:path');
 const { before, test } = require('node:test');
 const { StencilDocGenerator } = require('./generate-stencil-docs');
@@ -18,13 +20,10 @@ test('keeps properties whose JSDoc contains @default', () => {
   const documented = props
     .filter(({ name }) => ['iconPack', 't'].includes(name))
     .map(({ name, description, defaultValue }) => ({ name, description, defaultValue }));
-  assert.deepEqual(
-    documented,
-    [
-      { name: 'iconPack', description: 'Icon pack', defaultValue: 'defaultIconPack' },
-      { name: 't', description: 'Language', defaultValue: 'useLanguage()' },
-    ]
-  );
+  assert.deepEqual(documented, [
+    { name: 'iconPack', description: 'Icon pack', defaultValue: 'defaultIconPack' },
+    { name: 't', description: 'Language', defaultValue: 'useLanguage()' },
+  ]);
 });
 
 test('keeps @deprecated as a property description without including @default', () => {
@@ -82,4 +81,49 @@ test('keeps accepted spacing while applying source wording changes', () => {
     generator.components.get('RtkChatComposerUi').description,
     '@deprecated . This component is deprecated, please use rtk-chat-composer-view instead.'
   );
+});
+
+test('selects renderable core properties and prioritizes meeting in script examples', () => {
+  const core = new StencilDocGenerator('unused', 'unused', 'core');
+  const example = core.generateCoreExample({
+    name: 'rtk-meeting',
+    tagName: 'rtk-meeting',
+    props: [
+      { name: 'applyDesignSystem', type: 'boolean', required: true },
+      { name: 'config', type: 'UIConfig', required: true },
+      { name: 'meeting', type: 'Meeting', required: true },
+      { name: 'size', type: 'Size', required: true },
+    ],
+  });
+  assert.match(example, /<rtk-meeting\n size="md">/);
+  assert.match(example, /el\.meeting= meeting;/);
+
+  const unrenderable = core.generateCoreExample({
+    name: 'rtk-example',
+    tagName: 'rtk-example',
+    props: [{ name: 't', type: 'RtkI18n', required: true }],
+  });
+  assert.doesNotMatch(unrenderable, /### With Properties|<script>/);
+});
+
+test('renders bare deprecation tags as readable property descriptions', async (t) => {
+  const outputDir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtk-docs-'));
+  t.after(() => fs.rmSync(outputDir, { recursive: true }));
+  const core = new StencilDocGenerator('unused', outputDir, 'core');
+  await core.generateComponentDoc({
+    name: 'rtk-grid',
+    tagName: 'rtk-grid',
+    props: [
+      {
+        name: 'overrides',
+        type: 'any',
+        required: false,
+        defaultValue: null,
+        description: '@deprecated',
+      },
+    ],
+  });
+
+  const content = fs.readFileSync(path.join(outputDir, 'rtk-grid.mdx'), 'utf8');
+  assert.match(content, /\| `overrides` \| `any` \| ❌ \| - \| \*\*Deprecated\*\* \|/);
 });

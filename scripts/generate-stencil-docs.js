@@ -406,7 +406,10 @@ products:
 
       props.forEach((prop) => {
         const required = prop.required ? '✅' : '❌';
-        const description = prop.description || '*No description*';
+        const description =
+          prop.description === '@deprecated'
+            ? '**Deprecated**'
+            : prop.description || '*No description*';
         const type = this.formatType(prop.type);
         const defaultValue = prop.defaultValue ? this.wrapInlineCode(prop.defaultValue) : '-';
 
@@ -472,23 +475,33 @@ products:
 
 `;
 
-    if (props.length > 0) {
+    const attributeProps = props.filter(
+      (p) => !p.name.toLowerCase().includes('state') && this.getCoreValue(p.name, p.type) !== ''
+    );
+    const scriptProps = props
+      .filter(
+        (p) => !p.name.toLowerCase().includes('state') && this.getCoreScript(p.name, p.type) !== ''
+      )
+      .sort(
+        (a, b) =>
+          Number(b.name === 'meeting' || b.name === 'participant') -
+          Number(a.name === 'meeting' || a.name === 'participant')
+      );
+    if (attributeProps.length > 0 || scriptProps.length > 0) {
       content += `### With Properties
 
 \`\`\`html
 <${tagName}`;
 
       // Add example props (first 3 required props, excluding state-related props)
-      const filteredProps = props.filter((p) => !p.name.toLowerCase().includes('state'));
-      const exampleProps = filteredProps.filter((p) => p.required).slice(0, 3);
+      const exampleProps = attributeProps.filter((p) => p.required).slice(0, 3);
       if (exampleProps.length === 0) {
         // If no required props, show first 3 optional ones
-        exampleProps.push(...filteredProps.slice(0, 3));
+        exampleProps.push(...attributeProps.slice(0, 3));
       }
 
       exampleProps.forEach((prop) => {
-        const exampleValue = this.getCoreValue(prop.name, prop.type);
-        content += `${exampleValue}`;
+        content += this.getCoreValue(prop.name, prop.type);
       });
 
       content += `>
@@ -498,21 +511,19 @@ products:
 `;
     }
 
-    if (props.length > 0) {
+    if (scriptProps.length > 0) {
       content += `
 \`\`\`html
 <script>
   const el = document.querySelector("${name}");
 `;
-      const filteredProps = props.filter((p) => !p.name.toLowerCase().includes('state'));
-      const exampleProps = filteredProps.filter((p) => p.required).slice(0, 3);
+      const exampleProps = scriptProps.filter((p) => p.required).slice(0, 3);
       if (exampleProps.length === 0) {
         // If no required props, show first 3 optional ones
-        exampleProps.push(...filteredProps.slice(0, 3));
+        exampleProps.push(...scriptProps.slice(0, 3));
       }
       exampleProps.forEach((prop) => {
-        const exampleValue = this.getCoreScript(prop.name, prop.type);
-        content += `${exampleValue}`;
+        content += this.getCoreScript(prop.name, prop.type);
       });
 
       content += `
