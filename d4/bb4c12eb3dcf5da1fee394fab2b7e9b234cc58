@@ -1,0 +1,19 @@
+scripts/generate-stencil-docs.test.js
+  s_332516f56795aa::t_80678d0cb57956 2-3,23-26,85-129
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "d4bb4c12eb3dcf5da1fee394fab2b7e9b234cc58",
+  "prompts": {},
+  "sessions": {
+    "s_332516f56795aa": {
+      "agent_id": {
+        "tool": "windsurf",
+        "id": "fixed-supernova",
+        "model": "unknown"
+      },
+      "human_author": "Ravindra Singh Rathor <rsrathor@cloudflare.com>"
+    }
+  }
+}
