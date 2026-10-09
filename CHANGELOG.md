@@ -1,3 +1,76 @@
+## [2.0.3-staging.10](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.0.3-staging.9...@cloudflare/realtimekit-ui-v2.0.3-staging.10) (2026-10-09)
+
+
+### Bug Fixes
+
+* **chat-selector:** fixed null pointers in chat-selector around paginated list ([792b852](https://github.com/cloudflare/realtimekit-ui/commit/792b8526140174f48f47342c26eef9ef06cbfb42))
+
+## [2.0.3-staging.9](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.0.3-staging.8...@cloudflare/realtimekit-ui-v2.0.3-staging.9) (2026-10-09)
+
+
+### Bug Fixes
+
+* **ai-review:** added components.d.ts and semicolon fixes ([ff1dde4](https://github.com/cloudflare/realtimekit-ui/commit/ff1dde444559cd19f8e1e016008388ee17fff824))
+* **auto-docs-generation:** brought changes from cloudflare-docs and fixed the page structure ([bd8297f](https://github.com/cloudflare/realtimekit-ui/commit/bd8297f8fce2413aa2bf487280c7943815d209a6))
+
+## [2.0.3-staging.8](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.0.3-staging.7...@cloudflare/realtimekit-ui-v2.0.3-staging.8) (2026-10-07)
+
+
+### Bug Fixes
+
+* **asset-split:** using assets from single bucket across repos to support single allowlist entry ([027f74f](https://github.com/cloudflare/realtimekit-ui/commit/027f74f7c2c05df2b1b1591bb4983e94c727818a))
+
+## [2.0.3-staging.7](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.0.3-staging.6...@cloudflare/realtimekit-ui-v2.0.3-staging.7) (2026-10-07)
+
+
+### Bug Fixes
+
+* remove the mediaPermissionUpdate listener when rtk-speaker-selector disconnects ([867d9ac](https://github.com/cloudflare/realtimekit-ui/commit/867d9ac42ee51bfd49880cbbafe5a2e6dd2fd236))
+
+## [2.0.3-staging.6](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.0.3-staging.5...@cloudflare/realtimekit-ui-v2.0.3-staging.6) (2026-10-07)
+
+
+### Bug Fixes
+
+* stop the previous audio analyser in rtk-audio-tile on each audio update ([b6dd670](https://github.com/cloudflare/realtimekit-ui/commit/b6dd670192a31f7385f5f7f48551682e0aba0871))
+
+## [2.0.3-staging.5](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.0.3-staging.4...@cloudflare/realtimekit-ui-v2.0.3-staging.5) (2026-10-07)
+
+
+### Bug Fixes
+
+* **rtk-debugger-ui:** rtk debugger was shifting as per the content of the nav bar and content ([c050aca](https://github.com/cloudflare/realtimekit-ui/commit/c050acafef90e2b97efcb59e952a1aec51e197f0))
+* **rtk-debugger:** brought consistency in colors with settings modal ([e2b8414](https://github.com/cloudflare/realtimekit-ui/commit/e2b8414166b645b4fcb086f2a7323590673ffd3b))
+
+## [2.0.3-staging.4](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.0.3-staging.3...@cloudflare/realtimekit-ui-v2.0.3-staging.4) (2026-10-02)
+
+
+### Bug Fixes
+
+* **rtk-grid:** rtk grid was not updating on mass action on active participants map ([2b9ae6e](https://github.com/cloudflare/realtimekit-ui/commit/2b9ae6e49135e166f5c8cbb37be6110a3bcf0fb3))
+* **rtk-grid:** using common debounce for peer leave/joins as suggested by ai ([66510e6](https://github.com/cloudflare/realtimekit-ui/commit/66510e62ba1698b703ac179a129403b83918be0f))
+
+## [2.0.3-staging.3](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.0.3-staging.2...@cloudflare/realtimekit-ui-v2.0.3-staging.3) (2026-10-01)
+
+
+### Bug Fixes
+
+* **missing-audio:** post reconnect, some participants were not able to hear others ([56cc4e6](https://github.com/cloudflare/realtimekit-ui/commit/56cc4e61d4ad85f13e60189268a7acc1d4956707))
+
+## [2.0.3-staging.2](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.0.3-staging.1...@cloudflare/realtimekit-ui-v2.0.3-staging.2) (2026-09-29)
+
+
+### Bug Fixes
+
+* fall back to lodash cloneDeep when structuredClone is not defined ([76094ba](https://github.com/cloudflare/realtimekit-ui/commit/76094ba36f2a95853dd5e200c8850316a4720d58))
+
+## [2.0.3-staging.1](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.0.2...@cloudflare/realtimekit-ui-v2.0.3-staging.1) (2026-09-16)
+
+
+### Bug Fixes
+
+* live transcripts start replaying stale transcripts randomly ([6058760](https://github.com/cloudflare/realtimekit-ui/commit/6058760057a73a8426377f63087f8ff8bd1925f0))
+
 ## [2.0.2](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.0.1...@cloudflare/realtimekit-ui-v2.0.2) (2026-08-24)
 
 
