@@ -1,3 +1,11 @@
+## [2.0.3-staging.9](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.0.3-staging.8...@cloudflare/realtimekit-ui-v2.0.3-staging.9) (2026-10-09)
+
+
+### Bug Fixes
+
+* **ai-review:** added components.d.ts and semicolon fixes ([ff1dde4](https://github.com/cloudflare/realtimekit-ui/commit/ff1dde444559cd19f8e1e016008388ee17fff824))
+* **auto-docs-generation:** brought changes from cloudflare-docs and fixed the page structure ([bd8297f](https://github.com/cloudflare/realtimekit-ui/commit/bd8297f8fce2413aa2bf487280c7943815d209a6))
+
 ## [2.0.3-staging.8](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.0.3-staging.7...@cloudflare/realtimekit-ui-v2.0.3-staging.8) (2026-10-07)
 
 
