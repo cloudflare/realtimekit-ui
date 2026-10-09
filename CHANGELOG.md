@@ -1,3 +1,10 @@
+## [2.0.3-staging.10](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.0.3-staging.9...@cloudflare/realtimekit-ui-v2.0.3-staging.10) (2026-10-09)
+
+
+### Bug Fixes
+
+* **chat-selector:** fixed null pointers in chat-selector around paginated list ([792b852](https://github.com/cloudflare/realtimekit-ui/commit/792b8526140174f48f47342c26eef9ef06cbfb42))
+
 ## [2.0.3-staging.9](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.0.3-staging.8...@cloudflare/realtimekit-ui-v2.0.3-staging.9) (2026-10-09)
 
 
