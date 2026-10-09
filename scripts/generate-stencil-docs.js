@@ -667,7 +667,7 @@ function MyComponent() {
     } else if (lowerType.includes('[]') || lowerType.includes('array')) {
       return `[${prop}]="[]"`;
     } else if (lowerType.includes('object') || lowerType.includes('{')) {
-      return `[${prop}=]"{}"`;
+      return `[${prop}]="{}"`;
     } else if (lowerType.includes('meeting')) {
       return `[${prop}]="meeting"`;
     } else if (lowerType.includes('size')) {
@@ -698,7 +698,7 @@ function MyComponent() {
     } else if (lowerType.includes('size')) {
       return `\n ${prop}="md"`;
     } else if (lowerType.includes('controlbarvariant')) {
-      return `\n ${prop}"button"`;
+      return `\n ${prop}="button"`;
     } else if (lowerType.includes('iconvariant')) {
       return `\n ${prop}="primary"`;
     } else if (lowerType.includes('avatarvariant')) {
@@ -722,13 +722,13 @@ function MyComponent() {
     } else if (lowerType.includes('object') || lowerType.includes('{')) {
       return `\n  el.${prop}= {};`;
     } else if (lowerType.includes('meeting')) {
-      return `\n  el.${prop}= meeting`;
+      return `\n  el.${prop}= meeting;`;
     } else if (lowerType.includes('uiconfig')) {
-      return `\n  el.${prop}= defaultUiConfig`;
+      return `\n  el.${prop}= defaultUiConfig;`;
     } else if (lowerType.includes('iconpack')) {
-      return `\n  el.${prop}= defaultIconPack`;
+      return `\n  el.${prop}= defaultIconPack;`;
     } else if (lowerType.includes('peer')) {
-      return `\n  el.${prop}= participant`;
+      return `\n  el.${prop}= participant;`;
     }
     return '';
   }
@@ -760,11 +760,14 @@ async function main() {
   }
 
   const docsRootIndexContent = `---
-pcx_content_type: navigation
+pcx_content_type: reference
 title: Component Reference
+description: API reference for RealtimeKit UI Kit components, props, and configuration options.
 sidebar:
   group:
     hideIndex: true
+products:
+  - realtime
 ---
 `;
 
