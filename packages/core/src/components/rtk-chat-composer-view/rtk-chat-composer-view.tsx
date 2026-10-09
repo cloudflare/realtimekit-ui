@@ -35,6 +35,7 @@ export class RtkChatComposerView {
   /** Whether user can send text messages */
   @Prop() canSendTextMessage = true;
 
+  /** Whether a message is being sent */
   @Prop() isSending: boolean = false;
 
   /** Whether user can send file messages */

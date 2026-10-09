@@ -13,10 +13,8 @@ import { ControlBarVariant } from '../rtk-controlbar-button/rtk-controlbar-butto
 import { SyncWithStore } from '../../utils/sync-with-store';
 
 /**
- * A toggle button for enabling/disabling Picture-in-Picture mode.
- *
- * Allows users to switch the video display to a floating window that stays
- * on top of other applications.
+ * A button to turn Picture-in-Picture mode on or off when available. For example,
+ * a participant can keep the meeting video visible while using another app.
  */
 @Component({
   tag: 'rtk-pip-toggle',
