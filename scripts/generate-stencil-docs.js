@@ -735,23 +735,23 @@ function MyComponent() {
   getCoreScript(prop, type) {
     const lowerType = type.toLowerCase();
     if (lowerType.includes('boolean')) {
-      return `\n  el.${prop}= true;`;
+      return `\n  el.${prop} = true;`;
     } else if (lowerType.includes('number')) {
-      return `\n  el.${prop}= 42;`;
+      return `\n  el.${prop} = 42;`;
     } else if (lowerType.includes('function') || lowerType.includes('=>')) {
-      return `\n  el.${prop}= handleEvent;`;
+      return `\n  el.${prop} = handleEvent;`;
     } else if (lowerType.includes('[]') || lowerType.includes('array')) {
-      return `\n  el.${prop}= [];`;
+      return `\n  el.${prop} = [];`;
     } else if (lowerType.includes('object') || lowerType.includes('{')) {
-      return `\n  el.${prop}= {};`;
+      return `\n  el.${prop} = {};`;
     } else if (lowerType.includes('meeting')) {
-      return `\n  el.${prop}= meeting;`;
+      return `\n  el.${prop} = meeting;`;
     } else if (lowerType.includes('uiconfig')) {
-      return `\n  el.${prop}= defaultUiConfig;`;
+      return `\n  el.${prop} = defaultUiConfig;`;
     } else if (lowerType.includes('iconpack')) {
-      return `\n  el.${prop}= defaultIconPack;`;
+      return `\n  el.${prop} = defaultIconPack;`;
     } else if (lowerType.includes('peer')) {
-      return `\n  el.${prop}= participant;`;
+      return `\n  el.${prop} = participant;`;
     }
     return '';
   }

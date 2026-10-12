@@ -1,3 +1,10 @@
+## [2.0.4-staging.1](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.0.3...@cloudflare/realtimekit-ui-v2.0.4-staging.1) (2026-10-12)
+
+
+### Bug Fixes
+
+* correct spacing in doc generator ([891af38](https://github.com/cloudflare/realtimekit-ui/commit/891af38992c719245ea92718f7c0a10b28283687))
+
 ## [2.0.3](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.0.2...@cloudflare/realtimekit-ui-v2.0.3) (2026-10-12)
 
 
