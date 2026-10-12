@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 
 const REPO_URL = 'https://github.com/cloudflare/realtimekit-ui';
-const REPO_BRANCH = 'staging';
+const REPO_BRANCH = 'main';
 const GENERATOR_PATH = 'scripts/generate-stencil-docs.js';
 
 const toRepoUrl = (filePath) => {
