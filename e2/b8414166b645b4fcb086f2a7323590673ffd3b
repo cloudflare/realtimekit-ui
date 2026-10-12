@@ -1,0 +1,27 @@
+packages/core/src/components/rtk-debugger-audio/rtk-debugger-audio.css
+  s_a3892d84feb4bc::t_58517fcd96ad4c 8,24,28,46,50,66,76
+packages/core/src/components/rtk-debugger-screenshare/rtk-debugger-screenshare.css
+  s_a3892d84feb4bc::t_30849be52acce6 8,24,28,46,50,66,76
+packages/core/src/components/rtk-debugger-system/rtk-debugger-system.css
+  s_a3892d84feb4bc::t_ae07e6391a1113 8,24,28,46,62,72
+packages/core/src/components/rtk-debugger-video/rtk-debugger-video.css
+  s_a3892d84feb4bc::t_802d4573359ce4 8,24,28,46,50,66,76
+packages/core/src/components/rtk-debugger/rtk-debugger.css
+  s_a3892d84feb4bc::t_fa335c7662b51e 90,105,109,113,121
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "e2b8414166b645b4fcb086f2a7323590673ffd3b",
+  "prompts": {},
+  "sessions": {
+    "s_a3892d84feb4bc": {
+      "agent_id": {
+        "tool": "windsurf",
+        "id": "arrow-vision",
+        "model": "unknown"
+      },
+      "human_author": "Ravindra Singh Rathor <rsrathor@cloudflare.com>"
+    }
+  }
+}
