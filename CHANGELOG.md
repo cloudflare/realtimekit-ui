@@ -1,3 +1,10 @@
+## [2.0.3-staging.11](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.0.3-staging.10...@cloudflare/realtimekit-ui-v2.0.3-staging.11) (2026-10-12)
+
+
+### Bug Fixes
+
+* **self-tile:** self tile was missing for manual view mode ([781d0ca](https://github.com/cloudflare/realtimekit-ui/commit/781d0cac2c55540ec4a87ef90d85d9e493b77b0f))
+
 ## [2.0.3-staging.10](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.0.3-staging.9...@cloudflare/realtimekit-ui-v2.0.3-staging.10) (2026-10-09)
 
 
