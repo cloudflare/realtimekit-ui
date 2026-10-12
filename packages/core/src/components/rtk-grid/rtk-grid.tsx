@@ -259,7 +259,9 @@ export class RtkGrid {
 
     this.participants = this.filterParticipants([
       ...participants.active.toArray().filter((p) => p.id !== self.id),
-      ...(participants.viewMode === 'ACTIVE_GRID' && !self.isPinned && !this.hideSelf
+      ...(['ACTIVE_GRID', 'MANUAL'].includes(participants.viewMode) &&
+      !self.isPinned &&
+      !this.hideSelf
         ? [self]
         : []),
     ]);
