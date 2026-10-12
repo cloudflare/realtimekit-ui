@@ -6,10 +6,8 @@ import { SyncWithStore } from '../../utils/sync-with-store';
 import { RtkI18n, useLanguage } from '../../lib/lang';
 
 /**
- * A modal for sending broadcast messages to all meeting participants.
- *
- * Allows hosts and moderators to send important announcements that
- * appear prominently to all users in the meeting.
+ * A modal for writing a broadcast message, such as an announcement to everyone
+ * in a meeting. It currently shows a confirmation without sending the message.
  */
 @Component({
   tag: 'rtk-broadcast-message-modal',

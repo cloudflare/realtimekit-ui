@@ -66,7 +66,7 @@ export class RtkSpeakerSelector {
   disconnectedCallback() {
     this.meeting?.self.removeListener('deviceListUpdate', this.deviceListUpdateListener);
     this.meeting?.self.removeListener('deviceUpdate', this.deviceUpdateListener);
-    this.meeting?.self.addListener('mediaPermissionUpdate', this.mediaPermissionUpdate);
+    this.meeting?.self.removeListener('mediaPermissionUpdate', this.mediaPermissionUpdate);
   }
 
   private deviceListUpdateListener = async () => {

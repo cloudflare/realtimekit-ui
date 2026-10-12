@@ -13,7 +13,7 @@ import { ChatUpdateParams } from '@cloudflare/realtimekit';
   shadow: true,
 })
 export class RtkChatSelector {
-  private $paginatedListRef: HTMLRtkPaginatedListElement;
+  private $paginatedListRef?: HTMLRtkPaginatedListElement;
 
   /** Meeting object */
   @SyncWithStore()
@@ -87,10 +87,7 @@ export class RtkChatSelector {
 
   disconnectedCallback() {
     if (!this.meeting) return;
-    const { self, participants } = this.meeting;
-    self?.permissions?.off('*', this.chatPermissionUpdateListener);
-    participants?.joined?.off('participantJoined', this.participantJoinedListener);
-    participants?.joined?.off('participantLeft', this.participantLeftListener);
+    this.disconnectMeeting(this.meeting);
   }
 
   @Watch('overrides')
@@ -137,7 +134,7 @@ export class RtkChatSelector {
   private selectUser = async (user?: Participant) => {
     if (user?.userId) {
       this.unreadMap.set(user.userId, false);
-      this.$paginatedListRef.rerenderList();
+      this.$paginatedListRef?.rerenderList();
     }
     this.selectedUser = user;
     this.chatSelectorChange.emit({ selectedUser: user });
@@ -165,11 +162,11 @@ export class RtkChatSelector {
   };
 
   private participantJoinedListener = (data) => {
-    this.$paginatedListRef.onNewNode(data);
+    this.$paginatedListRef?.onNewNode(data);
   };
 
   private participantLeftListener = (data) => {
-    this.$paginatedListRef.onNodeDelete(data.id);
+    this.$paginatedListRef?.onNodeDelete(data.id);
     this.onParticipantUpdate();
   };
 
@@ -212,7 +209,7 @@ export class RtkChatSelector {
     const otherUserId = data.message.targetUserIds.find((id) => id !== selfUserId);
     if (!otherUserId) return;
     this.unreadMap.set(otherUserId, true);
-    this.$paginatedListRef.rerenderList();
+    this.$paginatedListRef?.rerenderList();
   };
 
   render() {

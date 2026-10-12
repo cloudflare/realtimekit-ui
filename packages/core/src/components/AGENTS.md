@@ -116,6 +116,10 @@ Smart container components (`rtk-meeting`, `rtk-header`, etc.) delegate layout t
 
 **Never apply `@SyncWithStore()` to component-specific props** (e.g., `size`, `variant`). Only the standard six store props get this decorator.
 
+## RECONNECT GRID STABILITY
+
+`rtk-grid` keeps its existing participant arrays while the SDK rebuilds a reconnect snapshot. It listens to `participants.active.participantsUpdate` for the final commit, then refreshes active, pinned, and screen-share arrays together. The SDK may also emit `participantJoined` for same-ID fresh-object replacement to preserve existing callback behavior; the debounced handlers read the same final committed map. For remote peer-ID handover, the SDK binds tracks first and atomically replaces the active-map entry at the same position before emitting leave/join/update events, so every handler reads a complete media-ready map. Keep the `participantsUpdate` listener paired in `meetingChanged()` and `disconnectMeeting()`; it is the authoritative final snapshot commit and also covers final-empty snapshots that produce no `participantJoined` event.
+
 ## KNOWN INCOMPLETE COMPONENTS
 
 | Component                        | Issue                                                                     |

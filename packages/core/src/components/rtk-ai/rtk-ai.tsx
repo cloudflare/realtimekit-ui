@@ -10,10 +10,8 @@ import { SyncWithStore } from '../../utils/sync-with-store';
 export type AIView = 'default' | 'sidebar' | 'full-screen';
 
 /**
- * An AI assistant component for meeting interactions.
- *
- * Provides AI-powered features like transcription, summarization, and
- * intelligent meeting assistance. Rendered inside rtk-sidebar as the 'ai' section.
+ * The AI panel shows meeting transcriptions. For example, participants can
+ * read the conversation in the sidebar during a meeting.
  */
 @Component({
   tag: 'rtk-ai',

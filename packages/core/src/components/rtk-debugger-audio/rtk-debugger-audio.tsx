@@ -169,7 +169,6 @@ export class RtkDebuggerAudio {
 
     return (
       <Host>
-        <div id="header"></div>
         <div class="tab-body">
           <div class="status-container">
             <div class="status-section">

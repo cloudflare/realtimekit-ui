@@ -56,9 +56,6 @@ export class RtkDebuggerSystem {
   @Prop()
   t: RtkI18n = useLanguage();
 
-  /** Is Network section expanded */
-  @State() isBatterySectionOpen: boolean = true;
-
   /** Summarised health of network stats */
   @State() batterySectionHealth: StatsHealth = null;
 
@@ -67,10 +64,6 @@ export class RtkDebuggerSystem {
 
   /** Stats as formatted array to display */
   @State() batteryFormattedStats: FormattedStatsObj[] = [];
-
-  private toggleSection(section: string) {
-    if (section === 'battery') this.isBatterySectionOpen = !this.isBatterySectionOpen;
-  }
 
   private batteryUpdateListener = () => {
     const batteryLevelPercentage = Math.round(this.battery.level * 100);
@@ -140,20 +133,18 @@ export class RtkDebuggerSystem {
 
     return (
       <Host>
-        <div id="header"></div>
         <div class="tab-body">
           <div class="status-container">
             <div class="status-section">
-              <div class="section-header" onClick={() => this.toggleSection('battery')}>
+              <div class="section-header">
                 <span>{this.t('debugger.system.sections.battery')}</span>
                 {this.batterySectionHealth && (
                   <span class={`status ${this.batterySectionHealth?.toLowerCase()}`}>
                     {this.t(`debugger.quality.${this.batterySectionHealth?.toLowerCase()}`)}
                   </span>
                 )}
-                {/* <span class="arrow">{this.isBatterySectionOpen ? '▾' : '▸'}</span> */}
               </div>
-              {this.isBatterySectionOpen && !!this.batteryFormattedStats.length && (
+              {!!this.batteryFormattedStats.length && (
                 <div class="section-body battery-table">
                   {this.batteryFormattedStats.map((formattedStatsObj) => (
                     <div class="battery-row">

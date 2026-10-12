@@ -1,7 +1,7 @@
 import { cloneDeep } from 'lodash-es';
 
 export default function clone(obj: any) {
-  if (structuredClone) {
+  if (typeof structuredClone === 'function') {
     return structuredClone(obj);
   }
   return cloneDeep(obj);

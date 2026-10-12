@@ -113,50 +113,52 @@ export class RtkDebugger {
           <header>
             <h3>{this.t('debugger.troubleshooting.label')}</h3>
           </header>
-          <button
-            type="button"
-            class={{ active: this.activeTab === 'audio' }}
-            onClick={() => this.changeTab('audio')}
-          >
-            {this.t('debugger.audio.label')}
-            <div class="right">
-              <rtk-icon icon={this.iconPack.mic_on} />
-              {this.size === 'sm' && <rtk-icon icon={this.iconPack.chevron_right} />}
-            </div>
-          </button>
-          <button
-            type="button"
-            class={{ active: this.activeTab === 'video' }}
-            onClick={() => this.changeTab('video')}
-          >
-            {this.t('debugger.video.label')}
-            <div class="right">
-              <rtk-icon icon={this.iconPack.video_on} />
-              {this.size === 'sm' && <rtk-icon icon={this.iconPack.chevron_right} />}
-            </div>
-          </button>
-          <button
-            type="button"
-            class={{ active: this.activeTab === 'screenshare' }}
-            onClick={() => this.changeTab('screenshare')}
-          >
-            {this.t('debugger.screenshare.label')}
-            <div class="right">
-              <rtk-icon icon={this.iconPack.share_screen_start} />
-              {this.size === 'sm' && <rtk-icon icon={this.iconPack.chevron_right} />}
-            </div>
-          </button>
-          <button
-            type="button"
-            class={{ active: this.activeTab === 'system', hidden: !showSystemsTab }}
-            onClick={() => this.changeTab('system')}
-          >
-            {this.t('debugger.system.label')}
-            <div class="right">
-              <rtk-icon icon={this.iconPack.settings} />
-              {this.size === 'sm' && <rtk-icon icon={this.iconPack.chevron_right} />}
-            </div>
-          </button>
+          <nav>
+            <button
+              type="button"
+              class={{ active: this.activeTab === 'audio' }}
+              onClick={() => this.changeTab('audio')}
+            >
+              {this.t('debugger.audio.label')}
+              <div class="right">
+                <rtk-icon icon={this.iconPack.mic_on} />
+                {this.size === 'sm' && <rtk-icon icon={this.iconPack.chevron_right} />}
+              </div>
+            </button>
+            <button
+              type="button"
+              class={{ active: this.activeTab === 'video' }}
+              onClick={() => this.changeTab('video')}
+            >
+              {this.t('debugger.video.label')}
+              <div class="right">
+                <rtk-icon icon={this.iconPack.video_on} />
+                {this.size === 'sm' && <rtk-icon icon={this.iconPack.chevron_right} />}
+              </div>
+            </button>
+            <button
+              type="button"
+              class={{ active: this.activeTab === 'screenshare' }}
+              onClick={() => this.changeTab('screenshare')}
+            >
+              {this.t('debugger.screenshare.label')}
+              <div class="right">
+                <rtk-icon icon={this.iconPack.share_screen_start} />
+                {this.size === 'sm' && <rtk-icon icon={this.iconPack.chevron_right} />}
+              </div>
+            </button>
+            <button
+              type="button"
+              class={{ active: this.activeTab === 'system', hidden: !showSystemsTab }}
+              onClick={() => this.changeTab('system')}
+            >
+              {this.t('debugger.system.label')}
+              <div class="right">
+                <rtk-icon icon={this.iconPack.settings} />
+                {this.size === 'sm' && <rtk-icon icon={this.iconPack.chevron_right} />}
+              </div>
+            </button>
+          </nav>
         </aside>
 
         <main class={{ active: this.isMobileMainVisible }} part="main-content">

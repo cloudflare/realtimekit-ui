@@ -145,7 +145,7 @@ class StencilDocGenerator {
     while ((match = interfaceRegex.exec(componentsContent)) !== null) {
       const [, jsDocComment, componentName, propsContent] = match;
       const props = this.parseProps(propsContent, componentName);
-      const description = this.parseComponentDescription(jsDocComment);
+      const description = this.parseComponentDescription(jsDocComment, componentName);
 
       // Set name and tagName based on framework
       const isReact = this.libraryName === 'React';
@@ -180,11 +180,17 @@ class StencilDocGenerator {
 
   parseProps(propsContent, componentName) {
     const props = [];
-    const propRegex = /\/\*\*\s*\n\s*\*\s*(.*?)\s*\n\s*\*\/\s*\n\s*"([^"]+)":\s*/g;
+    // Match the full JSDoc block so tags do not hide properties.
+    const propRegex = /\/\*\*((?:[^*]|\*(?!\/))*)\*\/[ \t]*\n[ \t]*"([^"]+)":\s*/g;
 
     let match;
     while ((match = propRegex.exec(propsContent)) !== null) {
-      const [, description, name] = match;
+      const [, jsDoc, name] = match;
+      const description = jsDoc
+        .split('\n')
+        .map((line) => line.replace(/^[ \t]*\*[ \t]?/, '').trim())
+        .filter((line) => line && (!line.startsWith('@') || line.startsWith('@deprecated')))
+        .join(' ');
       const typeStartIndex = propRegex.lastIndex;
       const { value: typeWithDefault, endIndex } = this.readUntilTopLevelSemicolon(
         propsContent,
@@ -277,8 +283,8 @@ class StencilDocGenerator {
   }
 
   parseTypeAndDefault(typeString) {
-    // Check if there's a default value (pattern: Type = defaultValue)
-    const defaultMatch = typeString.match(/^(.+?)\s*=\s*(.+)$/);
+    // Check for a default assignment without mistaking an arrow-function type for one.
+    const defaultMatch = typeString.match(/^(.+?)\s*=(?!>)\s*(.+)$/);
 
     if (defaultMatch) {
       return {
@@ -293,21 +299,44 @@ class StencilDocGenerator {
     };
   }
 
-  parseComponentDescription(jsDocComment) {
-    if (!jsDocComment) return null;
+  parseComponentDescription(jsDocComment, componentName) {
+    const parseComment = (comment) => {
+      if (!comment) return null;
 
-    // Extract the description from JSDoc comment
-    // Remove /** and */ and extract the main description
-    const cleanComment = jsDocComment
-      .replace(/\/\*\*/, '')
-      .replace(/\*\//, '')
-      .replace(/^\s*\*/gm, '') // Remove leading * from each line
-      .trim();
+      // Extract the description from JSDoc comment
+      // Remove /** and */ and extract the main description
+      const cleanComment = comment
+        .replace(/\/\*\*/, '')
+        .replace(/\*\//, '')
+        .replace(/^\s*\*/gm, '') // Remove leading * from each line
+        .trim();
 
-    // Return the first paragraph (before any @tags)
-    const description = cleanComment.split(/\n\s*@/)[0].trim();
+      // Return the description before any @tags
+      return cleanComment.split(/\n\s*@/)[0].trim() || null;
+    };
+    const declarationDescription = parseComment(jsDocComment);
+    const kebabName = this.camelToKebab(componentName);
+    const sourceFilePath = path.join(
+      path.dirname(this.filePath),
+      'components',
+      kebabName,
+      `${kebabName}.tsx`
+    );
+    if (!fs.existsSync(sourceFilePath)) return declarationDescription;
 
-    return description || null;
+    const sourceContent = fs.readFileSync(sourceFilePath, 'utf8');
+    // Only use JSDoc directly attached to the component decorator.
+    const sourceComment = sourceContent.match(
+      /(\/\*\*(?:[^*]|\*(?!\/))*\*\/)[ \t\r\n]*@Component\(/
+    );
+    const sourceDescription = parseComment(sourceComment?.[1]);
+    if (!sourceDescription) return declarationDescription;
+
+    // Preserve declaration formatting when only whitespace or punctuation spacing differs.
+    const normalize = (text) => text?.replace(/\s+/g, ' ').replace(/\s+(?=[.,;:!?])/g, '');
+    return normalize(sourceDescription) === normalize(declarationDescription)
+      ? declarationDescription
+      : sourceDescription.replace(/\n[ \t]*\n/g, '\n');
   }
 
   // for web-components and angular components (converts CamelCase to kebab-case)
@@ -334,12 +363,14 @@ class StencilDocGenerator {
 
   async generateIndex() {
     const content = `---
-pcx_content_type: reference
+pcx_content_type: navigation
 title: ${this.libraryName}
 description: Complete API reference for ${this.libraryName} library components
 sidebar:
   group:
     hideIndex: true
+products:
+  - realtime
 ---`;
 
     fs.writeFileSync(path.join(this.outputDir, 'index.mdx'), content);
@@ -349,9 +380,11 @@ sidebar:
     const { name, tagName, props = [], events = [], description } = component;
 
     let content = `---
-pcx_content_type: reference
+pcx_content_type: navigation
 title: ${name}
 description: API reference for ${name} component (${this.libraryName} Library)
+products:
+  - realtime
 ---
 `;
 
@@ -373,7 +406,10 @@ description: API reference for ${name} component (${this.libraryName} Library)
 
       props.forEach((prop) => {
         const required = prop.required ? '✅' : '❌';
-        const description = prop.description || '*No description*';
+        const description =
+          prop.description === '@deprecated'
+            ? '**Deprecated**'
+            : prop.description || '*No description*';
         const type = this.formatType(prop.type);
         const defaultValue = prop.defaultValue ? this.wrapInlineCode(prop.defaultValue) : '-';
 
@@ -439,23 +475,33 @@ description: API reference for ${name} component (${this.libraryName} Library)
 
 `;
 
-    if (props.length > 0) {
+    const attributeProps = props.filter(
+      (p) => !p.name.toLowerCase().includes('state') && this.getCoreValue(p.name, p.type) !== ''
+    );
+    const scriptProps = props
+      .filter(
+        (p) => !p.name.toLowerCase().includes('state') && this.getCoreScript(p.name, p.type) !== ''
+      )
+      .sort(
+        (a, b) =>
+          Number(b.name === 'meeting' || b.name === 'participant') -
+          Number(a.name === 'meeting' || a.name === 'participant')
+      );
+    if (attributeProps.length > 0 || scriptProps.length > 0) {
       content += `### With Properties
 
 \`\`\`html
 <${tagName}`;
 
       // Add example props (first 3 required props, excluding state-related props)
-      const filteredProps = props.filter((p) => !p.name.toLowerCase().includes('state'));
-      const exampleProps = filteredProps.filter((p) => p.required).slice(0, 3);
+      const exampleProps = attributeProps.filter((p) => p.required).slice(0, 3);
       if (exampleProps.length === 0) {
         // If no required props, show first 3 optional ones
-        exampleProps.push(...filteredProps.slice(0, 3));
+        exampleProps.push(...attributeProps.slice(0, 3));
       }
 
       exampleProps.forEach((prop) => {
-        const exampleValue = this.getCoreValue(prop.name, prop.type);
-        content += `${exampleValue}`;
+        content += this.getCoreValue(prop.name, prop.type);
       });
 
       content += `>
@@ -465,21 +511,19 @@ description: API reference for ${name} component (${this.libraryName} Library)
 `;
     }
 
-    if (props.length > 0) {
+    if (scriptProps.length > 0) {
       content += `
 \`\`\`html
 <script>
   const el = document.querySelector("${name}");
 `;
-      const filteredProps = props.filter((p) => !p.name.toLowerCase().includes('state'));
-      const exampleProps = filteredProps.filter((p) => p.required).slice(0, 3);
+      const exampleProps = scriptProps.filter((p) => p.required).slice(0, 3);
       if (exampleProps.length === 0) {
         // If no required props, show first 3 optional ones
-        exampleProps.push(...filteredProps.slice(0, 3));
+        exampleProps.push(...scriptProps.slice(0, 3));
       }
       exampleProps.forEach((prop) => {
-        const exampleValue = this.getCoreScript(prop.name, prop.type);
-        content += `${exampleValue}`;
+        content += this.getCoreScript(prop.name, prop.type);
       });
 
       content += `
@@ -634,7 +678,7 @@ function MyComponent() {
     } else if (lowerType.includes('[]') || lowerType.includes('array')) {
       return `[${prop}]="[]"`;
     } else if (lowerType.includes('object') || lowerType.includes('{')) {
-      return `[${prop}=]"{}"`;
+      return `[${prop}]="{}"`;
     } else if (lowerType.includes('meeting')) {
       return `[${prop}]="meeting"`;
     } else if (lowerType.includes('size')) {
@@ -665,7 +709,7 @@ function MyComponent() {
     } else if (lowerType.includes('size')) {
       return `\n ${prop}="md"`;
     } else if (lowerType.includes('controlbarvariant')) {
-      return `\n ${prop}"button"`;
+      return `\n ${prop}="button"`;
     } else if (lowerType.includes('iconvariant')) {
       return `\n ${prop}="primary"`;
     } else if (lowerType.includes('avatarvariant')) {
@@ -689,13 +733,13 @@ function MyComponent() {
     } else if (lowerType.includes('object') || lowerType.includes('{')) {
       return `\n  el.${prop}= {};`;
     } else if (lowerType.includes('meeting')) {
-      return `\n  el.${prop}= meeting`;
+      return `\n  el.${prop}= meeting;`;
     } else if (lowerType.includes('uiconfig')) {
-      return `\n  el.${prop}= defaultUiConfig`;
+      return `\n  el.${prop}= defaultUiConfig;`;
     } else if (lowerType.includes('iconpack')) {
-      return `\n  el.${prop}= defaultIconPack`;
+      return `\n  el.${prop}= defaultIconPack;`;
     } else if (lowerType.includes('peer')) {
-      return `\n  el.${prop}= participant`;
+      return `\n  el.${prop}= participant;`;
     }
     return '';
   }
@@ -727,11 +771,14 @@ async function main() {
   }
 
   const docsRootIndexContent = `---
-pcx_content_type: navigation
+pcx_content_type: reference
 title: Component Reference
+description: API reference for RealtimeKit UI Kit components, props, and configuration options.
 sidebar:
   group:
     hideIndex: true
+products:
+  - realtime
 ---
 `;
 

@@ -1,9 +1,9 @@
 import { Meeting } from '../types/rtk-client';
 import { isFirefox } from '../utils/browser';
 
-interface PeerAudio {
-  id: string;
+interface TrackOwners {
   track: MediaStreamTrack;
+  audioIds: Set<string>;
 }
 
 /**
@@ -14,7 +14,11 @@ export default class RTKAudio {
   private audioStream: MediaStream;
   private meeting: Meeting;
 
-  private audioTracks: PeerAudio[];
+  /** Maps participant audio/screenshare track IDs to their physical MediaStreamTrack IDs. */
+  private trackIdByAudioIdMap: Map<string, string>;
+
+  /** Keeps the idempotent set of logical owners for each physical track. */
+  private trackOwners: Map<string, TrackOwners>;
 
   private logger: Meeting['__internals__']['logger'];
 
@@ -29,23 +33,67 @@ export default class RTKAudio {
     this.audioStream = new MediaStream();
     this.audio.srcObject = this.audioStream;
 
-    this.audioTracks = [];
+    this.trackIdByAudioIdMap = new Map();
+    this.trackOwners = new Map();
   }
 
-  addTrack(id: string, track: MediaStreamTrack) {
-    // Remove the track if it already exists, with the same id
-    this.removeTrack(id);
-    this.audioTracks.push({ id, track });
-    this.audioStream.addTrack(track);
+  addTrack(audioId: string, track: MediaStreamTrack) {
+    /**
+     * NOTE(ravindra-cloudflare):
+     * audioId format: audio-${peerId} or screenshare-${peerId}.
+     *
+     * During reconnection, the old and new peer IDs of the same participant
+     * can temporarily co-own the same track.
+     *
+     * Before adding track, we should check if the track is already added with a different audio ID.
+     */
+    const currentTrackId = this.trackIdByAudioIdMap.get(audioId);
+
+    // Track already added, just play it
+    if (currentTrackId === track.id) {
+      this.play();
+      return;
+    }
+
+    // A logical audio ID owns one track. Release its previous track before replacing it.
+    if (currentTrackId) this.removeTrack(audioId);
+
+    this.trackIdByAudioIdMap.set(audioId, track.id);
+    const owners = this.trackOwners.get(track.id);
+    if (owners) {
+      // Set membership is idempotent when reconnect events repeat or arrive out of order.
+      owners.audioIds.add(audioId);
+    } else {
+      // If you are the first owner of this track, add it to the audio stream
+      this.trackOwners.set(track.id, { track, audioIds: new Set([audioId]) });
+      this.audioStream.addTrack(track);
+    }
     this.play();
   }
 
-  removeTrack(id: string) {
-    const track = this.audioTracks.find((a) => a.id === id);
-    if (track != null) {
-      this.audioStream.removeTrack(track.track);
-      this.audioTracks = this.audioTracks.filter((a) => a.id !== id);
-    }
+  removeTrack(audioId: string) {
+    /**
+     * NOTE(ravindra-cloudflare):
+     * audioId format: audio-${peerId} or screenshare-${peerId}.
+     *
+     * During reconnection, the old and new peer IDs of the same participant
+     * can temporarily co-own the same track.
+     *
+     * Before removing track, we should check if the track is still owned by other audio IDs.
+     */
+    const trackId = this.trackIdByAudioIdMap.get(audioId);
+    if (!trackId) return;
+
+    this.trackIdByAudioIdMap.delete(audioId);
+    const owners = this.trackOwners.get(trackId);
+    if (!owners) return;
+
+    owners.audioIds.delete(audioId);
+    if (owners.audioIds.size > 0) return;
+
+    // Remove the physical track only after its final logical owner is gone.
+    this.audioStream.removeTrack(owners.track);
+    this.trackOwners.delete(trackId);
   }
 
   async play() {

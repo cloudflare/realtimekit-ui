@@ -153,7 +153,7 @@ export class RtkDialogManager {
             iconPack={this.iconPack}
             t={this.t}
           >
-            <rtk-debugger {...defaults} />
+            <Render element="rtk-debugger" defaults={defaults} />
           </rtk-dialog>
         </Host>
       );

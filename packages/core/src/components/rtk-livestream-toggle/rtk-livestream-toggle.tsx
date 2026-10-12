@@ -9,10 +9,8 @@ import { ControlBarVariant } from '../rtk-controlbar-button/rtk-controlbar-butto
 import { SyncWithStore } from '../../utils/sync-with-store';
 
 /**
- * A toggle button for starting/stopping livestream broadcasting.
- *
- * Only visible to users with livestream permissions. Allows hosts to
- * broadcast the meeting to external streaming platforms.
+ * A button for starting or stopping a meeting livestream. It appears only for
+ * participants who have permission to host the livestream.
  */
 @Component({
   tag: 'rtk-livestream-toggle',

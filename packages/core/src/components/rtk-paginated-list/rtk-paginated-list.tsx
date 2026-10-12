@@ -186,7 +186,7 @@ export class RtkPaginatedList {
   }
 
   /**
-   * Updates a new node anywhere in the list
+   * Updates an existing node in the paginated list.
    * @param {string} id - The id of the node to update
    * @param {DataNode} node - The updated data node
    * */

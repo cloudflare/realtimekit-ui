@@ -2,9 +2,9 @@ import { Meeting } from '../types/rtk-client';
 import { isFirefox } from '../utils/browser';
 
 const SOUNDS = {
-  joined: 'https://rtk-uploads.realtime.cloudflare.com/notification_join.mp3',
-  left: 'https://rtk-uploads.realtime.cloudflare.com/notification_join.mp3',
-  message: 'https://rtk-uploads.realtime.cloudflare.com/notification_message.mp3',
+  joined: 'https://rtk-assets.realtime.cloudflare.com/ui-kit/sounds/notification_join.mp3',
+  left: 'https://rtk-assets.realtime.cloudflare.com/ui-kit/sounds/notification_join.mp3',
+  message: 'https://rtk-assets.realtime.cloudflare.com/ui-kit/sounds/notification_message.mp3',
 };
 
 export type Sound = keyof typeof SOUNDS;

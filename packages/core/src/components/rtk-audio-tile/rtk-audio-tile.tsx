@@ -75,6 +75,8 @@ export class RtkAudioTile {
     audioTrack,
   }: Pick<Peer, 'audioEnabled' | 'audioTrack'>) => {
     if (!this.participant) return;
+    // stop the analyser of the previous track so it does not keep polling
+    this.hark?.stop();
     if (audioEnabled && audioTrack) {
       const stream = new MediaStream();
       stream.addTrack(audioTrack);
