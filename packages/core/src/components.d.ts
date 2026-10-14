@@ -611,7 +611,7 @@ export namespace Components {
         "meeting": Meeting;
         /**
           * UI Overrides
-          * @default {   disableEmojiPicker: false,   disablePrivateChat: false, }
+          * @default {   disableEmojiPicker: false,   disablePrivateChat: false,   disableParticipantsPreview: false, }
          */
         "overrides": Overrides;
         /**
@@ -933,7 +933,7 @@ export namespace Components {
         "meeting": Meeting;
         /**
           * UI Overrides
-          * @default {   disableEmojiPicker: false,   disablePrivateChat: false, }
+          * @default {   disableEmojiPicker: false,   disablePrivateChat: false,   disableParticipantsPreview: false, }
          */
         "overrides": Overrides1;
         /**
@@ -2130,7 +2130,7 @@ export namespace Components {
         "mode": MeetingMode;
         /**
           * UI Kit Overrides
-          * @default {   disableEmojiPicker: false,   disablePrivateChat: false, }
+          * @default {   disableEmojiPicker: false,   disablePrivateChat: false,   disableParticipantsPreview: false, }
          */
         "overrides": Overrides;
         /**
@@ -2986,6 +2986,54 @@ export namespace Components {
         "t": RtkI18n;
     }
     /**
+     * A component which shows the participants already in the meeting, before you join it.
+     * Renders overlapping avatars with a caption like "John, Jane and 25 others in the meeting".
+     */
+    interface RtkParticipantsPreview {
+        /**
+          * Config object
+          * @default createDefaultConfig()
+         */
+        "config": UIConfig;
+        /**
+          * Icon pack
+          * @default defaultIconPack
+         */
+        "iconPack": IconPack;
+        /**
+          * Maximum number of avatars to show; the rest collapse into a "+N" tile
+          * @default 5
+         */
+        "maxAvatars": number;
+        /**
+          * Meeting object
+         */
+        "meeting": Meeting;
+        /**
+          * UI Overrides
+          * @default {   disableEmojiPicker: false,   disablePrivateChat: false,   disableParticipantsPreview: false, }
+         */
+        "overrides": Overrides;
+        /**
+          * Poll interval in milliseconds (minimum 5000)
+          * @default 10000
+         */
+        "pollInterval": number;
+        /**
+          * Size
+         */
+        "size": Size;
+        /**
+          * States object
+         */
+        "states": States;
+        /**
+          * Language
+          * @default useLanguage()
+         */
+        "t": RtkI18n;
+    }
+    /**
      * A component which lists all participants, with ability to
      * run privileged actions on each participant according to your permissions.
      */
@@ -3744,6 +3792,11 @@ export namespace Components {
          */
         "meeting": Meeting;
         /**
+          * UI Overrides
+          * @default {   disableEmojiPicker: false,   disablePrivateChat: false,   disableParticipantsPreview: false, }
+         */
+        "overrides": Overrides;
+        /**
           * Size
          */
         "size": Size;
@@ -4358,7 +4411,7 @@ export namespace Components {
         "mode": MeetingMode1;
         /**
           * UI Kit Overrides
-          * @default {   disableEmojiPicker: false,   disablePrivateChat: false, }
+          * @default {   disableEmojiPicker: false,   disablePrivateChat: false,   disableParticipantsPreview: false, }
          */
         "overrides": Overrides1;
         /**
@@ -6117,6 +6170,16 @@ declare global {
         new (): HTMLRtkParticipantsAudioElement;
     };
     /**
+     * A component which shows the participants already in the meeting, before you join it.
+     * Renders overlapping avatars with a caption like "John, Jane and 25 others in the meeting".
+     */
+    interface HTMLRtkParticipantsPreviewElement extends Components.RtkParticipantsPreview, HTMLStencilElement {
+    }
+    var HTMLRtkParticipantsPreviewElement: {
+        prototype: HTMLRtkParticipantsPreviewElement;
+        new (): HTMLRtkParticipantsPreviewElement;
+    };
+    /**
      * A component which lists all participants, with ability to
      * run privileged actions on each participant according to your permissions.
      */
@@ -6973,6 +7036,7 @@ declare global {
         "rtk-participant-tile": HTMLRtkParticipantTileElement;
         "rtk-participants": HTMLRtkParticipantsElement;
         "rtk-participants-audio": HTMLRtkParticipantsAudioElement;
+        "rtk-participants-preview": HTMLRtkParticipantsPreviewElement;
         "rtk-participants-stage-list": HTMLRtkParticipantsStageListElement;
         "rtk-participants-stage-queue": HTMLRtkParticipantsStageQueueElement;
         "rtk-participants-toggle": HTMLRtkParticipantsToggleElement;
@@ -7613,7 +7677,7 @@ declare namespace LocalJSX {
         "onRtkStateUpdate"?: (event: RtkChatCustomEvent<States1>) => void;
         /**
           * UI Overrides
-          * @default {   disableEmojiPicker: false,   disablePrivateChat: false, }
+          * @default {   disableEmojiPicker: false,   disablePrivateChat: false,   disableParticipantsPreview: false, }
          */
         "overrides"?: Overrides;
         /**
@@ -8014,7 +8078,7 @@ declare namespace LocalJSX {
         "onRtkDropdownToggle"?: (event: RtkChatSelectorCustomEvent<{ open: boolean }>) => void;
         /**
           * UI Overrides
-          * @default {   disableEmojiPicker: false,   disablePrivateChat: false, }
+          * @default {   disableEmojiPicker: false,   disablePrivateChat: false,   disableParticipantsPreview: false, }
          */
         "overrides"?: Overrides1;
         /**
@@ -9325,7 +9389,7 @@ declare namespace LocalJSX {
         "onRtkStatesUpdate"?: (event: RtkMeetingCustomEvent<States>) => void;
         /**
           * UI Kit Overrides
-          * @default {   disableEmojiPicker: false,   disablePrivateChat: false, }
+          * @default {   disableEmojiPicker: false,   disablePrivateChat: false,   disableParticipantsPreview: false, }
          */
         "overrides"?: Overrides;
         /**
@@ -10208,6 +10272,54 @@ declare namespace LocalJSX {
         "t"?: RtkI18n;
     }
     /**
+     * A component which shows the participants already in the meeting, before you join it.
+     * Renders overlapping avatars with a caption like "John, Jane and 25 others in the meeting".
+     */
+    interface RtkParticipantsPreview {
+        /**
+          * Config object
+          * @default createDefaultConfig()
+         */
+        "config"?: UIConfig;
+        /**
+          * Icon pack
+          * @default defaultIconPack
+         */
+        "iconPack"?: IconPack;
+        /**
+          * Maximum number of avatars to show; the rest collapse into a "+N" tile
+          * @default 5
+         */
+        "maxAvatars"?: number;
+        /**
+          * Meeting object
+         */
+        "meeting"?: Meeting;
+        /**
+          * UI Overrides
+          * @default {   disableEmojiPicker: false,   disablePrivateChat: false,   disableParticipantsPreview: false, }
+         */
+        "overrides"?: Overrides;
+        /**
+          * Poll interval in milliseconds (minimum 5000)
+          * @default 10000
+         */
+        "pollInterval"?: number;
+        /**
+          * Size
+         */
+        "size"?: Size;
+        /**
+          * States object
+         */
+        "states"?: States;
+        /**
+          * Language
+          * @default useLanguage()
+         */
+        "t"?: RtkI18n;
+    }
+    /**
      * A component which lists all participants, with ability to
      * run privileged actions on each participant according to your permissions.
      */
@@ -11054,6 +11166,11 @@ declare namespace LocalJSX {
          */
         "onRtkStateUpdate"?: (event: RtkSetupScreenCustomEvent<States>) => void;
         /**
+          * UI Overrides
+          * @default {   disableEmojiPicker: false,   disablePrivateChat: false,   disableParticipantsPreview: false, }
+         */
+        "overrides"?: Overrides;
+        /**
           * Size
          */
         "size"?: Size;
@@ -11711,7 +11828,7 @@ declare namespace LocalJSX {
         "onRtkStatesUpdate"?: (event: RtkUiProviderCustomEvent<States1>) => void;
         /**
           * UI Kit Overrides
-          * @default {   disableEmojiPicker: false,   disablePrivateChat: false, }
+          * @default {   disableEmojiPicker: false,   disablePrivateChat: false,   disableParticipantsPreview: false, }
          */
         "overrides"?: Overrides1;
         /**
@@ -12158,6 +12275,11 @@ declare namespace LocalJSX {
         "size": Size;
         "defaultParticipantsTabId": ParticipantsTabId;
     }
+    interface RtkParticipantsPreviewAttributes {
+        "maxAvatars": number;
+        "pollInterval": number;
+        "size": Size;
+    }
     interface RtkParticipantsStageListAttributes {
         "size": Size;
         "hideHeader": boolean;
@@ -12417,6 +12539,7 @@ declare namespace LocalJSX {
         "rtk-participant-tile": Omit<RtkParticipantTile, keyof RtkParticipantTileAttributes> & { [K in keyof RtkParticipantTile & keyof RtkParticipantTileAttributes]?: RtkParticipantTile[K] } & { [K in keyof RtkParticipantTile & keyof RtkParticipantTileAttributes as `attr:${K}`]?: RtkParticipantTileAttributes[K] } & { [K in keyof RtkParticipantTile & keyof RtkParticipantTileAttributes as `prop:${K}`]?: RtkParticipantTile[K] };
         "rtk-participants": Omit<RtkParticipants, keyof RtkParticipantsAttributes> & { [K in keyof RtkParticipants & keyof RtkParticipantsAttributes]?: RtkParticipants[K] } & { [K in keyof RtkParticipants & keyof RtkParticipantsAttributes as `attr:${K}`]?: RtkParticipantsAttributes[K] } & { [K in keyof RtkParticipants & keyof RtkParticipantsAttributes as `prop:${K}`]?: RtkParticipants[K] };
         "rtk-participants-audio": RtkParticipantsAudio;
+        "rtk-participants-preview": Omit<RtkParticipantsPreview, keyof RtkParticipantsPreviewAttributes> & { [K in keyof RtkParticipantsPreview & keyof RtkParticipantsPreviewAttributes]?: RtkParticipantsPreview[K] } & { [K in keyof RtkParticipantsPreview & keyof RtkParticipantsPreviewAttributes as `attr:${K}`]?: RtkParticipantsPreviewAttributes[K] } & { [K in keyof RtkParticipantsPreview & keyof RtkParticipantsPreviewAttributes as `prop:${K}`]?: RtkParticipantsPreview[K] };
         "rtk-participants-stage-list": Omit<RtkParticipantsStageList, keyof RtkParticipantsStageListAttributes> & { [K in keyof RtkParticipantsStageList & keyof RtkParticipantsStageListAttributes]?: RtkParticipantsStageList[K] } & { [K in keyof RtkParticipantsStageList & keyof RtkParticipantsStageListAttributes as `attr:${K}`]?: RtkParticipantsStageListAttributes[K] } & { [K in keyof RtkParticipantsStageList & keyof RtkParticipantsStageListAttributes as `prop:${K}`]?: RtkParticipantsStageList[K] };
         "rtk-participants-stage-queue": Omit<RtkParticipantsStageQueue, keyof RtkParticipantsStageQueueAttributes> & { [K in keyof RtkParticipantsStageQueue & keyof RtkParticipantsStageQueueAttributes]?: RtkParticipantsStageQueue[K] } & { [K in keyof RtkParticipantsStageQueue & keyof RtkParticipantsStageQueueAttributes as `attr:${K}`]?: RtkParticipantsStageQueueAttributes[K] } & { [K in keyof RtkParticipantsStageQueue & keyof RtkParticipantsStageQueueAttributes as `prop:${K}`]?: RtkParticipantsStageQueue[K] };
         "rtk-participants-toggle": Omit<RtkParticipantsToggle, keyof RtkParticipantsToggleAttributes> & { [K in keyof RtkParticipantsToggle & keyof RtkParticipantsToggleAttributes]?: RtkParticipantsToggle[K] } & { [K in keyof RtkParticipantsToggle & keyof RtkParticipantsToggleAttributes as `attr:${K}`]?: RtkParticipantsToggleAttributes[K] } & { [K in keyof RtkParticipantsToggle & keyof RtkParticipantsToggleAttributes as `prop:${K}`]?: RtkParticipantsToggle[K] };
@@ -12796,6 +12919,11 @@ declare module "@stencil/core" {
              * A component which plays all the audio from participants and screenshares.
              */
             "rtk-participants-audio": LocalJSX.IntrinsicElements["rtk-participants-audio"] & JSXBase.HTMLAttributes<HTMLRtkParticipantsAudioElement>;
+            /**
+             * A component which shows the participants already in the meeting, before you join it.
+             * Renders overlapping avatars with a caption like "John, Jane and 25 others in the meeting".
+             */
+            "rtk-participants-preview": LocalJSX.IntrinsicElements["rtk-participants-preview"] & JSXBase.HTMLAttributes<HTMLRtkParticipantsPreviewElement>;
             /**
              * A component which lists all participants, with ability to
              * run privileged actions on each participant according to your permissions.

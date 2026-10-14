@@ -1,0 +1,68 @@
+@import '../../styles/reset.css';
+
+:host {
+  @apply flex flex-col items-center justify-center gap-3 text-center;
+  @apply text-text-sm text-text-600;
+}
+
+@media (prefers-reduced-motion) {
+  /* No transitions when disabled */
+  :host {
+    --rtk-transition-property: none;
+  }
+}
+
+/* useful for removing from layouts that may have gap */
+:host([data-hidden]) {
+  display: none;
+}
+
+.stack {
+  @apply flex items-center;
+}
+
+/* rtk-tooltip is the flex item, so overlap + stacking live on it */
+.stack rtk-tooltip {
+  @apply relative inline-flex;
+}
+
+.stack rtk-tooltip + rtk-tooltip {
+  @apply -ml-3;
+}
+
+/* !important: overrides the inline z-index that stacks later avatars on top */
+.stack rtk-tooltip:hover {
+  z-index: 100 !important;
+}
+
+.caption {
+  @apply text-text-md text-text-900 m-0;
+}
+
+/* border-box on both so avatars and the "+N" tile are the exact same size incl. border */
+rtk-avatar {
+  @apply text-text-sm box-border h-10 w-10 cursor-default;
+  border: theme('borderWidth.md') solid theme('colors.background.1000');
+  transition-property: var(--rtk-transition-property, transform);
+  transition-duration: 150ms;
+  transition-timing-function: ease-out;
+}
+
+/* "+N" overflow tile: same footprint as an avatar */
+.more {
+  @apply text-text-sm bg-brand-500 text-text-on-brand-1000 box-border flex h-10 w-10 cursor-default select-none items-center justify-center rounded-full font-medium;
+  border: theme('borderWidth.md') solid theme('colors.background.1000');
+  transition-property: var(--rtk-transition-property, transform);
+  transition-duration: 150ms;
+  transition-timing-function: ease-out;
+}
+
+.stack rtk-tooltip:hover .more,
+.stack rtk-tooltip:hover rtk-avatar {
+  transform: scale(1.1);
+}
+
+:host([size='sm']) rtk-avatar,
+:host([size='sm']) .more {
+  @apply text-text-xs h-8 w-8;
+}

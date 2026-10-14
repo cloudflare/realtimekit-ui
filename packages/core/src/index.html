@@ -374,6 +374,7 @@
             },
             addEffectsAddon: false,
             disableEmojiPickerOverride: false,
+            disableParticipantsPreviewOverride: false,
           },
           async initialize() {
             const url = new URL(window.location.href);
@@ -465,8 +466,14 @@
 
             this.status = 'Getting meeting details...';
 
-            const { roomName, defaults, authToken, addEffectsAddon, disableEmojiPickerOverride } =
-              this.data;
+            const {
+              roomName,
+              defaults,
+              authToken,
+              addEffectsAddon,
+              disableEmojiPickerOverride,
+              disableParticipantsPreviewOverride,
+            } = this.data;
             const modules = {
               spotlight: true,
               devTools: {
@@ -515,6 +522,7 @@
               }
               this.overrides = {
                 disableEmojiPicker: disableEmojiPickerOverride,
+                disableParticipantsPreview: disableParticipantsPreviewOverride,
               };
               this.attachMeetingObject(meeting);
               this.$refs.meeting.overrides = this.overrides;
@@ -633,6 +641,15 @@
                     id="disableEmojiPickerOverride"
                     class="checkbox-styles"
                     x-model="data.disableEmojiPickerOverride"
+                  />
+                </label>
+                <label for="disableParticipantsPreviewOverride" class="checkbox-label">
+                  <span>Disable Participants Preview</span>
+                  <input
+                    type="checkbox"
+                    id="disableParticipantsPreviewOverride"
+                    class="checkbox-styles"
+                    x-model="data.disableParticipantsPreviewOverride"
                   />
                 </label>
               </div>

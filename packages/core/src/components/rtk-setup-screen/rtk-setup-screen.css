@@ -23,6 +23,7 @@
 
 .meeting-title {
   @apply text-heading-md mb-4 text-center font-medium;
+  @apply line-clamp-1 w-full break-words;
 }
 
 .join-as {
@@ -49,6 +50,10 @@ input {
   @apply text-text-lg placeholder:text-text-600 outline-none transition;
   border: theme('borderWidth.sm') solid theme('colors.background.600');
   @apply focus:border-brand-500;
+}
+
+rtk-participants-preview {
+  @apply mb-6 w-full;
 }
 
 rtk-spinner {
