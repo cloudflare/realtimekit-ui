@@ -170,6 +170,7 @@ export default class BreakoutRoomsManager {
    * update a meeting's title
    */
   public updateMeetingTitle(meetingId: string, newTitle: string) {
+    this.#hasLocalChanges = true;
     this.#allMeetingsMap.get(meetingId).title = newTitle;
     if (!isDraftRoom(meetingId)) {
       this.#meetingsToUpdate.add(meetingId);
