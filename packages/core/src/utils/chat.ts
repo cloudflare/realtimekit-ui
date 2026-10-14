@@ -215,8 +215,8 @@ export function parseRichText(text: string) {
 
   text = text
     .split(' ')
-    .map((word, idx) => {
-      if (word === '>' && (idx === 0 || word[idx - 1] === '>')) {
+    .map((word, idx, words) => {
+      if (word === '>' && words.slice(0, idx).every((w) => w === '>')) {
         return `<q></q>`;
       }
       return word;
