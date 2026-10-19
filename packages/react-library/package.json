@@ -27,7 +27,7 @@
   "scripts": {
     "build": "npm run clean && npm run compile",
     "clean": "rm -rf dist",
-    "compile": "npm run tsc && tsc -p tsconfig.es.json",
+    "compile": "npm run tsc && tsc -p tsconfig.es.json && node ../../scripts/fix-esm-imports.js dist/es",
     "tsc": "tsc -p tsconfig.json",
     "rollup": "rollup -c",
     "lint": "echo \"No lint script\"",
