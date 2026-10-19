@@ -14,6 +14,7 @@ function resolveSpecifier(file, specifier) {
   const target = path.resolve(path.dirname(file), specifier);
   if (fs.existsSync(`${target}.js`)) return `${specifier}.js`;
   if (fs.existsSync(path.join(target, 'index.js'))) return `${specifier}/index.js`;
+  console.warn(`fix-esm-imports: can't resolve '${specifier}' in ${file}, left unchanged`);
   return specifier;
 }
 

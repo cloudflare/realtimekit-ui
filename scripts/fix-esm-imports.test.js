@@ -3,7 +3,7 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');
-const { beforeEach, test } = require('node:test');
+const { afterEach, beforeEach, test } = require('node:test');
 const { fixEsmImports } = require('./fix-esm-imports');
 
 let dir;
@@ -37,6 +37,10 @@ beforeEach(() => {
     'components/stencil-generated/react-component-lib/createComponent.js',
     'export const createComponent = (tagName) => tagName;\n'
   );
+});
+
+afterEach(() => {
+  fs.rmSync(dir, { recursive: true, force: true });
 });
 
 test('points relative specifiers at a file or a directory index', () => {
@@ -80,6 +84,18 @@ test('leaves package and already complete specifiers alone', () => {
   fixEsmImports(dir);
 
   assert.equal(read('extra.js'), source);
+});
+
+test('warns about relative specifiers it cannot resolve', (t) => {
+  const warn = t.mock.method(console, 'warn', () => {});
+  const source = "export * from './missing';\n";
+  write('broken.js', source);
+
+  fixEsmImports(dir);
+
+  assert.equal(read('broken.js'), source);
+  assert.equal(warn.mock.callCount(), 1);
+  assert.match(warn.mock.calls[0].arguments[0], /'\.\/missing'/);
 });
 
 test('the output loads with the Node ESM loader once fixed', async () => {
