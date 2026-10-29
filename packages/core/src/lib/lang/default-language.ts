@@ -219,6 +219,7 @@ export const defaultLanguage = {
   'breakout_rooms.close_breakout': 'Close Breakout',
   'breakout_rooms.update_breakout': 'Update Breakout',
   'breakout_rooms.discard_changes': 'Discard Changes',
+  'breakout_rooms.error.apply_changes': 'Some changes could not be saved. Please try again.',
   'breakout_rooms.room': 'Room',
   'breakout_rooms.rooms': 'Rooms',
   'breakout_rooms.room_name': 'Room Name',

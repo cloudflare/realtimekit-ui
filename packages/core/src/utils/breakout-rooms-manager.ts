@@ -170,6 +170,7 @@ export default class BreakoutRoomsManager {
    * update a meeting's title
    */
   public updateMeetingTitle(meetingId: string, newTitle: string) {
+    this.#hasLocalChanges = true;
     this.#allMeetingsMap.get(meetingId).title = newTitle;
     if (!isDraftRoom(meetingId)) {
       this.#meetingsToUpdate.add(meetingId);
@@ -307,22 +308,17 @@ export default class BreakoutRoomsManager {
   }
 
   async applyChanges(meeting: Meeting) {
-    // create new rooms
-    const createMeetingsPromise =
-      this.meetingsToCreate.length !== 0
-        ? meeting.connectedMeetings.createMeetings(this.meetingsToCreate)
-        : Promise.resolve([]);
+    // Save renames first so retrying a failed rename cannot create duplicate rooms.
+    const meetingsToUpdate = this.meetingsToUpdate;
+    if (meetingsToUpdate.length !== 0) {
+      await meeting.connectedMeetings.updateMeetings(meetingsToUpdate);
+    }
 
-    // update old rooms titles
-    const updateMeetingsPromise =
-      this.meetingsToUpdate.length !== 0
-        ? meeting.connectedMeetings.updateMeetings(this.meetingsToUpdate)
-        : Promise.resolve();
-
-    const [createMeetingsResponse] = await Promise.all([
-      createMeetingsPromise,
-      updateMeetingsPromise,
-    ]);
+    const meetingsToCreate = this.meetingsToCreate;
+    const createMeetingsResponse =
+      meetingsToCreate.length !== 0
+        ? await meeting.connectedMeetings.createMeetings(meetingsToCreate)
+        : [];
 
     // replace temporary ids
     if (createMeetingsResponse) {
@@ -335,22 +331,28 @@ export default class BreakoutRoomsManager {
       });
     }
 
-    // move participants (no async)
-    if (this.participantsToMove.length !== 0) {
-      this.participantsToMove.forEach(
-        ({ sourceMeetingId, destinationMeetingId, participantIds }) => {
-          meeting.connectedMeetings.moveParticipants(
-            sourceMeetingId,
-            destinationMeetingId,
-            participantIds
-          );
-        }
+    const moves = this.participantsToMove;
+    for (const { sourceMeetingId, destinationMeetingId, participantIds } of moves) {
+      const result = await meeting.connectedMeetings.moveParticipants(
+        sourceMeetingId,
+        destinationMeetingId,
+        participantIds
       );
+      if (result?.success === false) {
+        throw new Error('Could not move participants between breakout rooms');
+      }
+
+      const movedParticipantIds = new Set(participantIds);
+      this.#allParticipantsMap.forEach((participant, identifier) => {
+        if (movedParticipantIds.has(participant.id)) {
+          this.#participantsOldMeetingMap.set(identifier, destinationMeetingId);
+        }
+      });
     }
 
     // delete rooms
     if (this.meetingsToDelete.length !== 0) {
-      meeting.connectedMeetings.deleteMeetings(this.meetingsToDelete);
+      await meeting.connectedMeetings.deleteMeetings(this.meetingsToDelete);
     }
   }
 

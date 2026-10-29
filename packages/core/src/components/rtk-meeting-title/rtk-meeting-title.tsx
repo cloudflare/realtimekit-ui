@@ -1,5 +1,5 @@
 import { Meeting } from '../../types/rtk-client';
-import { Component, Host, h, Prop } from '@stencil/core';
+import { Component, Host, h, Prop, State, Watch } from '@stencil/core';
 import { IconPack, defaultIconPack } from '../../lib/icons';
 import { SyncWithStore } from '../../utils/sync-with-store';
 import { useLanguage, RtkI18n } from '../../lib/lang';
@@ -28,8 +28,29 @@ export class RtkMeetingTitle {
   @Prop()
   t: RtkI18n = useLanguage();
 
+  @State() meetingTitle: string;
+
+  connectedCallback() {
+    this.meetingChanged(this.meeting);
+  }
+
+  disconnectedCallback() {
+    this.meeting?.meta?.removeListener('meetingTitleUpdate', this.titleUpdateListener);
+  }
+
+  private titleUpdateListener = ({ meetingTitle }: { meetingTitle: string }) => {
+    this.meetingTitle = meetingTitle;
+  };
+
+  @Watch('meeting')
+  meetingChanged(meeting: Meeting, oldMeeting?: Meeting) {
+    oldMeeting?.meta?.removeListener('meetingTitleUpdate', this.titleUpdateListener);
+    this.meetingTitle = meeting?.meta?.meetingTitle;
+    meeting?.meta?.addListener('meetingTitleUpdate', this.titleUpdateListener);
+  }
+
   render() {
-    const title = this.meeting?.meta.meetingTitle;
+    const title = this.meetingTitle;
 
     if (title == null) return <Host data-hidden />;
 
