@@ -7,6 +7,7 @@ import { participantIdentifier, resetRoomCount } from '../../utils/breakout-room
 import { RTKPermissionsPreset } from '@cloudflare/realtimekit';
 import { SyncWithStore } from '../../utils/sync-with-store';
 import BreakoutRoomsManager, { DraftMeeting } from '../../utils/breakout-rooms-manager';
+import { sendNotification } from '../../utils/notification';
 
 export type BreakoutManagerState = 'room-config' | 'participants-config';
 export type BreakoutRoomConfig = {
@@ -58,6 +59,8 @@ export class RtkBreakoutRoomsManager {
 
   /** update about room changes */
   @State() ephemeralStatusText: string = '';
+
+  @State() applyChangesError: boolean = false;
 
   /** Flag that tells if participants are being dragged */
   @State() isDragMode: boolean = false;
@@ -140,6 +143,7 @@ export class RtkBreakoutRoomsManager {
   };
 
   private setEphemeralStatus(text: string) {
+    this.applyChangesError = false;
     this.ephemeralStatusText = text;
     setTimeout(() => {
       this.ephemeralStatusText = '';
@@ -286,10 +290,25 @@ export class RtkBreakoutRoomsManager {
   };
 
   private applyChanges = async () => {
+    if (this.roomConfig.applyingChanges) return;
+
+    this.applyChangesError = false;
     this.roomConfig = { ...this.roomConfig, applyingChanges: true };
-    await this.stateManager.applyChanges(this.meeting);
-    this.close();
-    this.roomConfig = { ...this.roomConfig, applyingChanges: false };
+    try {
+      await this.stateManager.applyChanges(this.meeting);
+      this.close();
+    } catch {
+      this.ephemeralStatusText = '';
+      this.applyChangesError = true;
+      sendNotification({
+        id: 'breakout-rooms-save-failed',
+        message: this.t('breakout_rooms.error.apply_changes'),
+        icon: this.iconPack.warning,
+        duration: 5000,
+      });
+    } finally {
+      this.roomConfig = { ...this.roomConfig, applyingChanges: false };
+    }
   };
 
   @Listen('selectedParticipantsUpdate')
@@ -303,6 +322,7 @@ export class RtkBreakoutRoomsManager {
   }
 
   private getStatusText() {
+    if (this.applyChangesError) return this.t('breakout_rooms.error.apply_changes');
     if (this.ephemeralStatusText !== '') return this.ephemeralStatusText;
     let statusText = '';
 
@@ -590,7 +610,12 @@ export class RtkBreakoutRoomsManager {
           </div>
           <div class="participant-config-actions">
             <div
-              class={{ 'status-bar': true, 'ephemeral-status': this.ephemeralStatusText !== '' }}
+              role={this.applyChangesError ? 'alert' : undefined}
+              class={{
+                'status-bar': true,
+                'error-status': this.applyChangesError,
+                'ephemeral-status': this.ephemeralStatusText !== '',
+              }}
             >
               {this.ephemeralStatusText !== '' && <rtk-icon icon={this.iconPack.checkmark} />}
               {this.getStatusText()}
@@ -612,6 +637,7 @@ export class RtkBreakoutRoomsManager {
                     size="md"
                     class="color-danger"
                     variant="ghost"
+                    disabled={this.roomConfig.applyingChanges}
                     onClick={() => this.discardChanges()}
                   >
                     {this.t('breakout_rooms.discard_changes')}
@@ -620,7 +646,13 @@ export class RtkBreakoutRoomsManager {
               {this.roomConfig.mode === 'edit' &&
                 this.stateManager.hasLocalChanges &&
                 this.permissions.canAlterConnectedMeetings && (
-                  <rtk-button size="md" class="update-breakout-button" onClick={this.applyChanges}>
+                  <rtk-button
+                    size="md"
+                    class="update-breakout-button"
+                    disabled={this.roomConfig.applyingChanges}
+                    onClick={this.applyChanges}
+                  >
+                    {this.roomConfig.applyingChanges && <rtk-spinner size="sm" />}
                     {this.t('breakout_rooms.update_breakout')}
                   </rtk-button>
                 )}

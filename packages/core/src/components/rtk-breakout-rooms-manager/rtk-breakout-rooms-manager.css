@@ -197,6 +197,10 @@ aside {
   @apply w-80;
 }
 
+.status-bar.error-status {
+  @apply text-danger;
+}
+
 .ephemeral-status {
   @apply text-success;
   rtk-icon {

@@ -1,4 +1,14 @@
-import { Component, h, Host, Prop, Event, EventEmitter, State, writeTask } from '@stencil/core';
+import {
+  Component,
+  h,
+  Host,
+  Prop,
+  Event,
+  EventEmitter,
+  State,
+  Watch,
+  writeTask,
+} from '@stencil/core';
 import { RtkI18n, useLanguage } from '../../lib/lang';
 import { defaultIconPack, IconPack } from '../../lib/icons';
 import { ConnectedMeetingParticipant, States } from '../../types/props';
@@ -85,11 +95,9 @@ export class RtkBreakoutRoomManager {
 
   private allParticipants: RTKConnectedMeetings['parentMeeting']['participants'];
 
-  private permissions: RTKPermissionsPreset['connectedMeetings'];
+  @State() private permissions: RTKPermissionsPreset['connectedMeetings'];
 
   private roomTitle: string;
-
-  private canEditMeetingTitle: boolean;
 
   private inputTextEl: HTMLInputElement;
 
@@ -97,13 +105,15 @@ export class RtkBreakoutRoomManager {
     this.allParticipants = getAllConnectedParticipants(this.meeting);
     this.permissionsUpdateListener();
     this.showExpandedCard = this.defaultExpanded;
-    this.roomTitle = this.room.isParent ? this.t('breakout_rooms.main_room') : this.room?.title;
-    this.canEditMeetingTitle =
-      this.permissions.canAlterConnectedMeetings &&
-      !this.room.isParent &&
-      !this.meeting.connectedMeetings.isActive; // TODO: remove this once socket supports update meetings
+    this.syncRoomTitle();
 
     this.meeting.self.permissions.on('permissionsUpdate', this.permissionsUpdateListener);
+  }
+
+  @Watch('room')
+  syncRoomTitle() {
+    if (this.editingTitleRoomId === this.room?.id) return;
+    this.roomTitle = this.room?.isParent ? this.t('breakout_rooms.main_room') : this.room?.title;
   }
 
   disconnectedCallback() {
@@ -111,7 +121,7 @@ export class RtkBreakoutRoomManager {
   }
 
   private permissionsUpdateListener = () => {
-    this.permissions = this.meeting.self.permissions.connectedMeetings;
+    this.permissions = { ...this.meeting.self.permissions.connectedMeetings };
   };
 
   private reset = () => {
@@ -306,7 +316,7 @@ export class RtkBreakoutRoomManager {
                 {this.room?.participants?.length ?? '0'})
               </span>
             )}
-            {this.canEditMeetingTitle && (
+            {this.permissions.canAlterConnectedMeetings && !this.room.isParent && (
               <rtk-tooltip
                 label={
                   this.editingTitleRoomId === this.room.id
