@@ -125,7 +125,6 @@ Smart container components (`rtk-meeting`, `rtk-header`, etc.) delegate layout t
 | Component                        | Issue                                                                     |
 | -------------------------------- | ------------------------------------------------------------------------- |
 | `rtk-broadcast-message-modal`    | `sendMessage()` is a stub — no real API call, just 2s fake success        |
-| `rtk-breakout-room-manager`      | Active state is a workaround pending socket support                       |
 | `rtk-chat-messages-ui-paginated` | Private message filtering is a client-side hack (backend bug)             |
 | `rtk-chat-selector`              | Initial load de-duplication is a temp hack (needs pagination API)         |
 | `rtk-pinned-message-selector`    | `reset()` called as hack because socket doesn't update `updatedAt` on pin |

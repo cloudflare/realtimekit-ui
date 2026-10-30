@@ -235,6 +235,20 @@ describe('Breakout rooms manager', () => {
     expect(manager.hasLocalChanges).toEqual(false);
   });
 
+  it('should flag a rename of an existing room as a local change', () => {
+    const manager = new BreakoutRoomsManager();
+    manager.updateCurrentState(MOCK_STATE_LIVE);
+    const [connectedMeeting] = manager.allConnectedMeetings;
+
+    manager.updateMeetingTitle(connectedMeeting.id, 'Renamed room');
+
+    expect(manager.hasLocalChanges).toEqual(true);
+    expect(manager.meetingsToUpdate).toEqual([{ id: connectedMeeting.id, title: 'Renamed room' }]);
+
+    manager.updateCurrentState(MOCK_STATE_LIVE);
+    expect(manager.meetingsToUpdate).toEqual([{ id: connectedMeeting.id, title: 'Renamed room' }]);
+  });
+
   it('should delete draft meeting', () => {
     const manager = new BreakoutRoomsManager();
     manager.updateCurrentState(MOCK_STATE);
@@ -300,6 +314,41 @@ describe('Breakout rooms manager', () => {
         sourceMeetingId: connectedMeeting2.id,
       },
     ]);
+  });
+
+  it('keeps edits for retry and does not create rooms when a rename fails', async () => {
+    const manager = new BreakoutRoomsManager();
+    manager.updateCurrentState(MOCK_STATE_LIVE);
+    manager.updateMeetingTitle(MOCK_ROOM_1.id, 'Renamed room');
+    const draftRoom = manager.addNewMeeting();
+    manager.assignParticipantsToMeeting([MOCK_PARTICIPANT_1.customParticipantId], draftRoom.id);
+    manager.deleteMeeting(MOCK_ROOM_3.id);
+
+    const client: RealtimeKitClient = new RealtimeKitClientMock();
+    const updateMeetings = client.connectedMeetings.updateMeetings as jest.Mock;
+    updateMeetings.mockRejectedValueOnce(
+      new Error('Could not update connected meetings: room_id_1')
+    );
+
+    await expect(manager.applyChanges(client)).rejects.toThrow(
+      'Could not update connected meetings'
+    );
+
+    expect(manager.hasLocalChanges).toBe(true);
+    expect(manager.meetingsToUpdate).toEqual([{ id: MOCK_ROOM_1.id, title: 'Renamed room' }]);
+    expect(manager.meetingsToCreate).toEqual([{ id: draftRoom.id, title: draftRoom.title }]);
+    expect(client.connectedMeetings.createMeetings).not.toHaveBeenCalled();
+    expect(client.connectedMeetings.moveParticipants).not.toHaveBeenCalled();
+    expect(client.connectedMeetings.deleteMeetings).not.toHaveBeenCalled();
+
+    updateMeetings.mockResolvedValueOnce(undefined);
+    await manager.applyChanges(client);
+
+    expect(updateMeetings).toHaveBeenCalledTimes(2);
+    expect(client.connectedMeetings.createMeetings).toHaveBeenCalledTimes(1);
+    expect(client.connectedMeetings.moveParticipants).toHaveBeenCalled();
+    expect(client.connectedMeetings.deleteMeetings).toHaveBeenCalledWith([MOCK_ROOM_3.id]);
+    expect(manager.meetingsToCreate).toHaveLength(0);
   });
 
   it('should apply changes', async () => {
