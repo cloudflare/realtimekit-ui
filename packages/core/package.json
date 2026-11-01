@@ -63,7 +63,7 @@
     "resize-observer-polyfill": "^1.5.1"
   },
   "devDependencies": {
-    "@cloudflare/realtimekit": "^2.0.2-staging.6",
+    "@cloudflare/realtimekit": "^2.0.5-staging.2",
     "@rollup/plugin-commonjs": "^28.0.2",
     "@rollup/plugin-node-resolve": "^16.0.0",
     "@rollup/plugin-terser": "^0.4.4",
