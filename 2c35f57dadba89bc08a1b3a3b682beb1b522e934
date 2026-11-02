@@ -1,0 +1,19 @@
+packages/core/src/index.html
+  s_7404a85a6175cb::t_2d83a166f4845e 377,469-476,525,646-654
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "2c35f57dadba89bc08a1b3a3b682beb1b522e934",
+  "prompts": {},
+  "sessions": {
+    "s_7404a85a6175cb": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_ef49a24e1ffehunINA9DN34dEN",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Aman Kumar <amankumar@cloudflare.com>"
+    }
+  }
+}

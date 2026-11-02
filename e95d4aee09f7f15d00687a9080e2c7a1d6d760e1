@@ -1,0 +1,21 @@
+packages/core/src/components/rtk-participants-preview/rtk-participants-preview.css
+  s_7404a85a6175cb::t_45ec97a4ad83c6 34,44,53,61
+packages/core/src/components/rtk-participants-preview/rtk-participants-preview.tsx
+  s_7404a85a6175cb::t_5614bd56bb2e4c 20,99-104,180-183,195-199,267,273,283
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "e95d4aee09f7f15d00687a9080e2c7a1d6d760e1",
+  "prompts": {},
+  "sessions": {
+    "s_7404a85a6175cb": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_ef49a24e1ffehunINA9DN34dEN",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Aman Kumar <amankumar@cloudflare.com>"
+    }
+  }
+}

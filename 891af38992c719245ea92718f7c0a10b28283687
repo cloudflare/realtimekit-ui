@@ -1,0 +1,30 @@
+scripts/generate-stencil-docs.test.js
+  s_332516f56795aa::t_80678d0cb57956 99
+  s_b95a7beae61eb0::t_959e08d4043839 109
+scripts/generate-stencil-docs.js
+  s_b95a7beae61eb0::t_cc6db4d1de7427 726,728,730,732,734,736,738,740,742
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "891af38992c719245ea92718f7c0a10b28283687",
+  "prompts": {},
+  "sessions": {
+    "s_332516f56795aa": {
+      "agent_id": {
+        "tool": "windsurf",
+        "id": "fixed-supernova",
+        "model": "unknown"
+      },
+      "human_author": "Ravindra Singh Rathor <rsrathor@cloudflare.com>"
+    },
+    "s_b95a7beae61eb0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "75beddce-327d-4fda-8f18-2da84ae28aa9",
+        "model": "unknown"
+      },
+      "human_author": "Aman Kumar <amankumar@cloudflare.com>"
+    }
+  }
+}

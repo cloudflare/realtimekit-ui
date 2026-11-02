@@ -1,0 +1,19 @@
+scripts/generate-stencil-docs.js
+  s_b95a7beae61eb0::t_06e182ba688b05 6-14,16,18-24,123-133,191,410,416-423,433,829
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "171b8383c4ce7c55b0b6d3572ca1acbdf683d0b7",
+  "prompts": {},
+  "sessions": {
+    "s_b95a7beae61eb0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "75beddce-327d-4fda-8f18-2da84ae28aa9",
+        "model": "unknown"
+      },
+      "human_author": "Aman Kumar <amankumar@cloudflare.com>"
+    }
+  }
+}

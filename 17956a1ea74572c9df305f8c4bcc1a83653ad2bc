@@ -1,0 +1,21 @@
+packages/core/src/lib/lang/default-language.ts
+  s_7404a85a6175cb::t_6f4c49575fe205 181,183-191
+packages/core/src/lib/overrides.ts
+  s_7404a85a6175cb::t_49d9f595dc959d 17-21,30
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "17956a1ea74572c9df305f8c4bcc1a83653ad2bc",
+  "prompts": {},
+  "sessions": {
+    "s_7404a85a6175cb": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_ef49a24e1ffehunINA9DN34dEN",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Aman Kumar <amankumar@cloudflare.com>"
+    }
+  }
+}

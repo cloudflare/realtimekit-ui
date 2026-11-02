@@ -1,0 +1,19 @@
+.github/workflows/ai-pr-review.yml
+  s_1b1912ef30d34b::t_b4e783304859e9 33
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "6d4f0d861b76731cf19f9a8923e9d865c54f57e5",
+  "prompts": {},
+  "sessions": {
+    "s_1b1912ef30d34b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "s_1b1912ef30d34b",
+        "model": "unknown"
+      },
+      "human_author": "Dan Lapid <dlapid@cloudflare.com>"
+    }
+  }
+}
