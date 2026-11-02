@@ -1,3 +1,10 @@
+## [2.0.4-staging.4](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.0.4-staging.3...@cloudflare/realtimekit-ui-v2.0.4-staging.4) (2026-11-02)
+
+
+### Bug Fixes
+
+* treat a breakout room rename as a local change ([2a3ccd5](https://github.com/cloudflare/realtimekit-ui/commit/2a3ccd5ad3e5227426f5380a7884e4cf4a3575fb))
+
 ## [2.0.4-staging.3](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.0.4-staging.2...@cloudflare/realtimekit-ui-v2.0.4-staging.3) (2026-11-02)
 
 
