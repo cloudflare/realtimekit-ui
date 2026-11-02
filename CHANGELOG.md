@@ -1,3 +1,10 @@
+## [2.0.4-staging.3](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.0.4-staging.2...@cloudflare/realtimekit-ui-v2.0.4-staging.3) (2026-11-02)
+
+
+### Bug Fixes
+
+* update meeting title component on `meetingTitleUpdate` ([bc4e334](https://github.com/cloudflare/realtimekit-ui/commit/bc4e334113fb49ebc4bcc2d1f68855e0277fbf78))
+
 ## [2.0.4-staging.2](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.0.4-staging.1...@cloudflare/realtimekit-ui-v2.0.4-staging.2) (2026-10-14)
 
 
