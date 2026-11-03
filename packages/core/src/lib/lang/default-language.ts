@@ -299,6 +299,15 @@ export const defaultLanguage = {
 
   'init.auth_error':
     "We couldn't verify your access to this meeting. The meeting may have ended, or you may not have permission to join.",
+  'init.token_not_yet_valid':
+    "Your access to this meeting isn't active yet. Please try again at the meeting time.",
+  'init.token_expired':
+    'Your access to this meeting has expired. Please ask the meeting organizer for a new invite.',
+  'init.token_revoked':
+    'Your access to this meeting has been revoked. Please contact the meeting organizer.',
+  'init.token_invalid':
+    "We couldn't verify your access to this meeting. Please ask the meeting organizer for a new invite.",
+  'init.meeting_inactive': 'This meeting is inactive and is not accepting participants.',
   'init.network_error':
     "We couldn't connect to the meeting. Please try again, and if the problem continues, check your internet connection.",
   'init.browser_error': 'Your browser is not supported. Please try a different or updated browser.',
