@@ -1,3 +1,15 @@
+# [2.1.0-staging.1](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.0.4-staging.4...@cloudflare/realtimekit-ui-v2.1.0-staging.1) (2026-11-05)
+
+
+### Bug Fixes
+
+* bump realtimekit version and add fallback error message ([cd81a4a](https://github.com/cloudflare/realtimekit-ui/commit/cd81a4a6f135367149609642a962a85d0bc5551d))
+
+
+### Features
+
+* add error reason for auth token ([fa803d9](https://github.com/cloudflare/realtimekit-ui/commit/fa803d9bae8c072b87d5adf77b7f1276367bc4b1))
+
 ## [2.0.4-staging.4](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.0.4-staging.3...@cloudflare/realtimekit-ui-v2.0.4-staging.4) (2026-11-02)
 
 
