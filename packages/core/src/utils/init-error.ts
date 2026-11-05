@@ -23,15 +23,15 @@ export function getInitErrorInfo(t: RtkI18n, err: unknown): PreJoinError | null 
     case '0004':
       switch ((err as any)?.reason) {
         case 'participant_token_not_yet_valid':
-          return { message: t('init.token_not_yet_valid'), code };
+          return { message: t('init.token_not_yet_valid') || t('init.auth_error'), code };
         case 'participant_token_expired':
-          return { message: t('init.token_expired'), code };
+          return { message: t('init.token_expired') || t('init.auth_error'), code };
         case 'participant_token_revoked':
-          return { message: t('init.token_revoked'), code };
+          return { message: t('init.token_revoked') || t('init.auth_error'), code };
         case 'participant_token_invalid':
-          return { message: t('init.token_invalid'), code };
+          return { message: t('init.token_invalid') || t('init.auth_error'), code };
         case 'meeting_inactive':
-          return { message: t('init.meeting_inactive'), code };
+          return { message: t('init.meeting_inactive') || t('init.auth_error'), code };
         default:
           return { message: t('init.auth_error'), code };
       }
