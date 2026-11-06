@@ -93,6 +93,7 @@ export const DIRECTIVES = [
   d.RtkParticipantTile,
   d.RtkParticipants,
   d.RtkParticipantsAudio,
+  d.RtkParticipantsPreview,
   d.RtkParticipantsStageList,
   d.RtkParticipantsStageQueue,
   d.RtkParticipantsToggle,

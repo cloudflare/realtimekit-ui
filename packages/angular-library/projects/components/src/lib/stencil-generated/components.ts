@@ -2473,6 +2473,28 @@ export declare interface RtkParticipantsAudio extends Components.RtkParticipants
 
 
 @ProxyCmp({
+  inputs: ['config', 'iconPack', 'maxAvatars', 'meeting', 'overrides', 'pollInterval', 'size', 'states', 't']
+})
+@Component({
+  selector: 'rtk-participants-preview',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: '<ng-content></ng-content>',
+  // eslint-disable-next-line @angular-eslint/no-inputs-metadata-property
+  inputs: ['config', 'iconPack', 'maxAvatars', 'meeting', 'overrides', 'pollInterval', 'size', 'states', 't'],
+})
+export class RtkParticipantsPreview {
+  protected el: HTMLRtkParticipantsPreviewElement;
+  constructor(c: ChangeDetectorRef, r: ElementRef, protected z: NgZone) {
+    c.detach();
+    this.el = r.nativeElement;
+  }
+}
+
+
+export declare interface RtkParticipantsPreview extends Components.RtkParticipantsPreview {}
+
+
+@ProxyCmp({
   inputs: ['config', 'hideHeader', 'iconPack', 'meeting', 'search', 'size', 'states', 't', 'view']
 })
 @Component({
@@ -3115,14 +3137,14 @@ export declare interface RtkSettingsVideo extends Components.RtkSettingsVideo {
 
 
 @ProxyCmp({
-  inputs: ['config', 'iconPack', 'meeting', 'size', 'states', 't']
+  inputs: ['config', 'iconPack', 'meeting', 'overrides', 'size', 'states', 't']
 })
 @Component({
   selector: 'rtk-setup-screen',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: '<ng-content></ng-content>',
   // eslint-disable-next-line @angular-eslint/no-inputs-metadata-property
-  inputs: ['config', 'iconPack', 'meeting', 'size', 'states', 't'],
+  inputs: ['config', 'iconPack', 'meeting', 'overrides', 'size', 'states', 't'],
 })
 export class RtkSetupScreen {
   protected el: HTMLRtkSetupScreenElement;

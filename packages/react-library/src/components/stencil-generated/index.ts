@@ -99,6 +99,7 @@ export const RtkParticipantSetup = /*@__PURE__*/createReactComponent<JSX.RtkPart
 export const RtkParticipantTile = /*@__PURE__*/createReactComponent<JSX.RtkParticipantTile, HTMLRtkParticipantTileElement>('rtk-participant-tile');
 export const RtkParticipants = /*@__PURE__*/createReactComponent<JSX.RtkParticipants, HTMLRtkParticipantsElement>('rtk-participants');
 export const RtkParticipantsAudio = /*@__PURE__*/createReactComponent<JSX.RtkParticipantsAudio, HTMLRtkParticipantsAudioElement>('rtk-participants-audio');
+export const RtkParticipantsPreview = /*@__PURE__*/createReactComponent<JSX.RtkParticipantsPreview, HTMLRtkParticipantsPreviewElement>('rtk-participants-preview');
 export const RtkParticipantsStageList = /*@__PURE__*/createReactComponent<JSX.RtkParticipantsStageList, HTMLRtkParticipantsStageListElement>('rtk-participants-stage-list');
 export const RtkParticipantsStageQueue = /*@__PURE__*/createReactComponent<JSX.RtkParticipantsStageQueue, HTMLRtkParticipantsStageQueueElement>('rtk-participants-stage-queue');
 export const RtkParticipantsToggle = /*@__PURE__*/createReactComponent<JSX.RtkParticipantsToggle, HTMLRtkParticipantsToggleElement>('rtk-participants-toggle');
