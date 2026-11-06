@@ -91,6 +91,7 @@ realtimekit-ui/
 - **Never** target `main` in PRs — always `staging` first.
 - **Never** call `UIElemEditor.style`, `.setChildrenProps()`, `.getChildrenProps()`, `.replace()` — unimplemented stubs.
 - **Never** edit files in `packages/*/src/*/stencil-generated/` by hand — auto-overwritten on build.
+- **Never** make a structural change — files, patterns, conventions, anti-patterns, architecture, types, or known issues — without checking whether the relevant `AGENTS.md` (see KNOWLEDGE BASE MAINTENANCE) needs updating in the same commit.
 
 ## KNOWN INCOMPLETE / WORKAROUNDS
 
@@ -99,6 +100,41 @@ realtimekit-ui/
 - `rtk-grid.tsx` `filterParticipants()` uses `overrides.videoUnsubscribed` as a temp hack.
 - Vue library is deprecated and unsupported — do not add new components to `packages/vue-library/lib/components.ts`.
 - `peerDepdendencies` (misspelled) in `packages/core/package.json:55` is silently ignored by npm.
+
+## KNOWLEDGE BASE MAINTENANCE
+
+The `AGENTS.md` files ARE the knowledge base for AI coding agents. Any structural
+change to the codebase MUST be reflected in the relevant `AGENTS.md` in the SAME
+commit — stale knowledge is worse than none.
+
+### Which file to update (registry)
+
+| Knowledge-base file        | Scope                                                                                |
+| --------------------------- | ------------------------------------------------------------------------------------- |
+| Root `AGENTS.md`            | Project structure, cross-cutting conventions, anti-patterns, code map, known issues  |
+| `packages/core/AGENTS.md`   | Stencil package: output targets, Tailwind/theme setup, build scripts, commands       |
+| `components/AGENTS.md`      | Component categories, standard anatomy, UIConfig rendering, incomplete components    |
+| `lib/AGENTS.md`              | Shared library modules, their key APIs, render-engine internals                      |
+| `utils/AGENTS.md`            | Utility files table, store system, key patterns                                      |
+
+A single change may touch more than one file — update every file whose scope it affects.
+
+### What to update, by knowledge type (each covers add / change / remove)
+
+- **Files & directories** — when you add, rename, move, or delete a file/dir, update the
+  matching STRUCTURE tree and any file/module/component table that lists it.
+- **Patterns & conventions** — when you introduce, alter, or retire a naming rule, prop
+  block, event convention, or code-style rule, update CONVENTIONS.
+- **Anti-patterns** — when a new footgun appears, or an existing prohibition no longer
+  applies, add, revise, or remove the ANTI-PATTERNS entry.
+- **Architecture & APIs** — when a symbol, store shape, output target, or public export
+  changes signature, role, or existence, update CODE MAP / the relevant API table.
+- **Types** — when a shared type in `src/types/` is added, reshaped, or removed, update
+  every reference describing it.
+- **Known issues / gotchas / stubs** — when you introduce a workaround, or FIX one that
+  was documented, add it to — or remove it from — KNOWN INCOMPLETE / WORKAROUNDS.
+- **Commands & scripts** — when an npm script is added, renamed, or removed, update the
+  COMMANDS section(s).
 
 ## COMMANDS
 
