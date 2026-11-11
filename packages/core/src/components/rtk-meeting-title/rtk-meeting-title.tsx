@@ -1,5 +1,5 @@
 import { Meeting } from '../../types/rtk-client';
-import { Component, Host, h, Prop, State, Watch } from '@stencil/core';
+import { Component, Host, h, Prop, State, Watch, writeTask } from '@stencil/core';
 import { IconPack, defaultIconPack } from '../../lib/icons';
 import { SyncWithStore } from '../../utils/sync-with-store';
 import { useLanguage, RtkI18n } from '../../lib/lang';
@@ -13,6 +13,9 @@ import { useLanguage, RtkI18n } from '../../lib/lang';
   shadow: true,
 })
 export class RtkMeetingTitle {
+  private inputEl: HTMLInputElement;
+  private editButtonEl: HTMLRtkButtonElement;
+
   /** Meeting object */
   @SyncWithStore()
   @Prop()
@@ -30,30 +33,121 @@ export class RtkMeetingTitle {
 
   @State() meetingTitle: string;
 
+  @State() canEdit = false;
+
+  @State() isEditing = false;
+
   connectedCallback() {
     this.meetingChanged(this.meeting);
   }
 
   disconnectedCallback() {
-    this.meeting?.meta?.removeListener('meetingTitleUpdate', this.titleUpdateListener);
+    this.removeListeners(this.meeting);
   }
 
   private titleUpdateListener = ({ meetingTitle }: { meetingTitle: string }) => {
     this.meetingTitle = meetingTitle;
   };
 
+  private updateCanEdit = () => {
+    const permissions = this.meeting?.self?.permissions;
+    this.canEdit = this.meeting?.connectedMeetings?.parentMeeting?.id
+      ? !!permissions?.connectedMeetings?.canAlterConnectedMeetings
+      : !!permissions?.canEditMeetingTitle;
+  };
+
+  private removeListeners(meeting?: Meeting) {
+    meeting?.meta?.removeListener('meetingTitleUpdate', this.titleUpdateListener);
+    meeting?.self?.permissions?.removeListener('permissionsUpdate', this.updateCanEdit);
+    meeting?.connectedMeetings?.removeListener('stateUpdate', this.updateCanEdit);
+  }
+
   @Watch('meeting')
   meetingChanged(meeting: Meeting, oldMeeting?: Meeting) {
-    oldMeeting?.meta?.removeListener('meetingTitleUpdate', this.titleUpdateListener);
+    this.removeListeners(oldMeeting);
+    this.removeListeners(meeting);
     this.meetingTitle = meeting?.meta?.meetingTitle;
-    meeting?.meta?.removeListener('meetingTitleUpdate', this.titleUpdateListener);
+    this.updateCanEdit();
     meeting?.meta?.addListener('meetingTitleUpdate', this.titleUpdateListener);
+    meeting?.self?.permissions?.addListener('permissionsUpdate', this.updateCanEdit);
+    meeting?.connectedMeetings?.addListener('stateUpdate', this.updateCanEdit);
   }
+
+  private startEditing = () => {
+    this.isEditing = true;
+    writeTask(() => {
+      this.inputEl?.focus();
+      this.inputEl?.select();
+    });
+  };
+
+  // Returns focus to the edit button so keyboard users are not dropped on the page body.
+  private stopEditing = () => {
+    this.isEditing = false;
+    writeTask(() => this.editButtonEl?.focus());
+  };
+
+  private save = async () => {
+    const title = this.inputEl?.value.trim();
+    if (title && title !== this.meetingTitle) {
+      try {
+        await this.meeting.meta.setMeetingTitle(title);
+      } catch (error) {
+        this.meeting.__internals__.logger.error('rtkMeetingTitle::setMeetingTitle failed', {
+          error,
+        });
+      }
+    }
+    // The title itself only changes through meetingTitleUpdate, so a failed save shows the old one.
+    this.stopEditing();
+  };
+
+  private onKeyDown = (e: KeyboardEvent) => {
+    // isComposing: Enter that confirms an IME candidate must not save.
+    if (e.key === 'Enter' && !e.isComposing) this.save();
+    if (e.key === 'Escape') this.stopEditing();
+  };
 
   render() {
     const title = this.meetingTitle;
 
     if (title == null) return <Host data-hidden />;
+
+    if (this.isEditing) {
+      return (
+        <Host role="banner" aria-label={title}>
+          <input
+            ref={(el) => (this.inputEl = el)}
+            value={title}
+            aria-label={this.t('meeting_title.edit')}
+            onKeyDown={this.onKeyDown}
+            part="input"
+          />
+          <rtk-tooltip label={this.t('meeting_title.save')}>
+            <rtk-button
+              kind="icon"
+              variant="ghost"
+              size="sm"
+              aria-label={this.t('meeting_title.save')}
+              onClick={this.save}
+            >
+              <rtk-icon icon={this.iconPack.checkmark} />
+            </rtk-button>
+          </rtk-tooltip>
+          <rtk-tooltip label={this.t('cancel')}>
+            <rtk-button
+              kind="icon"
+              variant="ghost"
+              size="sm"
+              aria-label={this.t('cancel')}
+              onClick={this.stopEditing}
+            >
+              <rtk-icon icon={this.iconPack.dismiss} />
+            </rtk-button>
+          </rtk-tooltip>
+        </Host>
+      );
+    }
 
     return (
       <Host role="banner" aria-label={title}>
@@ -62,6 +156,21 @@ export class RtkMeetingTitle {
             {title}
           </div>
         </rtk-tooltip>
+        {this.canEdit && (
+          <rtk-tooltip label={this.t('meeting_title.edit')}>
+            <rtk-button
+              kind="icon"
+              variant="ghost"
+              size="sm"
+              aria-label={this.t('meeting_title.edit')}
+              onClick={this.startEditing}
+              ref={(el) => (this.editButtonEl = el)}
+              part="edit-button"
+            >
+              <rtk-icon icon={this.iconPack.edit} />
+            </rtk-button>
+          </rtk-tooltip>
+        )}
       </Host>
     );
   }

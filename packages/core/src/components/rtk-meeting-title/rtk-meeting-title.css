@@ -3,6 +3,13 @@
 :host {
   @apply text-text-lg select-none;
   @apply text-text-1000;
+  @apply flex items-center gap-1;
+}
+
+input {
+  @apply bg-background-900 text-text-1000 p-1;
+  @apply rounded-sm border-none outline-none;
+  font-size: inherit;
 }
 
 /* useful for removing from layouts that may have gap */
@@ -11,7 +18,7 @@
 }
 
 .title {
-  @apply line-clamp-1 text-center;
+  @apply line-clamp-1 min-w-0 text-center;
 }
 
 :host([size='sm']) {
