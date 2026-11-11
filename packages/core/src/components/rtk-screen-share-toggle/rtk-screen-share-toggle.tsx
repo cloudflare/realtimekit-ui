@@ -386,7 +386,7 @@ export class RtkScreenShareToggle {
                 onClick={this.stopScreenShare}
                 onKeyDown={this.handleMenuItemKeyDown}
               >
-                <rtk-icon icon={this.iconPack.share_screen_stop} slot="start" />
+                <rtk-icon icon={this.iconPack.share_screen_stop} variant="danger" slot="start" />
                 {this.t('screenshare.stop')}
               </rtk-menu-item>
             </rtk-menu-list>
