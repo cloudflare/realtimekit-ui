@@ -92,7 +92,7 @@ export const defaultLanguage = {
   'screenshare.shared': 'Your screen is being shared.',
   'screenshare.start': 'Share Screen',
   'screenshare.share_different_screen': 'Share Different Screen',
-  'screenshare.menu': 'Stop Sharing',
+  'screenshare.menu': 'Screen Sharing',
   'screenshare.stop': 'Stop Sharing',
   'screenshare.error.unknown': 'An error occurred while starting screenshare.',
   'screenshare.error.max_count': 'Maximum screen share limit reached.',

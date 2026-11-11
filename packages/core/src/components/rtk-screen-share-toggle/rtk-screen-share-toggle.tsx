@@ -285,9 +285,8 @@ export class RtkScreenShareToggle {
     const couldNotStart = this.shareScreenPermission === 'COULD_NOT_START';
 
     if (this.screenShareEnabled && !hasError) {
-      label = this.t('screenshare.menu') ?? this.t('screenshare.stop');
+      label = this.t('screenshare.menu');
       icon = this.iconPack.share_screen_menu ?? this.iconPack.share_screen_stop;
-      classList['red-icon'] = true;
     } else {
       label = this.t('screenshare.start');
       icon = this.iconPack.share_screen_start;
@@ -341,6 +340,7 @@ export class RtkScreenShareToggle {
       >
         <rtk-controlbar-button
           part="controlbar-button"
+          title={this.screenShareState.label}
           size={this.size}
           iconPack={this.iconPack}
           variant={this.variant}
@@ -355,7 +355,7 @@ export class RtkScreenShareToggle {
     );
 
     return (
-      <Host title={this.screenShareState.label}>
+      <Host>
         {this.screenShareEnabled ? (
           <rtk-menu placement="top" size={this.size} iconPack={this.iconPack} t={this.t}>
             {screenShareButton}
@@ -367,6 +367,7 @@ export class RtkScreenShareToggle {
                 role="button"
                 tabIndex={0}
                 aria-disabled={this.screenShareState.disable}
+                title={this.t('screenshare.share_different_screen')}
                 onClick={this.enableScreenShare}
                 onKeyDown={this.handleMenuItemKeyDown}
               >
@@ -383,6 +384,7 @@ export class RtkScreenShareToggle {
                 role="button"
                 tabIndex={0}
                 aria-disabled={this.screenShareState.disable}
+                title={this.t('screenshare.stop')}
                 onClick={this.stopScreenShare}
                 onKeyDown={this.handleMenuItemKeyDown}
               >
