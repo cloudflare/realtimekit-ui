@@ -240,6 +240,20 @@ export class RtkScreenshareView {
                   {this.t('screenshare.stop')}
                 </rtk-button>
               )}
+              {this.meeting != null && (
+                <rtk-button
+                  variant="secondary"
+                  onClick={() => {
+                    this.meeting.self.enableScreenShare();
+                  }}
+                >
+                  <rtk-icon
+                    icon={this.iconPack.share_screen_different ?? this.iconPack.share_screen_start}
+                    slot="start"
+                  />
+                  {this.t('screenshare.share_different_screen')}
+                </rtk-button>
+              )}
               <rtk-button
                 variant="secondary"
                 id="expand-btn"

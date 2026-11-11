@@ -4,6 +4,22 @@
   display: block;
 }
 
+rtk-menu {
+  display: block;
+}
+
+rtk-menu-list {
+  max-width: calc(100vw - 24px);
+}
+
+rtk-menu-item {
+  @apply px-3 py-2 leading-5;
+}
+
+rtk-menu-item rtk-icon {
+  @apply h-5 w-5 shrink-0;
+}
+
 /* useful for removing from layouts that may have gap */
 :host([data-hidden]) {
   display: none;
