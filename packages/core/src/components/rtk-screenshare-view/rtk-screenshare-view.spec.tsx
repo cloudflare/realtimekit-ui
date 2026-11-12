@@ -60,6 +60,9 @@ describe('<rtk-screenshare-view> screen-sharing actions', () => {
     expect(switchButton().querySelector<HTMLRtkIconElement>('rtk-icon').icon).toBe(
       defaultIconPack.share_screen_different
     );
+    expect(switchButton().querySelector<HTMLRtkIconElement>('rtk-icon').icon).not.toBe(
+      defaultIconPack.share_screen_start
+    );
   });
 
   it('does not show self-share actions for another participant', async () => {

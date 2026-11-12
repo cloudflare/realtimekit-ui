@@ -148,6 +148,7 @@ describe('<rtk-screen-share-toggle>', () => {
     const stopIcon = stopItem.querySelector<HTMLRtkIconElement>('rtk-icon');
 
     expect(switchIcon.icon).toBe(defaultIconPack.share_screen_different);
+    expect(switchIcon.icon).not.toBe(defaultIconPack.share_screen_start);
     expect(stopIcon.icon).toBe(defaultIconPack.share_screen_stop);
     expect(stopIcon.variant).toBe('danger');
     expect(stopItem.classList.contains('red')).toBe(false);
@@ -178,6 +179,61 @@ describe('<rtk-screen-share-toggle>', () => {
     expect(updates).toHaveBeenCalledWith(
       expect.objectContaining({ detail: { activeMoreMenu: false } })
     );
+  });
+
+  it.each([
+    [false, 'AbortError'],
+    [false, 'NotAllowedError'],
+    [false, 'Error'],
+    [true, 'AbortError'],
+    [true, 'NotAllowedError'],
+    [true, 'Error'],
+  ])(
+    'logs a rejected SDK call when sharing=%s (%s), restores the button, and allows retry',
+    async (sharing: boolean, name: string) => {
+      const { page, meeting, self, button, items, updates } = await createToggle({ sharing });
+      const error = Object.assign(new Error('Screen selection failed or was dismissed'), { name });
+      self.enableScreenShare.mockRejectedValueOnce(error);
+      const action = () => (sharing ? items()[0] : button());
+
+      action().click();
+      await page.waitForChanges();
+
+      expect(meeting.__internals__.logger.error).toHaveBeenCalledWith(
+        'rtkScreenShare::enableScreenShare',
+        { error }
+      );
+      expect(button().disabled).toBe(false);
+      expect(self.disableScreenShare).not.toHaveBeenCalled();
+      expect(updates).not.toHaveBeenCalled();
+
+      action().click();
+      await page.waitForChanges();
+      expect(self.enableScreenShare).toHaveBeenCalledTimes(2);
+      expect(updates).toHaveBeenCalledWith(
+        expect.objectContaining({ detail: { activeMoreMenu: false } })
+      );
+    }
+  );
+
+  it('handles a synchronous SDK error when switching and allows retry', async () => {
+    const { page, meeting, self, button, items } = await createToggle({ sharing: true });
+    const error = new Error('Unsupported concurrent call');
+    self.enableScreenShare.mockImplementationOnce(() => {
+      throw error;
+    });
+
+    items()[0].click();
+    await page.waitForChanges();
+
+    expect(meeting.__internals__.logger.error).toHaveBeenCalledWith(
+      'rtkScreenShare::enableScreenShare',
+      { error }
+    );
+    expect(button().disabled).toBe(false);
+    items()[0].click();
+    await page.waitForChanges();
+    expect(self.enableScreenShare).toHaveBeenCalledTimes(2);
   });
 
   it.each([

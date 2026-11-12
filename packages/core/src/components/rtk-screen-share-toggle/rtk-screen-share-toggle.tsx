@@ -248,7 +248,8 @@ export class RtkScreenShareToggle {
       return false;
     }
 
-    const self = this.meeting?.self;
+    const meeting = this.meeting;
+    const self = meeting?.self;
     if (
       self == null ||
       !this.canScreenShare ||
@@ -261,6 +262,8 @@ export class RtkScreenShareToggle {
     try {
       await self.enableScreenShare();
       this.stateUpdate.emit({ activeMoreMenu: false });
+    } catch (error) {
+      meeting.__internals__.logger.error('rtkScreenShare::enableScreenShare', { error });
     } finally {
       this.getState();
     }
