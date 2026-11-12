@@ -14,7 +14,8 @@ import { useLanguage, RtkI18n } from '../../lib/lang';
 })
 export class RtkMeetingTitle {
   private inputEl: HTMLInputElement;
-  private editButtonEl: HTMLRtkButtonElement;
+  private titleEl: HTMLDivElement;
+  private draftTitle: string;
 
   /** Meeting object */
   @SyncWithStore()
@@ -67,6 +68,7 @@ export class RtkMeetingTitle {
     this.removeListeners(oldMeeting);
     this.removeListeners(meeting);
     this.meetingTitle = meeting?.meta?.meetingTitle;
+    this.isEditing = false;
     this.updateCanEdit();
     meeting?.meta?.addListener('meetingTitleUpdate', this.titleUpdateListener);
     meeting?.self?.permissions?.addListener('permissionsUpdate', this.updateCanEdit);
@@ -74,6 +76,7 @@ export class RtkMeetingTitle {
   }
 
   private startEditing = () => {
+    this.draftTitle = this.meetingTitle;
     this.isEditing = true;
     writeTask(() => {
       this.inputEl?.focus();
@@ -81,10 +84,16 @@ export class RtkMeetingTitle {
     });
   };
 
-  // Returns focus to the edit button so keyboard users are not dropped on the page body.
+  private onTitleKeyDown = (e: KeyboardEvent) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    this.startEditing();
+  };
+
+  // Returns focus to the title so keyboard users are not dropped on the page body.
   private stopEditing = () => {
     this.isEditing = false;
-    writeTask(() => this.editButtonEl?.focus());
+    writeTask(() => this.titleEl?.focus());
   };
 
   private save = async () => {
@@ -118,7 +127,7 @@ export class RtkMeetingTitle {
         <Host role="banner" aria-label={title}>
           <input
             ref={(el) => (this.inputEl = el)}
-            value={title}
+            value={this.draftTitle}
             aria-label={this.t('meeting_title.edit')}
             onKeyDown={this.onKeyDown}
             part="input"
@@ -149,28 +158,21 @@ export class RtkMeetingTitle {
       );
     }
 
+    const editProps = this.canEdit && {
+      role: 'button',
+      tabIndex: 0,
+      'aria-label': this.t('meeting_title.edit'),
+      onClick: this.startEditing,
+      onKeyDown: this.onTitleKeyDown,
+    };
+
     return (
       <Host role="banner" aria-label={title}>
         <rtk-tooltip label={title} part="tooltip">
-          <div class="title" part="title">
+          <div class="title" part="title" ref={(el) => (this.titleEl = el)} {...editProps}>
             {title}
           </div>
         </rtk-tooltip>
-        {this.canEdit && (
-          <rtk-tooltip label={this.t('meeting_title.edit')}>
-            <rtk-button
-              kind="icon"
-              variant="ghost"
-              size="sm"
-              aria-label={this.t('meeting_title.edit')}
-              onClick={this.startEditing}
-              ref={(el) => (this.editButtonEl = el)}
-              part="edit-button"
-            >
-              <rtk-icon icon={this.iconPack.edit} />
-            </rtk-button>
-          </rtk-tooltip>
-        )}
       </Host>
     );
   }

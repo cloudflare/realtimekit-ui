@@ -8,7 +8,7 @@
 
 input {
   @apply bg-background-900 text-text-1000 p-1;
-  @apply rounded-sm border-none outline-none;
+  @apply select-text rounded-sm border-none outline-none;
   font-size: inherit;
 }
 
@@ -19,6 +19,10 @@ input {
 
 .title {
   @apply line-clamp-1 min-w-0 text-center;
+}
+
+.title[role='button'] {
+  @apply cursor-pointer;
 }
 
 :host([size='sm']) {
