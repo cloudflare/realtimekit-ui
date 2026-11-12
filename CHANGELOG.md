@@ -1,3 +1,10 @@
+# [2.1.0-staging.4](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.1.0-staging.3...@cloudflare/realtimekit-ui-v2.1.0-staging.4) (2026-11-12)
+
+
+### Bug Fixes
+
+* check if connected meeting is active before title update ([bf14dc8](https://github.com/cloudflare/realtimekit-ui/commit/bf14dc8888c0a7a2d161881ec2454e425ff937d9))
+
 # [2.1.0-staging.3](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.1.0-staging.2...@cloudflare/realtimekit-ui-v2.1.0-staging.3) (2026-11-12)
 
 
