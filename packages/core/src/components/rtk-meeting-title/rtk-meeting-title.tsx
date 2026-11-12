@@ -16,6 +16,7 @@ export class RtkMeetingTitle {
   private inputEl: HTMLInputElement;
   private titleEl: HTMLDivElement;
   private draftTitle: string;
+  private isSaving = false;
 
   /** Meeting object */
   @SyncWithStore()
@@ -55,6 +56,7 @@ export class RtkMeetingTitle {
     this.canEdit = this.meeting?.connectedMeetings?.parentMeeting?.id
       ? !!permissions?.connectedMeetings?.canAlterConnectedMeetings
       : !!permissions?.canEditMeetingTitle;
+    if (!this.canEdit) this.isEditing = false;
   };
 
   private removeListeners(meeting?: Meeting) {
@@ -97,14 +99,18 @@ export class RtkMeetingTitle {
   };
 
   private save = async () => {
+    if (this.isSaving) return;
     const title = this.inputEl?.value.trim();
     if (title && title !== this.meetingTitle) {
+      this.isSaving = true;
       try {
         await this.meeting.meta.setMeetingTitle(title);
       } catch (error) {
         this.meeting.__internals__.logger.error('rtkMeetingTitle::setMeetingTitle failed', {
           error,
         });
+      } finally {
+        this.isSaving = false;
       }
     }
     // The title itself only changes through meetingTitleUpdate, so a failed save shows the old one.
