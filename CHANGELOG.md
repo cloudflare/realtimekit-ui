@@ -1,3 +1,10 @@
+# [2.1.0-staging.2](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.1.0-staging.1...@cloudflare/realtimekit-ui-v2.1.0-staging.2) (2026-11-12)
+
+
+### Features
+
+* **screenshare:** added ability to seamlessly switch to sharing a different screen ([#201](https://github.com/cloudflare/realtimekit-ui/issues/201)) ([6f1169b](https://github.com/cloudflare/realtimekit-ui/commit/6f1169bb55c385eca1d9fb8d01b62b3cb026f1f2))
+
 # [2.1.0-staging.1](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.0.4-staging.4...@cloudflare/realtimekit-ui-v2.1.0-staging.1) (2026-11-05)
 
 
