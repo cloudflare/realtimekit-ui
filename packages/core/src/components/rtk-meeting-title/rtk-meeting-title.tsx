@@ -53,9 +53,14 @@ export class RtkMeetingTitle {
 
   private updateCanEdit = () => {
     const permissions = this.meeting?.self?.permissions;
-    this.canEdit = this.meeting?.connectedMeetings?.parentMeeting?.id
-      ? !!permissions?.connectedMeetings?.canAlterConnectedMeetings
-      : !!permissions?.canEditMeetingTitle;
+    if (
+      this.meeting?.connectedMeetings?.parentMeeting?.id &&
+      this.meeting?.connectedMeetings?.isActive
+    ) {
+      this.canEdit = !!permissions?.connectedMeetings?.canAlterConnectedMeetings;
+    } else {
+      this.canEdit = !!permissions?.canEditMeetingTitle;
+    }
     if (!this.canEdit) this.isEditing = false;
   };
 
