@@ -1,3 +1,10 @@
+# [2.1.0-staging.3](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.1.0-staging.2...@cloudflare/realtimekit-ui-v2.1.0-staging.3) (2026-11-12)
+
+
+### Bug Fixes
+
+* add inline editing for meeting title ([#200](https://github.com/cloudflare/realtimekit-ui/issues/200)) ([96a38ec](https://github.com/cloudflare/realtimekit-ui/commit/96a38ec55bd7e6fdd1c6ff604ce772bab48b1429))
+
 # [2.1.0-staging.2](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.1.0-staging.1...@cloudflare/realtimekit-ui-v2.1.0-staging.2) (2026-11-12)
 
 
