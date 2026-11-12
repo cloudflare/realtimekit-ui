@@ -465,4 +465,6 @@ export const defaultLanguage = {
   'debugger.system.battery.charging.description': 'A device running on power performs optimally.',
   'debugger.system.battery.charging.is_charging': 'Charging',
   'debugger.system.battery.charging.is_not_charging': 'Not charging',
+  'meeting_title.edit': 'Edit meeting title',
+  'meeting_title.save': 'Save meeting title',
 };
