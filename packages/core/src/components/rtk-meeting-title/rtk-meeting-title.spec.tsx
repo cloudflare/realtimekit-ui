@@ -3,11 +3,15 @@ import { RtkMeetingTitle } from './rtk-meeting-title';
 
 const emitter = () => ({ addListener: jest.fn(), removeListener: jest.fn() });
 
-function createMeeting(permissions: object, parentMeetingId?: string) {
+function createMeeting(
+  permissions: object,
+  parentMeetingId?: string,
+  isActive = !!parentMeetingId
+) {
   return {
     meta: { meetingTitle: 'Standup', setMeetingTitle: jest.fn(), ...emitter() },
     self: { permissions: { ...permissions, ...emitter() } },
-    connectedMeetings: { parentMeeting: { id: parentMeetingId }, ...emitter() },
+    connectedMeetings: { parentMeeting: { id: parentMeetingId }, isActive, ...emitter() },
   } as any;
 }
 
@@ -37,6 +41,9 @@ describe('<rtk-meeting-title>', () => {
     });
     expect(await isEditable(createMeeting(connected(true), 'parent'))).toBe(true);
     expect(await isEditable(createMeeting(connected(false), 'parent'))).toBe(false);
+    // No breakout rooms yet: canEditMeetingTitle decides, as in a regular meeting.
+    expect(await isEditable(createMeeting(connected(false), 'parent', false))).toBe(true);
+    expect(await isEditable(createMeeting(connected(true), 'parent', false))).toBe(false);
   });
 
   it('saves the typed title once and closes the editor', async () => {
