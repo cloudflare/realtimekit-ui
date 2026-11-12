@@ -46,9 +46,7 @@ async function createView({
   const stopButton = () =>
     root.shadowRoot.querySelector<HTMLRtkButtonElement>('.actions rtk-button[variant="danger"]');
 
-  // Observe rejections directly because DOM event handlers do not await returned promises.
-  const shareDifferentScreen: () => Promise<void> = page.rootInstance.shareDifferentScreen;
-  return { page, root, self, switchButton, stopButton, shareDifferentScreen };
+  return { page, root, self, logger, switchButton, stopButton };
 }
 
 describe('<rtk-screenshare-view> screen-sharing actions', () => {
@@ -117,15 +115,19 @@ describe('<rtk-screenshare-view> screen-sharing actions', () => {
   });
 
   it.each(['AbortError', 'NotAllowedError', 'Error'])(
-    'clears the busy state after a rejected SDK call (%s), while preserving the rejection',
+    'logs a rejected SDK call (%s), clears the busy state, and allows another attempt',
     async (name) => {
-      const { page, self, switchButton, shareDifferentScreen } = await createView();
+      const { page, self, logger, switchButton } = await createView();
       const error = Object.assign(new Error('Screen selection failed or was dismissed'), { name });
       self.enableScreenShare.mockRejectedValueOnce(error);
 
-      await expect(shareDifferentScreen()).rejects.toBe(error);
+      switchButton().shadowRoot.querySelector('button').click();
       await page.waitForChanges();
 
+      expect(logger.error).toHaveBeenCalledTimes(1);
+      expect(logger.error).toHaveBeenCalledWith('rtkScreenshareView::shareDifferentScreen', {
+        error,
+      });
       expect(switchButton().disabled).toBe(false);
       expect(self.disableScreenShare).not.toHaveBeenCalled();
 
@@ -135,16 +137,20 @@ describe('<rtk-screenshare-view> screen-sharing actions', () => {
     }
   );
 
-  it('clears the busy guard after a synchronous SDK error, while preserving the rejection', async () => {
-    const { page, self, switchButton, shareDifferentScreen } = await createView();
+  it('logs a synchronous SDK error and clears the busy guard', async () => {
+    const { page, self, logger, switchButton } = await createView();
     const error = new Error('Unsupported concurrent call');
     self.enableScreenShare.mockImplementationOnce(() => {
       throw error;
     });
 
-    await expect(shareDifferentScreen()).rejects.toBe(error);
+    switchButton().shadowRoot.querySelector('button').click();
     await page.waitForChanges();
 
+    expect(logger.error).toHaveBeenCalledTimes(1);
+    expect(logger.error).toHaveBeenCalledWith('rtkScreenshareView::shareDifferentScreen', {
+      error,
+    });
     expect(switchButton().disabled).toBe(false);
     switchButton().click();
     await page.waitForChanges();

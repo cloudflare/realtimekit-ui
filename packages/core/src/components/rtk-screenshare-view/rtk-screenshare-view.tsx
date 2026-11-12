@@ -176,6 +176,8 @@ export class RtkScreenshareView {
     this.isSwitchingScreen = true;
     try {
       await meeting.self.enableScreenShare();
+    } catch (error) {
+      meeting.__internals__.logger.error(`Error while sharing different screen: ${error?.message}`, { error });
     } finally {
       this.isSwitchingScreen = false;
     }
