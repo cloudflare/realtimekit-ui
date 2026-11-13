@@ -1,3 +1,10 @@
+# [2.1.0-staging.5](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.1.0-staging.4...@cloudflare/realtimekit-ui-v2.1.0-staging.5) (2026-11-13)
+
+
+### Features
+
+* **breakout-room:** allow renaming parent room, shuffle, fixed test and ai review ([#204](https://github.com/cloudflare/realtimekit-ui/issues/204)) ([770cff3](https://github.com/cloudflare/realtimekit-ui/commit/770cff3bceaff02f9ae9868e04ac1a45cefa8ddf))
+
 # [2.1.0-staging.4](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.1.0-staging.3...@cloudflare/realtimekit-ui-v2.1.0-staging.4) (2026-11-12)
 
 
