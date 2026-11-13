@@ -43,7 +43,7 @@
     "test.watch": "stencil test --spec --e2e --watchAll",
     "generate": "stencil generate",
     "format": "prettier --write 'src/**/*.{ts,tsx,js,css,html,json}'",
-    "lint": "eslint src/**/*.{ts,tsx}",
+    "lint": "eslint \"{src,e2e}/**/*.{ts,tsx}\"",
     "lint:fix": "npm run lint -- --fix",
     "prepublishOnly": "cp package.json package.json.bak && node prepublish.js",
     "postpublish": "mv package.json.bak package.json"

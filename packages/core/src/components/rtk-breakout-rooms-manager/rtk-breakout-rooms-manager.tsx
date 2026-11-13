@@ -380,13 +380,13 @@ export class RtkBreakoutRoomsManager {
           </header>
           <div class="rooms" ref={(el) => (this.selectorRef = el)}>
             {this.renderMainRoomMaybe()}
-            {this.getPermittedRooms().map((room, idx) => {
+            {this.getPermittedRooms().map((room) => {
               return (
                 <rtk-breakout-room-manager
                   key={room['id']}
                   assigningParticipants={this.assigningParticipants}
                   isDragMode={this.isDragMode}
-                  defaultExpanded={idx === 0}
+                  defaultExpanded={true}
                   meeting={this.meeting}
                   mode={this.roomConfig.mode}
                   onDelete={() => this.onRoomDelete(room['id'])}
@@ -495,8 +495,8 @@ export class RtkBreakoutRoomsManager {
                 >
                   <rtk-button
                     disabled={
-                      this.roomConfig.mode === 'edit' ||
-                      this.stateManager.unassignedParticipants.length === 0
+                      this.stateManager.unassignedParticipants.length === 0 ||
+                      this.getPermittedRooms()?.length === 0
                     }
                     kind="button"
                     variant="secondary"
@@ -553,13 +553,13 @@ export class RtkBreakoutRoomsManager {
 
               <div class="rooms" ref={(el) => (this.selectorRef = el)}>
                 {this.renderMainRoomMaybe()}
-                {this.getPermittedRooms().map((room, idx) => {
+                {this.getPermittedRooms().map((room) => {
                   return (
                     <rtk-breakout-room-manager
                       key={room['id']}
                       assigningParticipants={this.assigningParticipants}
                       isDragMode={this.isDragMode}
-                      defaultExpanded={idx === 0}
+                      defaultExpanded={true}
                       meeting={this.meeting}
                       mode={this.roomConfig.mode}
                       onDelete={() => this.onRoomDelete(room['id'])}

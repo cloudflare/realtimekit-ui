@@ -1,4 +1,14 @@
-import { Component, h, Host, Prop, Event, EventEmitter, State, writeTask } from '@stencil/core';
+import {
+  Component,
+  h,
+  Host,
+  Prop,
+  Event,
+  EventEmitter,
+  State,
+  Watch,
+  writeTask,
+} from '@stencil/core';
 import { RtkI18n, useLanguage } from '../../lib/lang';
 import { defaultIconPack, IconPack } from '../../lib/icons';
 import { ConnectedMeetingParticipant, States } from '../../types/props';
@@ -97,11 +107,8 @@ export class RtkBreakoutRoomManager {
     this.allParticipants = getAllConnectedParticipants(this.meeting);
     this.permissionsUpdateListener();
     this.showExpandedCard = this.defaultExpanded;
-    this.roomTitle = this.room.isParent ? this.t('breakout_rooms.main_room') : this.room?.title;
-    this.canEditMeetingTitle =
-      this.permissions.canAlterConnectedMeetings &&
-      !this.room.isParent &&
-      !this.meeting.connectedMeetings.isActive; // TODO: remove this once socket supports update meetings
+    this.roomChanged(this.room);
+    this.canEditMeetingTitle = this.permissions.canAlterConnectedMeetings;
 
     this.meeting.self.permissions.on('permissionsUpdate', this.permissionsUpdateListener);
   }
@@ -110,11 +117,17 @@ export class RtkBreakoutRoomManager {
     this.meeting.self.permissions.off('permissionsUpdate', this.permissionsUpdateListener);
   }
 
+  @Watch('room')
+  roomChanged(room: DraftMeeting) {
+    this.roomTitle = room?.title;
+  }
+
   private permissionsUpdateListener = () => {
     this.permissions = this.meeting.self.permissions.connectedMeetings;
   };
 
   private reset = () => {
+    this.inputTextEl?.blur();
     this.editingTitleRoomId = null;
     this.newTitle = null;
   };
@@ -130,12 +143,24 @@ export class RtkBreakoutRoomManager {
       this.glowCard();
       this.reset();
     } else {
+      this.newTitle = this.roomTitle;
       this.editingTitleRoomId = this.room.id;
       writeTask(() => {
-        this.inputTextEl.focus();
-        this.inputTextEl.select();
+        this.inputTextEl?.focus();
+        this.inputTextEl?.select();
       });
     }
+  };
+
+  private onTitleClick = () => {
+    if (!this.canEditMeetingTitle || this.editingTitleRoomId === this.room.id) return;
+    this.onEditClick();
+  };
+
+  private onTitleKeyDown = (event: KeyboardEvent) => {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.preventDefault();
+    this.onTitleClick();
   };
 
   private onDrop = (e: DragEvent) => {
@@ -287,27 +312,36 @@ export class RtkBreakoutRoomManager {
           }}
         >
           <div class="header">
-            <input
-              ref={(el) => (this.inputTextEl = el)}
-              placeholder={this.t('breakout_rooms.room_name')}
-              disabled={!(this.editingTitleRoomId === this.room.id)}
-              value={this.roomTitle}
-              minlength={ROOM_TITLE_MIN_CHARS}
-              onChange={(e) => {
-                this.newTitle = (e.target as HTMLInputElement).value;
-              }}
-              onKeyPress={(e) => this.onTitleChanged(e)}
-              class={{ 'editing-enabled': this.editingTitleRoomId === this.room.id }}
-              style={{ width: `${this.roomTitle.length + 1}ch` }}
-            />
-            {this.editingTitleRoomId !== this.room.id && (
-              <span class="participant-count">
-                (<rtk-icon icon={this.iconPack.people} />
-                {this.room?.participants?.length ?? '0'})
+            {this.editingTitleRoomId === this.room.id ? (
+              <input
+                ref={(el) => (this.inputTextEl = el)}
+                placeholder={this.t('breakout_rooms.room_name')}
+                value={this.newTitle}
+                minlength={ROOM_TITLE_MIN_CHARS}
+                onInput={(e) => {
+                  this.newTitle = (e.target as HTMLInputElement).value;
+                }}
+                onKeyPress={(e) => this.onTitleChanged(e)}
+                style={{ width: `${this.roomTitle.length + 1}ch` }}
+              />
+            ) : (
+              <span
+                class="room-title"
+                title={this.roomTitle}
+                role={this.canEditMeetingTitle ? 'button' : undefined}
+                tabIndex={this.canEditMeetingTitle ? 0 : undefined}
+                aria-label={
+                  this.canEditMeetingTitle ? this.t('breakout_rooms.edit_room_name') : undefined
+                }
+                onClick={this.canEditMeetingTitle ? this.onTitleClick : undefined}
+                onKeyDown={this.canEditMeetingTitle ? this.onTitleKeyDown : undefined}
+              >
+                {this.roomTitle}
               </span>
             )}
             {this.canEditMeetingTitle && (
               <rtk-tooltip
+                class="title-action"
                 label={
                   this.editingTitleRoomId === this.room.id
                     ? this.t('breakout_rooms.save_room_name')
@@ -325,6 +359,13 @@ export class RtkBreakoutRoomManager {
                 />
               </rtk-tooltip>
             )}
+            <span class="main-room-indicator">
+              {this.room.isParent ? this.t('breakout_rooms.main_room') : ''}
+            </span>
+            <span class="participant-count">
+              (<rtk-icon icon={this.iconPack.people} />
+              {this.room?.participants?.length ?? '0'})
+            </span>
 
             <div class="rooms-container">
               {this.permissions.canAlterConnectedMeetings &&

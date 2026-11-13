@@ -270,9 +270,24 @@ export default class BreakoutRoomsManager {
   }
 
   get meetingsToUpdate() {
-    return this.allConnectedMeetings
+    const meetingsToUpdate = this.allConnectedMeetings
       .filter((meeting) => this.#meetingsToUpdate.has(meeting.id))
       .map(({ id, title }) => ({ id, title }));
+
+    // Add parent meeting if it has been updated
+    if (
+      this.#state?.parentMeeting?.id &&
+      this.#meetingsToUpdate.has(this.#state.parentMeeting.id)
+    ) {
+      const localParentMeeting = this.#allMeetingsMap.get(this.#state.parentMeeting.id);
+      if (localParentMeeting) {
+        meetingsToUpdate.push({
+          id: localParentMeeting.id,
+          title: localParentMeeting.title,
+        });
+      }
+    }
+    return meetingsToUpdate;
   }
 
   get meetingsToDelete() {
