@@ -205,6 +205,92 @@ describe('Breakout rooms manager', () => {
     expect(manager.meetingsToUpdate).toEqual([{ id: MOCK_ROOM_1.id, title: 'Renamed room' }]);
   });
 
+  it.each([MOCK_STATE, MOCK_STATE_LIVE])(
+    'tracks a parent rename without adding it as a breakout room',
+    (state) => {
+      const manager = new BreakoutRoomsManager();
+      manager.updateCurrentState(state);
+      const parentId = state.parentMeeting.id;
+      manager.updateMeetingTitle(parentId, 'Renamed main room');
+
+      expect(manager.hasLocalChanges).toBe(true);
+      expect(manager.currentState.parentMeeting.title).toBe('Renamed main room');
+      expect(manager.allConnectedMeetings).toHaveLength(state.meetings.length);
+      expect(manager.meetingsToUpdate).toEqual([{ id: parentId, title: 'Renamed main room' }]);
+      expect(manager.meetingsToCreate).toEqual([]);
+      expect(manager.meetingsToDelete).toEqual([]);
+      expect(manager.participantsToMove).toEqual([]);
+    }
+  );
+
+  it('does not include an unchanged parent in room updates', () => {
+    const manager = new BreakoutRoomsManager();
+    manager.updateCurrentState(MOCK_STATE_LIVE);
+    expect(manager.meetingsToUpdate).toEqual([]);
+    manager.updateMeetingTitle(MOCK_ROOM_1.id, 'Renamed breakout');
+    expect(manager.meetingsToUpdate).toEqual([{ id: MOCK_ROOM_1.id, title: 'Renamed breakout' }]);
+  });
+
+  it('keeps only the latest parent rename alongside a breakout rename after a server update', () => {
+    const manager = new BreakoutRoomsManager();
+    manager.updateCurrentState(MOCK_STATE_LIVE);
+    const parentId = MOCK_STATE_LIVE.parentMeeting.id;
+    manager.updateMeetingTitle(parentId, 'First title');
+    manager.updateMeetingTitle(parentId, 'Latest title');
+    manager.updateMeetingTitle(MOCK_ROOM_2.id, 'Renamed breakout');
+    manager.updateCurrentState(MOCK_STATE_LIVE);
+
+    expect(manager.currentState.parentMeeting.title).toBe('Latest title');
+    expect(manager.meetingsToUpdate).toEqual([
+      { id: MOCK_ROOM_2.id, title: 'Renamed breakout' },
+      { id: parentId, title: 'Latest title' },
+    ]);
+  });
+
+  it('discards a pending parent rename and restores the server title', () => {
+    const manager = new BreakoutRoomsManager();
+    manager.updateCurrentState(MOCK_STATE_LIVE);
+    manager.updateMeetingTitle(MOCK_STATE_LIVE.parentMeeting.id, 'Unsaved title');
+    manager.discardChanges();
+
+    expect(manager.currentState.parentMeeting.title).toBe(MOCK_STATE_LIVE.parentMeeting.title);
+    expect(manager.meetingsToUpdate).toEqual([]);
+    expect(manager.hasLocalChanges).toBe(false);
+  });
+
+  it('applies a parent-only rename without creating rooms or moving participants', async () => {
+    const manager = new BreakoutRoomsManager();
+    manager.updateCurrentState(MOCK_STATE_LIVE);
+    manager.updateMeetingTitle(MOCK_STATE_LIVE.parentMeeting.id, 'Renamed main room');
+    const client: RealtimeKitClient = new RealtimeKitClientMock();
+
+    await manager.applyChanges(client);
+
+    expect(client.connectedMeetings.updateMeetings).toHaveBeenCalledTimes(1);
+    expect(client.connectedMeetings.updateMeetings).toHaveBeenCalledWith([
+      { id: MOCK_STATE_LIVE.parentMeeting.id, title: 'Renamed main room' },
+    ]);
+    expect(client.connectedMeetings.createMeetings).not.toHaveBeenCalled();
+    expect(client.connectedMeetings.deleteMeetings).not.toHaveBeenCalled();
+    expect(client.connectedMeetings.moveParticipants).not.toHaveBeenCalled();
+  });
+
+  it('applies parent and breakout renames in the same SDK request', async () => {
+    const manager = new BreakoutRoomsManager();
+    manager.updateCurrentState(MOCK_STATE_LIVE);
+    manager.updateMeetingTitle(MOCK_STATE_LIVE.parentMeeting.id, 'Renamed main room');
+    manager.updateMeetingTitle(MOCK_ROOM_1.id, 'Renamed breakout');
+    const client: RealtimeKitClient = new RealtimeKitClientMock();
+
+    await manager.applyChanges(client);
+
+    expect(client.connectedMeetings.updateMeetings).toHaveBeenCalledTimes(1);
+    expect(client.connectedMeetings.updateMeetings).toHaveBeenCalledWith([
+      { id: MOCK_ROOM_1.id, title: 'Renamed breakout' },
+      { id: MOCK_STATE_LIVE.parentMeeting.id, title: 'Renamed main room' },
+    ]);
+  });
+
   it('should shuffle assign participants', () => {
     const manager = new BreakoutRoomsManager();
     manager.updateCurrentState(MOCK_STATE);
