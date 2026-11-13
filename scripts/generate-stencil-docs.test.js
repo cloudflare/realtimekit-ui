@@ -96,7 +96,7 @@ test('selects renderable core properties and prioritizes meeting in script examp
     ],
   });
   assert.match(example, /<rtk-meeting\n size="md">/);
-  assert.match(example, /el\.meeting= meeting;/);
+  assert.match(example, /el\.meeting = meeting;/);
 
   const scriptOnly = core.generateCoreExample({
     name: 'rtk-permissions-message',
@@ -106,7 +106,7 @@ test('selects renderable core properties and prioritizes meeting in script examp
   const section = scriptOnly.split('### With Properties')[1];
   assert.ok(section.includes('<rtk-permissions-message>\n</rtk-permissions-message>'));
   assert.ok(section.indexOf('<script>') > section.indexOf('</rtk-permissions-message>'));
-  assert.ok(section.includes('el.meeting= meeting;'));
+  assert.ok(section.includes('el.meeting = meeting;'));
 
   const unrenderable = core.generateCoreExample({
     name: 'rtk-example',

@@ -91,6 +91,8 @@ export const defaultLanguage = {
   'screenshare.max_preview': 'Expand Preview',
   'screenshare.shared': 'Your screen is being shared.',
   'screenshare.start': 'Share Screen',
+  'screenshare.share_different_screen': 'Share Different Screen',
+  'screenshare.menu': 'Screen Sharing',
   'screenshare.stop': 'Stop Sharing',
   'screenshare.error.unknown': 'An error occurred while starting screenshare.',
   'screenshare.error.max_count': 'Maximum screen share limit reached.',
@@ -299,6 +301,15 @@ export const defaultLanguage = {
 
   'init.auth_error':
     "We couldn't verify your access to this meeting. The meeting may have ended, or you may not have permission to join.",
+  'init.token_not_yet_valid':
+    "Your access to this meeting isn't active yet. Please try again at the meeting time.",
+  'init.token_expired':
+    'Your access to this meeting has expired. Please ask the meeting organizer for a new invite.',
+  'init.token_revoked':
+    'Your access to this meeting has been revoked. Please contact the meeting organizer.',
+  'init.token_invalid':
+    "We couldn't verify your access to this meeting. Please ask the meeting organizer for a new invite.",
+  'init.meeting_inactive': 'This meeting is inactive and is not accepting participants.',
   'init.network_error':
     "We couldn't connect to the meeting. Please try again, and if the problem continues, check your internet connection.",
   'init.browser_error': 'Your browser is not supported. Please try a different or updated browser.',
@@ -454,4 +465,6 @@ export const defaultLanguage = {
   'debugger.system.battery.charging.description': 'A device running on power performs optimally.',
   'debugger.system.battery.charging.is_charging': 'Charging',
   'debugger.system.battery.charging.is_not_charging': 'Not charging',
+  'meeting_title.edit': 'Edit meeting title',
+  'meeting_title.save': 'Save meeting title',
 };

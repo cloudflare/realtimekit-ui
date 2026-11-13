@@ -92,6 +92,8 @@ export class RtkScreenshareView {
 
   @State() screenShareEnabled: boolean = false;
 
+  @State() isSwitchingScreen: boolean = false;
+
   @State() isFullScreen: boolean = false;
 
   @State() remoteControlInfo: string;
@@ -167,6 +169,20 @@ export class RtkScreenshareView {
     }
   }
 
+  private shareDifferentScreen = async () => {
+    const meeting = this.meeting;
+    if (meeting == null || this.isSwitchingScreen) return;
+
+    this.isSwitchingScreen = true;
+    try {
+      await meeting.self.enableScreenShare();
+    } catch (error) {
+      meeting.__internals__.logger.error('rtkScreenshareView::shareDifferentScreen', { error });
+    } finally {
+      this.isSwitchingScreen = false;
+    }
+  };
+
   private toggleFullScreen = () => {
     if (!this.isFullScreen) {
       requestFullScreen(this.host);
@@ -238,6 +254,19 @@ export class RtkScreenshareView {
                 >
                   <rtk-icon icon={this.iconPack.share_screen_stop} slot="start" />
                   {this.t('screenshare.stop')}
+                </rtk-button>
+              )}
+              {this.meeting != null && (
+                <rtk-button
+                  variant="secondary"
+                  disabled={this.isSwitchingScreen}
+                  onClick={this.shareDifferentScreen}
+                >
+                  <rtk-icon
+                    icon={this.iconPack.share_screen_different ?? this.iconPack.share_screen_start}
+                    slot="start"
+                  />
+                  {this.t('screenshare.share_different_screen')}
                 </rtk-button>
               )}
               <rtk-button

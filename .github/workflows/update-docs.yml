@@ -63,9 +63,9 @@ jobs:
 
       - name: Copy generated docs
         run: |
-          mkdir -p cloudflare-docs/src/content/docs/realtime/realtimekit/ui-kit/api-reference
+          mkdir -p cloudflare-docs/src/content/docs/realtime/realtimekit/humans/ui-kit/api-reference
 
-          cp -r docs/* cloudflare-docs/src/content/docs/realtime/realtimekit/ui-kit/api-reference/
+          cp -r docs/* cloudflare-docs/src/content/docs/realtime/realtimekit/humans/ui-kit/api-reference/
 
       - name: Check for changes
         id: check-changes
