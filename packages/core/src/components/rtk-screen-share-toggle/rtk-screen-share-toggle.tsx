@@ -214,6 +214,12 @@ export class RtkScreenShareToggle {
     }
   }
 
+  @Watch('t')
+  @Watch('iconPack')
+  screenShareAppearanceChanged() {
+    this.getState();
+  }
+
   private hasPermissionError() {
     return (
       this.shareScreenPermission === 'SYSTEM_DENIED' || this.shareScreenPermission === 'DENIED'
@@ -225,7 +231,13 @@ export class RtkScreenShareToggle {
     return this.maxScreenShareCount > 0 && this.screenShareCount >= this.maxScreenShareCount;
   };
 
-  private toggleScreenShare = async () => {
+  private stopScreenShare = () => {
+    if (this.screenShareState.disable) return;
+    this.meeting?.self.disableScreenShare();
+    this.stateUpdate.emit({ activeMoreMenu: false });
+  };
+
+  private enableScreenShare = async () => {
     if (this.screenShareState.disable) return;
     if (this.hasPermissionError()) {
       const permissionModalSettings: PermissionSettings = {
@@ -236,23 +248,34 @@ export class RtkScreenShareToggle {
       return false;
     }
 
-    const self = this.meeting?.self;
-    if (this.screenShareEnabled) {
-      self.disableScreenShare();
-      return;
-    }
+    const meeting = this.meeting;
+    const self = meeting?.self;
     if (
       self == null ||
       !this.canScreenShare ||
-      this.reachedMaxScreenShares() ||
+      (this.reachedMaxScreenShares() && !this.screenShareEnabled) ||
       this.hasPermissionError()
     )
       return;
 
     this.screenShareState = { ...this.screenShareState, disable: true };
-    await self.enableScreenShare();
-    this.screenShareState = { ...this.screenShareState, disable: false };
-    this.stateUpdate.emit({ activeMoreMenu: false });
+    try {
+      await self.enableScreenShare();
+      this.stateUpdate.emit({ activeMoreMenu: false });
+    } catch (error) {
+      meeting.__internals__.logger.error('rtkScreenShare::enableScreenShare', { error });
+    } finally {
+      this.getState();
+    }
+  };
+
+  private handleMenuItemKeyDown = (event: KeyboardEvent) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      if (event.currentTarget instanceof HTMLElement) {
+        event.currentTarget.click();
+      }
+    }
   };
 
   private getState() {
@@ -265,9 +288,8 @@ export class RtkScreenShareToggle {
     const couldNotStart = this.shareScreenPermission === 'COULD_NOT_START';
 
     if (this.screenShareEnabled && !hasError) {
-      label = this.t('screenshare.stop');
-      icon = this.iconPack.share_screen_stop;
-      classList['red-icon'] = true;
+      label = this.t('screenshare.menu');
+      icon = this.iconPack.share_screen_menu ?? this.iconPack.share_screen_stop;
     } else {
       label = this.t('screenshare.start');
       icon = this.iconPack.share_screen_start;
@@ -310,28 +332,73 @@ export class RtkScreenShareToggle {
       return <Host data-hidden />;
     }
 
+    const screenShareButton = (
+      <rtk-tooltip
+        slot={this.screenShareEnabled ? 'trigger' : undefined}
+        placement="top"
+        kind="block"
+        label={this.screenShareState.tooltipLabel}
+        delay={600}
+        part="tooltip"
+      >
+        <rtk-controlbar-button
+          part="controlbar-button"
+          title={this.screenShareState.label}
+          size={this.size}
+          iconPack={this.iconPack}
+          variant={this.variant}
+          label={this.screenShareState.label}
+          icon={this.screenShareState.icon}
+          class={this.screenShareState.classList}
+          onClick={this.screenShareEnabled ? undefined : this.enableScreenShare}
+          disabled={this.screenShareState.disable}
+          showWarning={this.screenShareState.showWarning}
+        />
+      </rtk-tooltip>
+    );
+
     return (
-      <Host title={this.screenShareState.label}>
-        <rtk-tooltip
-          placement="top"
-          kind="block"
-          label={this.screenShareState.tooltipLabel}
-          delay={600}
-          part="tooltip"
-        >
-          <rtk-controlbar-button
-            part="controlbar-button"
-            size={this.size}
-            iconPack={this.iconPack}
-            variant={this.variant}
-            label={this.screenShareState.label}
-            icon={this.screenShareState.icon}
-            class={this.screenShareState.classList}
-            onClick={this.toggleScreenShare}
-            disabled={this.screenShareState.disable}
-            showWarning={this.screenShareState.showWarning}
-          />
-        </rtk-tooltip>
+      <Host>
+        {this.screenShareEnabled ? (
+          <rtk-menu placement="top" size={this.size} iconPack={this.iconPack} t={this.t}>
+            {screenShareButton}
+            <rtk-menu-list iconPack={this.iconPack} t={this.t}>
+              <rtk-menu-item
+                size={this.size}
+                iconPack={this.iconPack}
+                t={this.t}
+                role="button"
+                tabIndex={0}
+                aria-disabled={this.screenShareState.disable}
+                title={this.t('screenshare.share_different_screen')}
+                onClick={this.enableScreenShare}
+                onKeyDown={this.handleMenuItemKeyDown}
+              >
+                <rtk-icon
+                  icon={this.iconPack.share_screen_different ?? this.iconPack.share_screen_start}
+                  slot="start"
+                />
+                {this.t('screenshare.share_different_screen')}
+              </rtk-menu-item>
+              <rtk-menu-item
+                size={this.size}
+                iconPack={this.iconPack}
+                t={this.t}
+                role="button"
+                tabIndex={0}
+                aria-disabled={this.screenShareState.disable}
+                title={this.t('screenshare.stop')}
+                onClick={this.stopScreenShare}
+                onKeyDown={this.handleMenuItemKeyDown}
+              >
+                <rtk-icon icon={this.iconPack.share_screen_stop} variant="danger" slot="start" />
+                {this.t('screenshare.stop')}
+              </rtk-menu-item>
+            </rtk-menu-list>
+          </rtk-menu>
+        ) : (
+          screenShareButton
+        )}
       </Host>
     );
   }

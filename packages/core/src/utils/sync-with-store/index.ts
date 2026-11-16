@@ -8,7 +8,6 @@ import {
 } from './ui-store';
 
 export function SyncWithStore() {
-
   return function (proto: ComponentInterface, propName: keyof RtkUiStore) {
     const { connectedCallback, disconnectedCallback } = proto;
 
@@ -35,7 +34,6 @@ export function SyncWithStore() {
       ) => {
         const requestId = (host as any)._storeRequestId;
         if (event.detail.requestId === requestId) {
-          
           // Blindly put peer specific store's value for propName in host propName
           const storeValue = event.detail.store.state[propName];
           host.componentOnReady().then(() => {
@@ -50,7 +48,7 @@ export function SyncWithStore() {
           appendElement(propName, host, event.detail.store);
           host[`_rtkStoreToCleanup-${propName}`] = event.detail.store;
           // Since peer specific store is available, remove element prop from global store
-          removeElement(propName, host, legacyGlobalUIStore as RtkUiStoreExtended)
+          removeElement(propName, host, legacyGlobalUIStore as RtkUiStoreExtended);
         }
       };
 
@@ -71,7 +69,7 @@ export function SyncWithStore() {
       });
 
       host.dispatchEvent(requestEvent);
-      
+
       // Listen for peer specific store ready event to use the correct store
       const storeReadyListener = () => {
         // Re-request store (peer specific store should now be available)
@@ -82,7 +80,7 @@ export function SyncWithStore() {
           bubbles: true,
           composed: true,
         });
-        
+
         host.dispatchEvent(retryRequestEvent);
       };
 

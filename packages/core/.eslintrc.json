@@ -24,5 +24,13 @@
         "allowBind": false
       }
     ]
-  }
+  },
+  "overrides": [
+    {
+      "files": ["**/*.spec.ts", "**/*.spec.tsx", "**/*.e2e.ts", "**/*.e2e.tsx"],
+      "parserOptions": {
+        "project": "./tsconfig.test.json"
+      }
+    }
+  ]
 }

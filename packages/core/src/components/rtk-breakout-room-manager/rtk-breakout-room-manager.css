@@ -40,8 +40,12 @@
   @apply w-full;
   @apply flex items-center;
 
+  rtk-tooltip {
+    @apply relative;
+  }
+
   rtk-icon {
-    @apply ml-2 h-5 cursor-pointer;
+    @apply ml-0 mr-1 h-5 cursor-pointer;
   }
 
   .danger {
@@ -56,20 +60,30 @@
     @apply flex flex-grow flex-row items-center justify-end;
   }
 
-  input {
-    @apply bg-background-800 text-text-900 p-1;
+  input,
+  .room-title {
+    @apply text-text-900 p-1;
     @apply text-text-md max-w-36 font-medium;
+  }
+  .room-title {
+    @apply min-w-0 truncate;
+  }
+  .room-title[role='button'] {
+    @apply cursor-pointer;
+  }
+  .title-action {
+    @apply ml-1 shrink-0;
+  }
+  input {
+    @apply bg-background-900;
     @apply rounded-sm border-none outline-none;
     @apply border-b-sm border-b-background-800 border-solid;
-  }
-  input:disabled {
-    @apply overflow-x-visible rounded-none border-none bg-transparent;
   }
   input:invalid {
     @apply border-b-sm border-b-danger border-dashed;
   }
-  input.editing-enabled {
-    @apply bg-background-900;
+  .main-room-indicator {
+    @apply text-text-700 text-text-sm p-1;
   }
 
   .participant-count {

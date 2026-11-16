@@ -17,7 +17,7 @@
     "start": "ng serve",
     "build": "ng build && cp projects/components/prepublish.js projects/components/dist/prepublish.js",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "node test.js"
   },
   "private": true,
   "dependencies": {
