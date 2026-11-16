@@ -1,3 +1,10 @@
+# [2.1.0-staging.6](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.1.0-staging.5...@cloudflare/realtimekit-ui-v2.1.0-staging.6) (2026-11-16)
+
+
+### Bug Fixes
+
+* **breakout-rooms:** reduced title constraint to match meeting.meta.setMeetingTitle ([#206](https://github.com/cloudflare/realtimekit-ui/issues/206)) ([6235235](https://github.com/cloudflare/realtimekit-ui/commit/6235235d98e9499df51a38565cb33023d1ed5231))
+
 # [2.1.0-staging.5](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.1.0-staging.4...@cloudflare/realtimekit-ui-v2.1.0-staging.5) (2026-11-13)
 
 
