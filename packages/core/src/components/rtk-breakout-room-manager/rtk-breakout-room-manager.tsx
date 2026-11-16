@@ -19,7 +19,7 @@ import { formatName, shorten } from '../../utils/string';
 import { SyncWithStore } from '../../utils/sync-with-store';
 import { DraftMeeting } from '../../utils/breakout-rooms-manager';
 
-const ROOM_TITLE_MIN_CHARS = 3;
+const ROOM_TITLE_MIN_CHARS = 1;
 
 @Component({
   tag: 'rtk-breakout-room-manager',
