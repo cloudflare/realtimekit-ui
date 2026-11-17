@@ -70,4 +70,3 @@ npm run lint:fix # eslint --fix
 - **Never** edit `dist/`, `loader/`, `docs/` by hand — overwritten on every build.
 - **Never** edit `src/components.d.ts` — Stencil-generated; changes to component APIs go in the `.tsx` source file.
 - **Never** use Tailwind `sm:`, `md:` breakpoint prefixes for size variants — use `size-sm:`, `size-md:` instead.
-- **Note:** `peerDepdendencies` (misspelled at `package.json:55`) is silently ignored by npm — the peer dep on `@cloudflare/realtimekit >=0` is not enforced.

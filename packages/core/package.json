@@ -52,8 +52,8 @@
     "access": "public",
     "tag": "latest"
   },
-  "peerDepdendencies": {
-    "@cloudflare/realtimekit": ">=0"
+  "peerDependencies": {
+    "@cloudflare/realtimekit": "*"
   },
   "dependencies": {
     "@floating-ui/dom": "^1.7.4",

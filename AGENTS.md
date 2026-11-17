@@ -98,7 +98,6 @@ realtimekit-ui/
 - `lib/builder`: `UIElemEditor.style/setChildrenProps/getChildrenProps/replace` are stubs that only `console.log`.
 - `rtk-grid.tsx` `filterParticipants()` uses `overrides.videoUnsubscribed` as a temp hack.
 - Vue library is deprecated and unsupported — do not add new components to `packages/vue-library/lib/components.ts`.
-- `peerDepdendencies` (misspelled) in `packages/core/package.json:55` is silently ignored by npm.
 
 ## COMMANDS
 
