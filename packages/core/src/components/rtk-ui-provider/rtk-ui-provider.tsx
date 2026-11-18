@@ -22,6 +22,7 @@ import deepMerge from 'lodash-es/merge';
 import { getInitErrorInfo } from '../../utils/init-error';
 import { getJoinErrorInfo } from '../../utils/join-error';
 import { PermissionSettings } from '../../types/props';
+import { reportUiKitMetadata } from '../../utils/ui-kit-metadata';
 
 const LEAVE_ROOM_TIMER = 10000;
 
@@ -173,6 +174,8 @@ export class RtkUiProvider {
   @Watch('meeting')
   meetingChanged(meeting: Meeting, oldMeeting?: Meeting) {
     if (meeting) {
+      reportUiKitMetadata(meeting);
+
       this.peerStore = createPeerStore({
         meeting,
         config: this.config,

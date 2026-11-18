@@ -4,6 +4,7 @@ export { BreakoutRoomsManager };
 export { provideRtkDesignSystem } from './utils/provide-design-system';
 export { extendConfig, generateConfig } from './utils/config';
 export { sendNotification } from './utils/notification';
+export { setUiKitSdkName } from './utils/ui-kit-metadata';
 export { RtkUiBuilder } from './lib/builder';
 export {
   uiStore,

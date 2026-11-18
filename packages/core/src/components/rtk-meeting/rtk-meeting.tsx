@@ -20,6 +20,7 @@ import {
 import { Overrides, defaultOverrides } from '../../lib/overrides';
 import { getInitErrorInfo } from '../../utils/init-error';
 import { getJoinErrorInfo } from '../../utils/join-error';
+import { reportUiKitMetadata } from '../../utils/ui-kit-metadata';
 
 export type MeetingMode = 'fixed' | 'fill';
 
@@ -251,6 +252,8 @@ export class RtkMeeting {
   @Watch('meeting')
   meetingChanged(meeting: Meeting, oldMeeting?: Meeting) {
     if (!meeting) return;
+
+    reportUiKitMetadata(meeting);
 
     // Create peer specific store for this meeting peer instance
     if (meeting) {
