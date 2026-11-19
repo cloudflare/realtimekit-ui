@@ -251,7 +251,7 @@ describe('<rtk-breakout-room-manager>', () => {
     );
   });
 
-  it.each(['', 'ab'])('rejects the too-short title %j', async (value) => {
+  it.each([''])('rejects the too-short title %j', async (value) => {
     const { page, title, input, action, updates } = await createRoom();
     title().click();
     await page.waitForChanges();

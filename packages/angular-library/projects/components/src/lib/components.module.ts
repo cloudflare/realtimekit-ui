@@ -1,6 +1,7 @@
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { DIRECTIVES } from './stencil-generated';
 import { defineCustomElements } from '@cloudflare/realtimekit-ui/loader';
+import { setUiKitSdkName } from '@cloudflare/realtimekit-ui';
 
 @NgModule({
   declarations: [...DIRECTIVES],
@@ -13,4 +14,8 @@ import { defineCustomElements } from '@cloudflare/realtimekit-ui/loader';
     },
   ],
 })
-export class RealtimeKitComponentsModule {}
+export class RealtimeKitComponentsModule {
+  constructor() {
+    setUiKitSdkName('angular');
+  }
+}
