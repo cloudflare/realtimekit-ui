@@ -1,3 +1,11 @@
+## [2.1.1-staging.1](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.1.0...@cloudflare/realtimekit-ui-v2.1.1-staging.1) (2026-11-19)
+
+
+### Bug Fixes
+
+* **logs:** upgrading realtimekit for proper type ([d8fc02b](https://github.com/cloudflare/realtimekit-ui/commit/d8fc02b2d4f2ee46d0e414ea3232e8a37d3d0352))
+* **sdk-version-reporting:** report ui kit sdk name and versions ([8d87b6b](https://github.com/cloudflare/realtimekit-ui/commit/8d87b6b150e18d2a33639fa7baaade9c4aa49689))
+
 # [2.1.0](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.0.3...@cloudflare/realtimekit-ui-v2.1.0) (2026-11-16)
 
 
