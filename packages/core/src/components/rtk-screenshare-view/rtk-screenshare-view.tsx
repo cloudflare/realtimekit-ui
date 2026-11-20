@@ -21,7 +21,7 @@ import {
   requestFullScreen,
 } from '../../utils/full-screen';
 import { SyncWithStore } from '../../utils/sync-with-store';
-import { RTKParticipant, RTKSelf } from '@cloudflare/realtimekit';
+import { RTKSelf } from '@cloudflare/realtimekit';
 
 /**
  * A component which plays a participant's screenshared video.
@@ -37,9 +37,23 @@ import { RTKParticipant, RTKSelf } from '@cloudflare/realtimekit';
 })
 export class RtkScreenshareView {
   private videoEl: HTMLVideoElement;
-  private screenShareListener: (
-    data: Pick<Peer, 'screenShareEnabled' | 'screenShareTracks'>
-  ) => void;
+
+  private screenShareListener = ({
+    screenShareEnabled,
+    screenShareTracks,
+  }: Pick<Peer, 'screenShareEnabled' | 'screenShareTracks'>) => {
+    const enabled = screenShareEnabled && screenShareTracks.video != null;
+
+    writeTask(() => {
+      this.screenShareEnabled = enabled;
+    });
+  };
+
+  private onVideoRef = (el: HTMLVideoElement) => {
+    if (el == null || el === this.videoEl) return;
+    this.videoEl = el;
+    this.participant?.registerScreenshareVideoElement(el);
+  };
 
   private fullScreenListener = () => {
     this.isFullScreen = isFullScreenEnabled();
@@ -110,63 +124,51 @@ export class RtkScreenshareView {
   connectedCallback() {
     window?.addEventListener('fullscreenchange', this.fullScreenListener);
     window?.addEventListener('webkitfullscreenchange', this.fullScreenListener);
-  }
 
-  componentDidLoad() {
     this.participantChanged(this.participant);
   }
 
   disconnectedCallback() {
-    if (!this.meeting) return;
-
-    const { self } = this.meeting;
-    if (this.participant.id === self.id && this.screenShareListener)
-      (this.participant as RTKParticipant).removeListener(
-        'screenShareUpdate',
-        this.screenShareListener
-      );
-    else
-      this.meeting.participants.joined.removeListener(
-        'screenShareUpdate',
-        this.participantScreenshareUpdate
-      );
+    this.cleanupParticipant(this.participant);
 
     window?.removeEventListener('fullscreenchange', this.fullScreenListener);
     window?.removeEventListener('webkitfullscreenchange', this.fullScreenListener);
   }
 
   @Watch('participant')
-  participantChanged(participant: Peer) {
-    if (participant != null && this.meeting) {
-      const { self } = this.meeting;
-      this.screenShareListener = ({ screenShareEnabled, screenShareTracks }) => {
-        const enabled = screenShareEnabled && screenShareTracks.video != null;
+  participantChanged(participant: Peer, oldParticipant?: Peer) {
+    // The SDK ignores a video element that another participant still manages
+    this.cleanupParticipant(oldParticipant);
+    if (participant == null) return;
 
-        writeTask(() => {
-          this.screenShareEnabled = enabled;
-        });
+    // On first load the video element is registered once it renders, see onVideoRef
+    if (this.videoEl) participant.registerScreenshareVideoElement(this.videoEl);
+    if (!this.meeting) return;
 
-        if (enabled) {
-          const stream = new MediaStream();
-          stream.addTrack(screenShareTracks.video);
-          if (this.videoEl != null) {
-            this.videoEl.srcObject = stream;
-            this.videoEl.play();
-          }
-        } else if (this.videoEl != null) {
-          this.videoEl.srcObject = undefined;
-        }
-      };
-      this.screenShareListener(participant);
+    this.screenShareListener(participant);
 
-      if (participant.id === self.id)
-        (participant as RTKSelf).addListener('screenShareUpdate', this.screenShareListener);
-      else
-        this.meeting.participants.joined.addListener(
-          'screenShareUpdate',
-          this.participantScreenshareUpdate
-        );
-    }
+    if (participant.id === this.meeting.self.id)
+      (participant as RTKSelf).addListener('screenShareUpdate', this.screenShareListener);
+    else
+      this.meeting.participants.joined.addListener(
+        'screenShareUpdate',
+        this.participantScreenshareUpdate
+      );
+  }
+
+  private cleanupParticipant(participant: Peer) {
+    if (participant == null) return;
+
+    participant.deregisterScreenshareVideoElement(this.videoEl);
+    if (!this.meeting) return;
+
+    if (participant.id === this.meeting.self.id)
+      (participant as RTKSelf).removeListener('screenShareUpdate', this.screenShareListener);
+    else
+      this.meeting.participants.joined.removeListener(
+        'screenShareUpdate',
+        this.participantScreenshareUpdate
+      );
   }
 
   private shareDifferentScreen = async () => {
@@ -205,7 +207,7 @@ export class RtkScreenshareView {
       <Host class={{ isSelf }}>
         <div key="video-container" id="video-container" class={{ expand: this.videoExpanded }}>
           <video
-            ref={(el) => (this.videoEl = el)}
+            ref={this.onVideoRef}
             class={{
               visible: this.screenShareEnabled,
               'fit-in-container': this.participant.supportsRemoteControl,
