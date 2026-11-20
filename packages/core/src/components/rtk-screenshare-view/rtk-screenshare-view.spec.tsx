@@ -19,15 +19,10 @@ async function createView({
     supportsRemoteControl: false,
     enableScreenShare: jest.fn(() => Promise.resolve()),
     disableScreenShare: jest.fn(() => Promise.resolve()),
+    registerScreenshareVideoElement: jest.fn(),
+    deregisterScreenshareVideoElement: jest.fn(),
   });
-  const participant = remote
-    ? {
-        id: 'remote',
-        screenShareEnabled: true,
-        screenShareTracks: {},
-        supportsRemoteControl: false,
-      }
-    : self;
+  const participant = remote ? createRemoteParticipant('remote') : self;
   const logger = { error: jest.fn() };
   const meeting = {
     self,
@@ -46,8 +41,87 @@ async function createView({
   const stopButton = () =>
     root.shadowRoot.querySelector<HTMLRtkButtonElement>('.actions rtk-button[variant="danger"]');
 
-  return { page, root, self, logger, switchButton, stopButton };
+  const videoEl = () => root.shadowRoot.querySelector('video');
+
+  return { page, root, self, participant, meeting, logger, switchButton, stopButton, videoEl };
 }
+
+function createRemoteParticipant(id: string) {
+  return {
+    id,
+    screenShareEnabled: true,
+    screenShareTracks: {} as { video?: unknown },
+    supportsRemoteControl: false,
+    registerScreenshareVideoElement: jest.fn(),
+    deregisterScreenshareVideoElement: jest.fn(),
+  };
+}
+
+describe('<rtk-screenshare-view> video element registration', () => {
+  it.each([false, true])(
+    'registers its video element with the participant (remote: %s)',
+    async (remote) => {
+      const { participant, videoEl } = await createView({ remote });
+
+      expect(participant.registerScreenshareVideoElement).toHaveBeenCalledTimes(1);
+      expect(participant.registerScreenshareVideoElement).toHaveBeenCalledWith(videoEl());
+      expect(participant.deregisterScreenshareVideoElement).not.toHaveBeenCalled();
+    }
+  );
+
+  it('leaves the video source to the SDK when the screen share updates', async () => {
+    const { page, participant, meeting, videoEl } = await createView({ remote: true });
+    expect(videoEl().classList.contains('visible')).toBe(false);
+
+    participant.screenShareTracks = { video: {} };
+    meeting.participants.joined.emit('screenShareUpdate', participant);
+    await page.waitForChanges();
+
+    expect(videoEl().classList.contains('visible')).toBe(true);
+    expect(videoEl().srcObject).toBeUndefined();
+  });
+
+  it('deregisters its video element and stops listening when removed', async () => {
+    const { root, self, meeting, videoEl } = await createView();
+    const element = videoEl();
+
+    root.remove();
+
+    expect(self.deregisterScreenshareVideoElement).toHaveBeenCalledTimes(1);
+    expect(self.deregisterScreenshareVideoElement).toHaveBeenCalledWith(element);
+    expect(self.listenerCount('screenShareUpdate')).toBe(0);
+    expect(meeting.participants.joined.listenerCount('screenShareUpdate')).toBe(0);
+  });
+
+  it('registers its video element again when it is attached again', async () => {
+    const { page, root, participant, meeting, videoEl } = await createView({ remote: true });
+    const element = videoEl();
+
+    root.remove();
+    page.body.appendChild(root);
+    await page.waitForChanges();
+
+    expect(participant.registerScreenshareVideoElement).toHaveBeenCalledTimes(2);
+    expect(participant.registerScreenshareVideoElement).toHaveBeenLastCalledWith(element);
+    expect(meeting.participants.joined.listenerCount('screenShareUpdate')).toBe(1);
+  });
+
+  it('moves its video element to a new participant', async () => {
+    const { page, root, self, meeting, videoEl } = await createView();
+    const next = createRemoteParticipant('next');
+
+    (root as HTMLRtkScreenshareViewElement).participant = next as any;
+    await page.waitForChanges();
+
+    expect(self.deregisterScreenshareVideoElement).toHaveBeenCalledWith(videoEl());
+    expect(next.registerScreenshareVideoElement).toHaveBeenCalledWith(videoEl());
+    expect(self.deregisterScreenshareVideoElement.mock.invocationCallOrder[0]).toBeLessThan(
+      next.registerScreenshareVideoElement.mock.invocationCallOrder[0]
+    );
+    expect(self.listenerCount('screenShareUpdate')).toBe(0);
+    expect(meeting.participants.joined.listenerCount('screenShareUpdate')).toBe(1);
+  });
+});
 
 describe('<rtk-screenshare-view> screen-sharing actions', () => {
   it('shows separate stop and switch buttons alongside the self-share message', async () => {
