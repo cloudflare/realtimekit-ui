@@ -231,8 +231,8 @@ export const defaultConfig: UIConfig = {
     ],
 
     'div#setupcontrols-media': [
-      ['rtk-mic-toggle', { size: 'sm' }],
-      ['rtk-camera-toggle', { size: 'sm' }],
+      ['rtk-mic-toggle', { size: 'sm', hideDeviceSelectionMenu: true }],
+      ['rtk-camera-toggle', { size: 'sm', hideDeviceSelectionMenu: true }],
     ],
     'div#setupcontrols-settings': [['rtk-settings-toggle', { size: 'sm' }]],
     'rtk-screenshare-view': {

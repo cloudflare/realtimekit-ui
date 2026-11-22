@@ -449,8 +449,8 @@ export const generateConfig = (
       ],
       'div#setupcontrols-indicator': [['rtk-audio-visualizer', { slot: 'start', hideMuted: true }]],
       'div#setupcontrols-media': [
-        ['rtk-mic-toggle', { size: 'sm' }],
-        ['rtk-camera-toggle', { size: 'sm' }],
+        ['rtk-mic-toggle', { size: 'sm', hideDeviceSelectionMenu: true }],
+        ['rtk-camera-toggle', { size: 'sm', hideDeviceSelectionMenu: true }],
       ],
       'div#setupcontrols-settings': [['rtk-settings-toggle', { size: 'sm' }]],
 

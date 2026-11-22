@@ -384,14 +384,14 @@ export declare interface RtkCameraSelector extends Components.RtkCameraSelector 
 
 
 @ProxyCmp({
-  inputs: ['iconPack', 'meeting', 'size', 't', 'variant']
+  inputs: ['hideDeviceSelectionMenu', 'iconPack', 'meeting', 'size', 'states', 't', 'variant']
 })
 @Component({
   selector: 'rtk-camera-toggle',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: '<ng-content></ng-content>',
   // eslint-disable-next-line @angular-eslint/no-inputs-metadata-property
-  inputs: ['iconPack', 'meeting', 'size', 't', 'variant'],
+  inputs: ['hideDeviceSelectionMenu', 'iconPack', 'meeting', 'size', 'states', 't', 'variant'],
 })
 export class RtkCameraToggle {
   protected el: HTMLRtkCameraToggleElement;
@@ -1998,14 +1998,14 @@ export declare interface RtkMessageView extends Components.RtkMessageView {
 
 
 @ProxyCmp({
-  inputs: ['iconPack', 'meeting', 'size', 't', 'variant']
+  inputs: ['hideDeviceSelectionMenu', 'iconPack', 'meeting', 'size', 't', 'variant']
 })
 @Component({
   selector: 'rtk-mic-toggle',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: '<ng-content></ng-content>',
   // eslint-disable-next-line @angular-eslint/no-inputs-metadata-property
-  inputs: ['iconPack', 'meeting', 'size', 't', 'variant'],
+  inputs: ['hideDeviceSelectionMenu', 'iconPack', 'meeting', 'size', 't', 'variant'],
 })
 export class RtkMicToggle {
   protected el: HTMLRtkMicToggleElement;
