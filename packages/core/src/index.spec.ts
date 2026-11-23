@@ -2,7 +2,7 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 
 const html = readFileSync(join(__dirname, 'index.html'), 'utf8');
-const script = html.match(/<script>\s*([\s\S]*?)\s*<\/script>/)?.[1];
+const script = html.match(/<script>\s*([\s\S]*?)\s*<\/script>/i)?.[1];
 if (!script) throw new Error('Demo app script not found');
 
 const createDemoApp = new Function(`${script}; return app;`)() as () => any;

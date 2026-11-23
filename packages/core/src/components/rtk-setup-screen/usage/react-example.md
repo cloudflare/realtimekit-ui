@@ -1,3 +1,7 @@
 ```jsx live
-<RtkSetupScreen meeting={meeting} style={{ height: '360px' }} />
+<RtkSetupScreen
+  meeting={meeting}
+  style={{ height: '360px' }}
+  overrides={{ hideMediaSelectorsInSetupScreen: true }}
+/>
 ```

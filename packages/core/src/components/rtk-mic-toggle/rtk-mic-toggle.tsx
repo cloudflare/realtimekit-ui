@@ -29,7 +29,7 @@ export class RtkMicToggle {
   };
 
   private deviceUpdateListener = () => {
-    this.currentDevices = this.meeting.self.getCurrentDevices();
+    this.currentDevices = { ...this.meeting.self.getCurrentDevices() };
   };
 
   private audioUpdateListener = ({ audioEnabled }: Peer) => {
@@ -133,7 +133,7 @@ export class RtkMicToggle {
     this.speakerDevices = speakerDevices.filter(
       (device) => device.kind === 'audiooutput' && !!device.deviceId
     );
-    this.currentDevices = meeting.self.getCurrentDevices();
+    this.currentDevices = { ...meeting.self.getCurrentDevices() };
   }
 
   @Watch('meeting')
@@ -149,7 +149,7 @@ export class RtkMicToggle {
       this.stageStatus = meeting.stage.status;
       this.audioInputDevices = [];
       this.speakerDevices = [];
-      this.currentDevices = self.getCurrentDevices();
+      this.currentDevices = { ...self.getCurrentDevices() };
       self.addListener('audioUpdate', this.audioUpdateListener);
       self.addListener('mediaPermissionUpdate', this.mediaPermissionUpdateListener);
       self.addListener('deviceListUpdate', this.deviceListUpdateListener);
@@ -169,7 +169,7 @@ export class RtkMicToggle {
     try {
       await meeting.self.setDevice(device);
       if (meeting === this.meeting) {
-        this.currentDevices = meeting.self.getCurrentDevices();
+        this.currentDevices = { ...meeting.self.getCurrentDevices() };
       }
     } catch (error) {
       meeting.__internals__.logger.warn('rtkMicToggle::setDevice', { error });
