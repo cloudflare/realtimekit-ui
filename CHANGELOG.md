@@ -1,3 +1,10 @@
+# [2.2.0-staging.2](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.2.0-staging.1...@cloudflare/realtimekit-ui-v2.2.0-staging.2) (2026-11-23)
+
+
+### Features
+
+* **device-list-alongside-media-toggles:** rtk-mic-toggle & rtk-camera-toggle now have device dropdowns and slots for noise cancellation and video effects ([#214](https://github.com/cloudflare/realtimekit-ui/issues/214)) ([bb71819](https://github.com/cloudflare/realtimekit-ui/commit/bb7181918d896ec7a01d9b5bd009da5c0f7faf86))
+
 # [2.2.0-staging.1](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.1.1-staging.1...@cloudflare/realtimekit-ui-v2.2.0-staging.1) (2026-11-23)
 
 
