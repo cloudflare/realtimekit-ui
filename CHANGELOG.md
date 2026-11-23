@@ -1,3 +1,10 @@
+# [2.2.0-staging.1](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.1.1-staging.1...@cloudflare/realtimekit-ui-v2.2.0-staging.1) (2026-11-23)
+
+
+### Features
+
+* **pip:** added screenshare support in PIP, fixed every known pip bug ([#213](https://github.com/cloudflare/realtimekit-ui/issues/213)) ([d7b28b4](https://github.com/cloudflare/realtimekit-ui/commit/d7b28b4ff957994fc6fa5e352c2f9056d7a5875f))
+
 ## [2.1.1-staging.1](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.1.0...@cloudflare/realtimekit-ui-v2.1.1-staging.1) (2026-11-19)
 
 
