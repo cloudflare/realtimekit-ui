@@ -3,6 +3,7 @@ import { newSpecPage } from '@stencil/core/testing';
 import { EventEmitter } from 'events';
 import { defaultIconPack, IconPack } from '../../lib/icons';
 import { RtkI18n, useLanguage } from '../../lib/lang';
+import { Meeting, Peer } from '../../types/rtk-client';
 import { RtkButton } from '../rtk-button/rtk-button';
 import { RtkIcon } from '../rtk-icon/rtk-icon';
 import { RtkScreenshareView } from './rtk-screenshare-view';
@@ -58,6 +59,28 @@ function createRemoteParticipant(id: string) {
 }
 
 describe('<rtk-screenshare-view> video element registration', () => {
+  it('does not deregister an absent video element when switching participants or disconnecting', () => {
+    const previous = createRemoteParticipant('previous');
+    const next = createRemoteParticipant('next');
+    const joined = new EventEmitter();
+    const view = new RtkScreenshareView();
+    view.meeting = { self: { id: 'self' }, participants: { joined } } as unknown as Meeting;
+    view.participant = previous as unknown as Peer;
+
+    view.connectedCallback();
+    expect(joined.listenerCount('screenShareUpdate')).toBe(1);
+
+    view.participantChanged(next as unknown as Peer, previous as unknown as Peer);
+    expect(previous.deregisterScreenshareVideoElement).not.toHaveBeenCalled();
+    expect(next.registerScreenshareVideoElement).not.toHaveBeenCalled();
+    expect(joined.listenerCount('screenShareUpdate')).toBe(1);
+
+    view.participant = next as unknown as Peer;
+    view.disconnectedCallback();
+    expect(next.deregisterScreenshareVideoElement).not.toHaveBeenCalled();
+    expect(joined.listenerCount('screenShareUpdate')).toBe(0);
+  });
+
   it.each([false, true])(
     'registers its video element with the participant (remote: %s)',
     async (remote) => {

@@ -159,7 +159,7 @@ export class RtkScreenshareView {
   private cleanupParticipant(participant: Peer) {
     if (participant == null) return;
 
-    participant.deregisterScreenshareVideoElement(this.videoEl);
+    if (this.videoEl) participant.deregisterScreenshareVideoElement(this.videoEl);
     if (!this.meeting) return;
 
     if (participant.id === this.meeting.self.id)
