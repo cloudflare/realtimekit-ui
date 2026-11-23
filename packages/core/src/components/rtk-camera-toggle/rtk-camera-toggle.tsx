@@ -6,9 +6,12 @@ import { PermissionSettings, Size, States } from '../../types/props';
 import { ControlBarVariant } from '../rtk-controlbar-button/rtk-controlbar-button';
 import { SyncWithStore } from '../../utils/sync-with-store';
 import { StageStatus } from '@cloudflare/realtimekit';
+import { getUserPreferences, setPreference } from '../../utils/user-prefs';
 
 /**
  * A button which toggles your camera.
+ *
+ * @slot additional-menu-items - Additional menu entries displayed after the camera devices.
  */
 @Component({
   tag: 'rtk-camera-toggle',
@@ -16,8 +19,19 @@ import { StageStatus } from '@cloudflare/realtimekit';
   shadow: true,
 })
 export class RtkCameraToggle {
+  private deviceListUpdateListener = ({ devices }: { devices: MediaDeviceInfo[] }) => {
+    this.videoDevices = devices.filter(
+      (device) => device.kind === 'videoinput' && !!device.deviceId
+    );
+  };
+
+  private deviceUpdateListener = () => {
+    this.currentDevice = this.meeting.self.getCurrentDevices()?.video;
+  };
+
   private videoUpdateListener = ({ videoEnabled }: Peer) => {
     this.videoEnabled = videoEnabled;
+    this.currentDevice = this.meeting.self.getCurrentDevices()?.video;
   };
 
   private stageStatusListener = () => {
@@ -50,6 +64,14 @@ export class RtkCameraToggle {
   /** Size */
   @Prop({ reflect: true }) size: Size;
 
+  /** Hides the video device menu, for setup and preview controls. */
+  @Prop({ reflect: true }) hideDeviceSelectionMenu: boolean = false;
+
+  /** States */
+  @SyncWithStore()
+  @Prop()
+  states: States;
+
   /** Icon pack */
   @SyncWithStore()
   @Prop()
@@ -68,6 +90,12 @@ export class RtkCameraToggle {
 
   @State() stageStatus: StageStatus = 'OFF_STAGE';
 
+  @State() videoDevices: MediaDeviceInfo[] = [];
+
+  @State() currentDevice: MediaDeviceInfo;
+
+  @State() hasAdditionalMenuItems: boolean = false;
+
   /** Emits updated state data */
   @Event({ eventName: 'rtkStateUpdate' }) stateUpdate: EventEmitter<States>;
 
@@ -76,17 +104,35 @@ export class RtkCameraToggle {
   }
 
   disconnectedCallback() {
-    this.meeting?.self.removeListener('videoUpdate', this.videoUpdateListener);
-    this.meeting?.self.removeListener('mediaPermissionUpdate', this.mediaPermissionUpdateListener);
-    this.meeting?.stage?.removeListener('stageStatusUpdate', this.stageStatusListener);
-    this.meeting?.self?.permissions?.removeListener(
+    this.removeMeetingListeners(this.meeting);
+  }
+
+  private removeMeetingListeners(meeting: Meeting) {
+    meeting?.self.removeListener('videoUpdate', this.videoUpdateListener);
+    meeting?.self.removeListener('mediaPermissionUpdate', this.mediaPermissionUpdateListener);
+    meeting?.self.removeListener('deviceListUpdate', this.deviceListUpdateListener);
+    meeting?.self.removeListener('deviceUpdate', this.deviceUpdateListener);
+    meeting?.stage?.removeListener('stageStatusUpdate', this.stageStatusListener);
+    meeting?.self?.permissions?.removeListener(
       'permissionsUpdate',
       this.meetingPermissionsUpdateListener
     );
   }
 
+  private async refreshDevices(meeting: Meeting) {
+    if (!meeting) return;
+    const videoDevices = await meeting.self.getVideoDevices();
+    if (meeting !== this.meeting) return;
+
+    this.videoDevices = videoDevices.filter(
+      (device) => device.kind === 'videoinput' && !!device.deviceId
+    );
+    this.currentDevice = meeting.self.getCurrentDevices()?.video;
+  }
+
   @Watch('meeting')
-  meetingChanged(meeting: Meeting) {
+  meetingChanged(meeting: Meeting, oldMeeting?: Meeting) {
+    this.removeMeetingListeners(oldMeeting);
     if (meeting != null) {
       const { self, stage } = meeting;
       this.canProduceVideo = this.meeting.self.permissions.canProduceVideo === 'ALLOWED';
@@ -94,15 +140,49 @@ export class RtkCameraToggle {
       this.videoEnabled = self.videoEnabled;
 
       this.stageStatus = meeting.stage.status;
+      this.videoDevices = [];
+      this.currentDevice = self.getCurrentDevices()?.video;
       self.addListener('videoUpdate', this.videoUpdateListener);
       self.addListener('mediaPermissionUpdate', this.mediaPermissionUpdateListener);
+      self.addListener('deviceListUpdate', this.deviceListUpdateListener);
+      self.addListener('deviceUpdate', this.deviceUpdateListener);
       stage?.addListener('stageStatusUpdate', this.stageStatusListener);
       meeting?.self?.permissions?.addListener(
         'permissionsUpdate',
         this.meetingPermissionsUpdateListener
       );
+      void this.refreshDevices(meeting);
     }
   }
+
+  private setDevice = async (device: MediaDeviceInfo) => {
+    const meeting = this.meeting;
+    if (!meeting) return;
+    try {
+      await meeting.self.setDevice(device);
+      if (meeting === this.meeting) {
+        this.currentDevice = meeting.self.getCurrentDevices()?.video;
+      }
+    } catch (error) {
+      meeting.__internals__.logger.warn('rtkCameraToggle::setDevice', { error });
+    }
+  };
+
+  private handleMenuKeyDown = (event: KeyboardEvent) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      (event.currentTarget as HTMLElement).click();
+    }
+  };
+
+  private handleMirrorChange = (event: CustomEvent<boolean>) => {
+    const mirrorVideo = event.detail;
+    if (mirrorVideo === (this.states?.prefs?.mirrorVideo ?? getUserPreferences().mirrorVideo)) {
+      return;
+    }
+    setPreference('mirror-video', mirrorVideo);
+    this.stateUpdate.emit({ prefs: { mirrorVideo } });
+  };
 
   private hasPermissionError() {
     return this.cameraPermission === 'DENIED' || this.cameraPermission === 'SYSTEM_DENIED';
@@ -196,23 +276,97 @@ export class RtkCameraToggle {
     }
 
     const { tooltipLabel, label, icon, classList, showWarning, disable } = this.getState();
+    const mirrorVideo = this.states?.prefs?.mirrorVideo ?? getUserPreferences().mirrorVideo;
 
     return (
       <Host title={label}>
-        <rtk-tooltip kind="block" label={tooltipLabel} part="tooltip">
-          <rtk-controlbar-button
-            part="controlbar-button"
-            size={this.size}
-            iconPack={this.iconPack}
-            class={classList}
-            variant={this.variant}
-            label={label}
-            icon={icon}
-            onClick={this.toggleCamera}
-            showWarning={showWarning}
-            disabled={disable}
-          />
-        </rtk-tooltip>
+        <div class="camera-controls">
+          <rtk-tooltip kind="block" label={tooltipLabel} part="tooltip">
+            <rtk-controlbar-button
+              part="controlbar-button"
+              size={this.size}
+              iconPack={this.iconPack}
+              class={classList}
+              variant={this.variant}
+              label={label}
+              icon={icon}
+              onClick={this.toggleCamera}
+              showWarning={showWarning}
+              disabled={disable}
+            />
+          </rtk-tooltip>
+          {!this.hideDeviceSelectionMenu && (
+            <rtk-menu
+              placement="top"
+              offset={4}
+              size={this.size}
+              iconPack={this.iconPack}
+              t={this.t}
+            >
+              <button
+                class="device-trigger"
+                type="button"
+                slot="trigger"
+                aria-label={this.t('camera_toggle.video_devices')}
+                aria-haspopup="menu"
+                title={this.t('camera_toggle.video_devices')}
+              >
+                <rtk-icon icon={this.iconPack.chevron_up} size="sm" />
+              </button>
+              <rtk-menu-list role="menu" iconPack={this.iconPack} t={this.t}>
+                {this.videoDevices.length === 0 && (
+                  <div class="empty-devices">{this.t('not_found_camera')}</div>
+                )}
+                {this.videoDevices.map((device) => (
+                  <rtk-menu-item
+                    role="menuitemradio"
+                    aria-checked={String(this.currentDevice?.deviceId === device.deviceId)}
+                    tabIndex={0}
+                    title={device.label}
+                    onClick={() => void this.setDevice(device)}
+                    onKeyDown={this.handleMenuKeyDown}
+                  >
+                    <span class="device-label">{device.label}</span>
+                    {this.currentDevice?.deviceId === device.deviceId && (
+                      <rtk-icon icon={this.iconPack.checkmark} size="sm" slot="end" />
+                    )}
+                  </rtk-menu-item>
+                ))}
+                <div
+                  class={{
+                    'additional-menu-items': true,
+                    'has-items': this.hasAdditionalMenuItems,
+                  }}
+                >
+                  {this.hasAdditionalMenuItems && <div class="menu-divider" role="separator" />}
+                  <slot
+                    name="additional-menu-items"
+                    onSlotchange={(event) => {
+                      this.hasAdditionalMenuItems =
+                        (event.target as HTMLSlotElement).assignedElements().length > 0;
+                    }}
+                  />
+                </div>
+                {!this.hasAdditionalMenuItems && <div class="menu-divider" role="separator" />}
+                <div class="mirror-option">
+                  <rtk-icon
+                    icon={this.iconPack[mirrorVideo ? 'mirror_on' : 'mirror_off']}
+                    size="sm"
+                    aria-hidden={true}
+                  />
+                  <span>{this.t('camera_toggle.mirror_video')}</span>
+                  <rtk-switch
+                    checked={mirrorVideo}
+                    iconPack={this.iconPack}
+                    t={this.t}
+                    aria-label={this.t('camera_toggle.mirror_video')}
+                    onRtkChange={this.handleMirrorChange}
+                  />
+                </div>
+              </rtk-menu-list>
+            </rtk-menu>
+          )}
+        </div>
       </Host>
     );
   }

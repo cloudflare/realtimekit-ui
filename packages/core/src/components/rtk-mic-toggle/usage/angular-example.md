@@ -1,9 +1,12 @@
 Template
 
 ```html
-<rtk-mic-toggle #one></rtk-mic-toggle>
+<rtk-mic-toggle #one>
+  <rtk-menu-item slot="additional-menu-items">Audio settings</rtk-menu-item>
+</rtk-mic-toggle>
 <rtk-mic-toggle #two></rtk-mic-toggle>
 <rtk-mic-toggle #three></rtk-mic-toggle>
+<rtk-mic-toggle #four></rtk-mic-toggle>
 ```
 
 Component
@@ -16,7 +19,9 @@ class MyComponent {
 
   @ViewChild('two') componentTwo: RtkMicToggle;
 
-  @ViewChild('three') componentTree: RtkMicToggle;
+  @ViewChild('three') componentThree: RtkMicToggle;
+
+  @ViewChild('four') componentFour: RtkMicToggle;
 
   rtkMeeting: RealtimeKitClient; // meeting instance
 
@@ -32,6 +37,10 @@ class MyComponent {
     // Render as a horizontal button
     this.componentThree.meeting = this.rtkMeeting;
     this.componentThree.variant = 'horizontal';
+
+    // Hide the device menu in a custom layout
+    this.componentFour.meeting = this.rtkMeeting;
+    this.componentFour.hideDeviceSelectionMenu = true;
   }
 }
 ```

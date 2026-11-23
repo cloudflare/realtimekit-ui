@@ -21,6 +21,7 @@ import gracefulStorage from '../../utils/graceful-storage';
 import { SyncWithStore } from '../../utils/sync-with-store';
 import { SocketConnectionState } from '@cloudflare/realtimekit';
 import { getJoinErrorInfo } from '../../utils/join-error';
+import { Overrides, defaultOverrides } from '../../lib/overrides';
 
 /**
  * A screen shown before joining the meeting, where you can edit your display name,
@@ -63,6 +64,11 @@ export class RtkSetupScreen {
   @SyncWithStore()
   @Prop()
   t: RtkI18n = useLanguage();
+
+  /** UI Kit Overrides */
+  @SyncWithStore()
+  @Prop()
+  overrides: Overrides = defaultOverrides;
 
   @State() displayName: string;
 
@@ -177,11 +183,13 @@ export class RtkSetupScreen {
               childProps={{ participant: this.meeting?.self, size: 'md' }}
               deepProps
             />
-            <div class={'media-selectors'}>
-              <rtk-microphone-selector {...defaults} variant="inline" />
-              <rtk-camera-selector {...defaults} variant="inline" />
-              <rtk-speaker-selector {...defaults} variant="inline" />
-            </div>
+            {!this.overrides?.hideMediaSelectorsInSetupScreen && (
+              <div class={'media-selectors'}>
+                <rtk-microphone-selector {...defaults} variant="inline" />
+                <rtk-camera-selector {...defaults} variant="inline" />
+                <rtk-speaker-selector {...defaults} variant="inline" />
+              </div>
+            )}
           </div>
           <div class="metadata">
             {meetingTitle && meetingTitle !== '' && <div class="meeting-title">{meetingTitle}</div>}

@@ -4,6 +4,105 @@
   display: block;
 }
 
+.camera-controls {
+  @apply inline-flex h-full items-stretch rounded-md transition-colors;
+}
+
+.camera-controls:hover {
+  --rtk-controlbar-button-background-color: theme('colors.background.800');
+}
+
+rtk-tooltip {
+  @apply shrink-0;
+  width: max-content;
+}
+
+rtk-controlbar-button {
+  @apply h-full;
+}
+
+:host(:not([hide-device-selection-menu])) rtk-controlbar-button {
+  min-width: 56px;
+  width: max-content;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+:host(:not([hide-device-selection-menu])[size='sm']) rtk-controlbar-button {
+  min-width: 40px;
+}
+
+:host(:not([hide-device-selection-menu])) rtk-controlbar-button::part(button) {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+rtk-tooltip:hover rtk-controlbar-button::part(button) {
+  @apply bg-background-700;
+}
+
+rtk-menu {
+  @apply flex shrink-0;
+  width: 28px;
+}
+
+.device-trigger {
+  @apply box-border flex h-full w-7 cursor-pointer items-center justify-center;
+  @apply text-text-1000 rounded-r-md border-none;
+  background-color: var(--rtk-controlbar-button-background-color, theme('colors.background.1000'));
+}
+
+.device-trigger:hover {
+  @apply bg-background-700;
+}
+
+.device-trigger:focus-visible {
+  outline: 2px solid theme('colors.brand.400');
+}
+
+rtk-menu-list {
+  @apply box-border max-h-[60vh] overflow-y-auto;
+  width: min(360px, calc(100vw - 24px));
+}
+
+rtk-menu-item {
+  @apply justify-between gap-3 px-3 py-2 leading-5;
+}
+
+rtk-menu-item:focus-visible {
+  outline: 2px solid theme('colors.brand.400');
+  outline-offset: -2px;
+}
+
+.mirror-option {
+  @apply text-text-1000 text-button-md flex items-center gap-2 px-3 py-2 leading-5;
+}
+
+.mirror-option rtk-switch {
+  @apply ml-auto shrink-0;
+}
+
+.device-label {
+  @apply min-w-0;
+  overflow-wrap: anywhere;
+}
+
+.empty-devices {
+  @apply text-text-600 px-3 py-2;
+}
+
+.menu-divider {
+  @apply border-background-700 border-t-sm border-b-none border-r-none border-l-none border-solid;
+}
+
+.additional-menu-items:not(.has-items) {
+  display: none;
+}
+
+::slotted([slot='additional-menu-items']) {
+  @apply box-border w-full;
+}
+
 /* useful for removing from layouts that may have gap */
 :host([data-hidden]) {
   display: none;

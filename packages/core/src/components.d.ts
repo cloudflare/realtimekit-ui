@@ -534,6 +534,11 @@ export namespace Components {
      */
     interface RtkCameraToggle {
         /**
+          * Hides the video device menu, for setup and preview controls.
+          * @default false
+         */
+        "hideDeviceSelectionMenu": boolean;
+        /**
           * Icon pack
           * @default defaultIconPack
          */
@@ -546,6 +551,10 @@ export namespace Components {
           * Size
          */
         "size": Size;
+        /**
+          * States
+         */
+        "states": States;
         /**
           * Language
           * @default useLanguage()
@@ -611,7 +620,7 @@ export namespace Components {
         "meeting": Meeting;
         /**
           * UI Overrides
-          * @default {   disableEmojiPicker: false,   disablePrivateChat: false, }
+          * @default {   disableEmojiPicker: false,   disablePrivateChat: false,   hideMediaSelectorsInSetupScreen: false, }
          */
         "overrides": Overrides;
         /**
@@ -933,7 +942,7 @@ export namespace Components {
         "meeting": Meeting;
         /**
           * UI Overrides
-          * @default {   disableEmojiPicker: false,   disablePrivateChat: false, }
+          * @default {   disableEmojiPicker: false,   disablePrivateChat: false,   hideMediaSelectorsInSetupScreen: false, }
          */
         "overrides": Overrides1;
         /**
@@ -2130,7 +2139,7 @@ export namespace Components {
         "mode": MeetingMode;
         /**
           * UI Kit Overrides
-          * @default {   disableEmojiPicker: false,   disablePrivateChat: false, }
+          * @default {   disableEmojiPicker: false,   disablePrivateChat: false,   hideMediaSelectorsInSetupScreen: false, }
          */
         "overrides": Overrides;
         /**
@@ -2342,6 +2351,11 @@ export namespace Components {
      * A button which toggles your microphone.
      */
     interface RtkMicToggle {
+        /**
+          * Hides the audio device menu, for setup and preview controls.
+          * @default false
+         */
+        "hideDeviceSelectionMenu": boolean;
         /**
           * Icon pack
           * @default defaultIconPack
@@ -3744,6 +3758,11 @@ export namespace Components {
          */
         "meeting": Meeting;
         /**
+          * UI Kit Overrides
+          * @default {   disableEmojiPicker: false,   disablePrivateChat: false,   hideMediaSelectorsInSetupScreen: false, }
+         */
+        "overrides": Overrides;
+        /**
           * Size
          */
         "size": Size;
@@ -3833,7 +3852,7 @@ export namespace Components {
           * Icon Pack
           * @default defaultIconPack
          */
-        "iconPack": { people: string; people_checked: string; chat: string; poll: string; participants: string; rocket: string; call_end: string; share: string; mic_on: string; mic_off: string; video_on: string; video_off: string; share_screen_start: string; share_screen_different: string; share_screen_stop: string; share_screen_menu: string; share_screen_person: string; clock: string; dismiss: string; send: string; search: string; more_vertical: string; chevron_down: string; chevron_up: string; chevron_left: string; chevron_right: string; settings: string; wifi: string; speaker: string; speaker_off: string; download: string; full_screen_maximize: string; full_screen_minimize: string; copy: string; attach: string; image: string; emoji_multiple: string; image_off: string; disconnected: string; wand: string; recording: string; subtract: string; stop_recording: string; warning: string; pin: string; pin_off: string; spinner: string; breakout_rooms: string; add: string; shuffle: string; edit: string; delete: string; back: string; save: string; web: string; checkmark: string; spotlight: string; join_stage: string; leave_stage: string; pip_off: string; pip_on: string; signal_1: string; signal_2: string; signal_3: string; signal_4: string; signal_5: string; start_livestream: string; stop_livestream: string; viewers: string; debug: string; info: string; devices: string; horizontal_dots: string; ai_sparkle: string; meeting_ai: string; captionsOn: string; captionsOff: string; play: string; pause: string; fastForward: string; minimize: string; maximize: string; };
+        "iconPack": { people: string; people_checked: string; chat: string; poll: string; participants: string; rocket: string; call_end: string; share: string; mic_on: string; mic_off: string; video_on: string; video_off: string; mirror_on: string; mirror_off: string; share_screen_start: string; share_screen_different: string; share_screen_stop: string; share_screen_menu: string; share_screen_person: string; clock: string; dismiss: string; send: string; search: string; more_vertical: string; chevron_down: string; chevron_up: string; chevron_left: string; chevron_right: string; settings: string; wifi: string; speaker: string; speaker_off: string; download: string; full_screen_maximize: string; full_screen_minimize: string; copy: string; attach: string; image: string; emoji_multiple: string; image_off: string; disconnected: string; wand: string; recording: string; subtract: string; stop_recording: string; warning: string; pin: string; pin_off: string; spinner: string; breakout_rooms: string; add: string; shuffle: string; edit: string; delete: string; back: string; save: string; web: string; checkmark: string; spotlight: string; join_stage: string; leave_stage: string; pip_off: string; pip_on: string; signal_1: string; signal_2: string; signal_3: string; signal_4: string; signal_5: string; start_livestream: string; stop_livestream: string; viewers: string; debug: string; info: string; devices: string; horizontal_dots: string; ai_sparkle: string; meeting_ai: string; captionsOn: string; captionsOff: string; play: string; pause: string; fastForward: string; minimize: string; maximize: string; };
         /**
           * Language
           * @default useLanguage()
@@ -4358,7 +4377,7 @@ export namespace Components {
         "mode": MeetingMode1;
         /**
           * UI Kit Overrides
-          * @default {   disableEmojiPicker: false,   disablePrivateChat: false, }
+          * @default {   disableEmojiPicker: false,   disablePrivateChat: false,   hideMediaSelectorsInSetupScreen: false, }
          */
         "overrides": Overrides1;
         /**
@@ -7524,6 +7543,11 @@ declare namespace LocalJSX {
      */
     interface RtkCameraToggle {
         /**
+          * Hides the video device menu, for setup and preview controls.
+          * @default false
+         */
+        "hideDeviceSelectionMenu"?: boolean;
+        /**
           * Icon pack
           * @default defaultIconPack
          */
@@ -7540,6 +7564,10 @@ declare namespace LocalJSX {
           * Size
          */
         "size"?: Size;
+        /**
+          * States
+         */
+        "states"?: States;
         /**
           * Language
           * @default useLanguage()
@@ -7613,7 +7641,7 @@ declare namespace LocalJSX {
         "onRtkStateUpdate"?: (event: RtkChatCustomEvent<States1>) => void;
         /**
           * UI Overrides
-          * @default {   disableEmojiPicker: false,   disablePrivateChat: false, }
+          * @default {   disableEmojiPicker: false,   disablePrivateChat: false,   hideMediaSelectorsInSetupScreen: false, }
          */
         "overrides"?: Overrides;
         /**
@@ -8014,7 +8042,7 @@ declare namespace LocalJSX {
         "onRtkDropdownToggle"?: (event: RtkChatSelectorCustomEvent<{ open: boolean }>) => void;
         /**
           * UI Overrides
-          * @default {   disableEmojiPicker: false,   disablePrivateChat: false, }
+          * @default {   disableEmojiPicker: false,   disablePrivateChat: false,   hideMediaSelectorsInSetupScreen: false, }
          */
         "overrides"?: Overrides1;
         /**
@@ -9325,7 +9353,7 @@ declare namespace LocalJSX {
         "onRtkStatesUpdate"?: (event: RtkMeetingCustomEvent<States>) => void;
         /**
           * UI Kit Overrides
-          * @default {   disableEmojiPicker: false,   disablePrivateChat: false, }
+          * @default {   disableEmojiPicker: false,   disablePrivateChat: false,   hideMediaSelectorsInSetupScreen: false, }
          */
         "overrides"?: Overrides;
         /**
@@ -9541,6 +9569,11 @@ declare namespace LocalJSX {
      * A button which toggles your microphone.
      */
     interface RtkMicToggle {
+        /**
+          * Hides the audio device menu, for setup and preview controls.
+          * @default false
+         */
+        "hideDeviceSelectionMenu"?: boolean;
         /**
           * Icon pack
           * @default defaultIconPack
@@ -11054,6 +11087,11 @@ declare namespace LocalJSX {
          */
         "onRtkStateUpdate"?: (event: RtkSetupScreenCustomEvent<States>) => void;
         /**
+          * UI Kit Overrides
+          * @default {   disableEmojiPicker: false,   disablePrivateChat: false,   hideMediaSelectorsInSetupScreen: false, }
+         */
+        "overrides"?: Overrides;
+        /**
           * Size
          */
         "size"?: Size;
@@ -11147,7 +11185,7 @@ declare namespace LocalJSX {
           * Icon Pack
           * @default defaultIconPack
          */
-        "iconPack"?: { people: string; people_checked: string; chat: string; poll: string; participants: string; rocket: string; call_end: string; share: string; mic_on: string; mic_off: string; video_on: string; video_off: string; share_screen_start: string; share_screen_different: string; share_screen_stop: string; share_screen_menu: string; share_screen_person: string; clock: string; dismiss: string; send: string; search: string; more_vertical: string; chevron_down: string; chevron_up: string; chevron_left: string; chevron_right: string; settings: string; wifi: string; speaker: string; speaker_off: string; download: string; full_screen_maximize: string; full_screen_minimize: string; copy: string; attach: string; image: string; emoji_multiple: string; image_off: string; disconnected: string; wand: string; recording: string; subtract: string; stop_recording: string; warning: string; pin: string; pin_off: string; spinner: string; breakout_rooms: string; add: string; shuffle: string; edit: string; delete: string; back: string; save: string; web: string; checkmark: string; spotlight: string; join_stage: string; leave_stage: string; pip_off: string; pip_on: string; signal_1: string; signal_2: string; signal_3: string; signal_4: string; signal_5: string; start_livestream: string; stop_livestream: string; viewers: string; debug: string; info: string; devices: string; horizontal_dots: string; ai_sparkle: string; meeting_ai: string; captionsOn: string; captionsOff: string; play: string; pause: string; fastForward: string; minimize: string; maximize: string; };
+        "iconPack"?: { people: string; people_checked: string; chat: string; poll: string; participants: string; rocket: string; call_end: string; share: string; mic_on: string; mic_off: string; video_on: string; video_off: string; mirror_on: string; mirror_off: string; share_screen_start: string; share_screen_different: string; share_screen_stop: string; share_screen_menu: string; share_screen_person: string; clock: string; dismiss: string; send: string; search: string; more_vertical: string; chevron_down: string; chevron_up: string; chevron_left: string; chevron_right: string; settings: string; wifi: string; speaker: string; speaker_off: string; download: string; full_screen_maximize: string; full_screen_minimize: string; copy: string; attach: string; image: string; emoji_multiple: string; image_off: string; disconnected: string; wand: string; recording: string; subtract: string; stop_recording: string; warning: string; pin: string; pin_off: string; spinner: string; breakout_rooms: string; add: string; shuffle: string; edit: string; delete: string; back: string; save: string; web: string; checkmark: string; spotlight: string; join_stage: string; leave_stage: string; pip_off: string; pip_on: string; signal_1: string; signal_2: string; signal_3: string; signal_4: string; signal_5: string; start_livestream: string; stop_livestream: string; viewers: string; debug: string; info: string; devices: string; horizontal_dots: string; ai_sparkle: string; meeting_ai: string; captionsOn: string; captionsOff: string; play: string; pause: string; fastForward: string; minimize: string; maximize: string; };
         /**
           * Tab change event
          */
@@ -11711,7 +11749,7 @@ declare namespace LocalJSX {
         "onRtkStatesUpdate"?: (event: RtkUiProviderCustomEvent<States1>) => void;
         /**
           * UI Kit Overrides
-          * @default {   disableEmojiPicker: false,   disablePrivateChat: false, }
+          * @default {   disableEmojiPicker: false,   disablePrivateChat: false,   hideMediaSelectorsInSetupScreen: false, }
          */
         "overrides"?: Overrides1;
         /**
@@ -11848,6 +11886,7 @@ declare namespace LocalJSX {
     interface RtkCameraToggleAttributes {
         "variant": ControlBarVariant;
         "size": Size;
+        "hideDeviceSelectionMenu": boolean;
     }
     interface RtkCaptionToggleAttributes {
         "variant": ControlBarVariant;
@@ -12087,6 +12126,7 @@ declare namespace LocalJSX {
     interface RtkMicToggleAttributes {
         "variant": ControlBarVariant;
         "size": Size;
+        "hideDeviceSelectionMenu": boolean;
     }
     interface RtkMicrophoneSelectorAttributes {
         "size": Size;

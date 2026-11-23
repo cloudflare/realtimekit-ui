@@ -360,6 +360,9 @@
 
     <script>
       const app = () => {
+        // Keep the SDK instance outside Alpine's reactive proxy (it uses private fields).
+        const noiseDemo = { current: null, baseConfig: null };
+        const effectsDemo = { current: null };
         return {
           meeting: null,
           joining: false,
@@ -368,11 +371,13 @@
             authToken: '',
             env: 'staging',
             showSetupScreen: false,
+            showMediaSelectorsInSetupScreen: true,
             defaults: {
               audio: false,
               video: false,
             },
             addEffectsAddon: false,
+            autoEnableNoiseCancellation: false,
             disableEmojiPickerOverride: false,
           },
           async initialize() {
@@ -424,15 +429,146 @@
               }, // Listen to background update action
             });
 
-            let config = registerAddons([videoBackground], meeting);
-            /**
-             *  config as undefined is accepted,
-             *  if addons are enabled, addon config will be used
-             */
-            this.$refs.meeting.config = config;
+            effectsDemo.current = videoBackground;
+            return registerAddons([videoBackground], meeting);
+          },
+          updateAddonMenus() {
+            const config = noiseDemo.baseConfig;
+            if (!config?.root) return;
+
+            const micConfig = config.root['rtk-mic-toggle'];
+            const noiseEnabled = Boolean(noiseDemo.current?.desired);
+            const noiseOption = [
+              'rtk-menu-item',
+              {
+                slot: 'additional-menu-items',
+                role: 'menuitem',
+                tabIndex: 0,
+                onClick: () => this.toggleNoiseCancellation(),
+                onKeyDown: (event) => {
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    event.currentTarget.click();
+                  }
+                },
+              },
+              [
+                'span',
+                {
+                  slot: 'start',
+                  'aria-hidden': 'true',
+                  innerHTML: noiseEnabled
+                    ? '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M3 9v6m4-9v12m4-15v18m4-12v6m4-9v12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>'
+                    : '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M3 9v6m4-9v12m4-15v18m4-12v6m4-9v12M3 3l18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+                  style: {
+                    display: 'inline-flex',
+                    width: '20px',
+                    height: '20px',
+                    flexShrink: '0',
+                    color: noiseEnabled
+                      ? 'rgb(var(--rtk-colors-brand-500, 33 96 253))'
+                      : 'rgb(var(--rtk-colors-text-1000, 255 255 255))',
+                  },
+                },
+              ],
+              noiseEnabled ? 'Disable noise cancellation' : 'Enable noise cancellation',
+            ];
+            const root = { ...config.root };
+            if (noiseDemo.current) {
+              root['rtk-mic-toggle'] = Array.isArray(micConfig)
+                ? [...micConfig, noiseOption]
+                : { ...micConfig, add: [...(micConfig?.add || []), noiseOption] };
+            }
+            if (effectsDemo.current) {
+              const cameraConfig = config.root['rtk-camera-toggle'];
+              const effectsOption = [
+                'rtk-menu-item',
+                {
+                  slot: 'additional-menu-items',
+                  role: 'menuitem',
+                  tabIndex: 0,
+                  onClick: () => {
+                    effectsDemo.current?.videoBackgroundChanger?.setAttribute('data-open', 'true');
+                  },
+                  onKeyDown: (event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault();
+                      event.currentTarget.click();
+                    }
+                  },
+                },
+                ['rtk-icon', { slot: 'start', icon: this.$refs.meeting.iconPack.wand, size: 'sm' }],
+                'Video Effects',
+              ];
+              root['rtk-camera-toggle'] = Array.isArray(cameraConfig)
+                ? [...cameraConfig, effectsOption]
+                : { ...cameraConfig, add: [...(cameraConfig?.add || []), effectsOption] };
+            }
+            this.$refs.meeting.config = {
+              ...config,
+              root,
+            };
+          },
+          async syncNoiseCancellation(state) {
+            if (
+              state.pending ||
+              state.controller.signal.aborted ||
+              state.desired === Boolean(state.instance)
+            ) {
+              return;
+            }
+            state.pending = (async () => {
+              try {
+                while (
+                  !state.controller.signal.aborted &&
+                  state.desired !== Boolean(state.instance)
+                ) {
+                  if (state.desired) {
+                    const { RealtimeKitNoiseCancellation } = await import(
+                      'https://cdn.jsdelivr.net/npm/@cloudflare/realtimekit-noise-cancellation@0.1.0/dist/index.js'
+                    );
+                    if (!state.desired || state.controller.signal.aborted) continue;
+                    state.instance = await RealtimeKitNoiseCancellation.init({
+                      meeting: state.meeting,
+                      signal: state.controller.signal,
+                      onError: (error) => console.error('Noise cancellation error:', error),
+                    });
+                  } else {
+                    const instance = state.instance;
+                    state.instance = null;
+                    await instance.dispose();
+                  }
+                }
+              } catch (error) {
+                if (!state.controller.signal.aborted) {
+                  console.error('Could not change noise cancellation:', error);
+                  state.desired = false;
+                  this.updateAddonMenus();
+                }
+              } finally {
+                state.pending = null;
+                if (!state.controller.signal.aborted && state.desired !== Boolean(state.instance)) {
+                  void this.syncNoiseCancellation(state);
+                }
+              }
+            })();
+          },
+          toggleNoiseCancellation() {
+            const state = noiseDemo.current;
+            if (!state || state.controller.signal.aborted) return;
+            state.desired = !state.desired;
+            this.updateAddonMenus();
+            void this.syncNoiseCancellation(state);
+          },
+          stopNoiseCancellation() {
+            const state = noiseDemo.current;
+            if (!state) return;
+            state.meeting.self.removeListener('roomLeft', state.onRoomLeft);
+            state.controller.abort();
+            noiseDemo.current = null;
           },
           async addConnectedMeetingListeners(meeting) {
-            meeting.connectedMeetings.on('meetingChanged', (newMeeting) => {
+            meeting.connectedMeetings.on('meetingChanged', async (newMeeting) => {
               newMeeting.__internals__.logger.info('Showing the next meeting UI for breakout', {
                 connectedMeetings: {
                   movement: {
@@ -441,8 +577,10 @@
                   },
                 },
               });
-              this.addAddonsInConfig(newMeeting);
-              this.attachMeetingObject(newMeeting, true);
+              const config = this.data.addEffectsAddon
+                ? await this.addAddonsInConfig(newMeeting)
+                : null;
+              await this.attachMeetingObject(newMeeting, config);
               // In the new meeting, we need to re-attach the listeners
               this.addConnectedMeetingListeners(newMeeting);
             });
@@ -465,8 +603,14 @@
 
             this.status = 'Getting meeting details...';
 
-            const { roomName, defaults, authToken, addEffectsAddon, disableEmojiPickerOverride } =
-              this.data;
+            const {
+              roomName,
+              defaults,
+              authToken,
+              addEffectsAddon,
+              disableEmojiPickerOverride,
+              showMediaSelectorsInSetupScreen,
+            } = this.data;
             const modules = {
               spotlight: true,
               devTools: {
@@ -510,13 +654,12 @@
               }
 
               this.status = 'Connecting...';
-              if (addEffectsAddon) {
-                await this.addAddonsInConfig(meeting);
-              }
+              const config = addEffectsAddon ? await this.addAddonsInConfig(meeting) : null;
               this.overrides = {
                 disableEmojiPicker: disableEmojiPickerOverride,
+                hideMediaSelectorsInSetupScreen: !showMediaSelectorsInSetupScreen,
               };
-              this.attachMeetingObject(meeting);
+              await this.attachMeetingObject(meeting, config);
               this.$refs.meeting.overrides = this.overrides;
               this.addConnectedMeetingListeners(meeting);
             } catch (err) {
@@ -526,10 +669,29 @@
               this.joining = false;
             }
           },
-          attachMeetingObject(meeting, log = false) {
+          async attachMeetingObject(meeting, config) {
+            this.stopNoiseCancellation();
+            if (!config) effectsDemo.current = null;
             this.meeting = meeting;
             this.$refs.meeting.meeting = meeting;
             window.meeting = meeting;
+            // Let rtk-meeting apply the preset before extending its generated config.
+            await new Promise((resolve) => requestAnimationFrame(resolve));
+            noiseDemo.baseConfig = config || this.$refs.meeting.config;
+            if (this.data.autoEnableNoiseCancellation) {
+              const state = {
+                meeting,
+                desired: true,
+                instance: null,
+                pending: null,
+                controller: new AbortController(),
+                onRoomLeft: () => this.stopNoiseCancellation(),
+              };
+              noiseDemo.current = state;
+              meeting.self.addListener('roomLeft', state.onRoomLeft);
+            }
+            this.updateAddonMenus();
+            if (noiseDemo.current) void this.syncNoiseCancellation(noiseDemo.current);
           },
         };
       };
@@ -589,6 +751,15 @@
                     x-model="data.showSetupScreen"
                   />
                 </label>
+                <label for="showMediaSelectorsInSetupScreen" class="checkbox-label">
+                  <span>Show Setup Media Selectors</span>
+                  <input
+                    type="checkbox"
+                    id="showMediaSelectorsInSetupScreen"
+                    class="checkbox-styles"
+                    x-model="data.showMediaSelectorsInSetupScreen"
+                  />
+                </label>
                 <label for="video" class="checkbox-label">
                   <span>Enable Video</span>
                   <input
@@ -619,6 +790,15 @@
                     id="addEffectsAddon"
                     class="checkbox-styles"
                     x-model="data.addEffectsAddon"
+                  />
+                </label>
+                <label for="autoEnableNoiseCancellation" class="checkbox-label">
+                  <span>Noise Cancellation</span>
+                  <input
+                    type="checkbox"
+                    id="autoEnableNoiseCancellation"
+                    class="checkbox-styles"
+                    x-model="data.autoEnableNoiseCancellation"
                   />
                 </label>
               </div>

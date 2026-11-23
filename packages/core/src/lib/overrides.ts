@@ -14,6 +14,10 @@ export interface Overrides {
    * Recommended: Disable private chat via preset.
    */
   disablePrivateChat?: boolean;
+  /**
+   * Hides the microphone, camera, and speaker selectors below the setup preview.
+   */
+  hideMediaSelectorsInSetupScreen?: boolean;
 }
 
 /**
@@ -22,4 +26,5 @@ export interface Overrides {
 export const defaultOverrides: Overrides = {
   disableEmojiPicker: false,
   disablePrivateChat: false,
+  hideMediaSelectorsInSetupScreen: false,
 };

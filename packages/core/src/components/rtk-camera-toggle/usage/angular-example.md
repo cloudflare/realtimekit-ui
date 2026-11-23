@@ -1,9 +1,12 @@
 Template
 
 ```html
-<rtk-camera-toggle #one></rtk-camera-toggle>
+<rtk-camera-toggle #one>
+  <rtk-menu-item slot="additional-menu-items">Video effects</rtk-menu-item>
+</rtk-camera-toggle>
 <rtk-camera-toggle #two></rtk-camera-toggle>
 <rtk-camera-toggle #three></rtk-camera-toggle>
+<rtk-camera-toggle #four></rtk-camera-toggle>
 ```
 
 Component
@@ -16,7 +19,9 @@ class MyComponent {
 
   @ViewChild('two') componentTwo: RtkCameraToggle;
 
-  @ViewChild('three') componentTree: RtkCameraToggle;
+  @ViewChild('three') componentThree: RtkCameraToggle;
+
+  @ViewChild('four') componentFour: RtkCameraToggle;
 
   rtkMeeting: RealtimeKitClient; // meeting instance
 
@@ -32,6 +37,10 @@ class MyComponent {
     // Render as a horizontal button
     this.componentThree.meeting = this.rtkMeeting;
     this.componentThree.variant = 'horizontal';
+
+    // Hide the device menu in a custom layout
+    this.componentFour.meeting = this.rtkMeeting;
+    this.componentFour.hideDeviceSelectionMenu = true;
   }
 }
 ```

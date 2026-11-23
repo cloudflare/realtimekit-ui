@@ -67,7 +67,7 @@ rtk-spinner {
 }
 
 rtk-participant-tile {
-  @apply h-auto w-full max-w-[584px];
+  @apply h-auto w-full max-w-[584px] overflow-visible;
 }
 
 .media-selectors {
