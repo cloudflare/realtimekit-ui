@@ -52,9 +52,6 @@
     "access": "public",
     "tag": "latest"
   },
-  "peerDependencies": {
-    "@cloudflare/realtimekit": "*"
-  },
   "dependencies": {
     "@floating-ui/dom": "^1.7.4",
     "hark": "^1.2.3",
