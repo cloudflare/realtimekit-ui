@@ -3115,14 +3115,14 @@ export declare interface RtkSettingsVideo extends Components.RtkSettingsVideo {
 
 
 @ProxyCmp({
-  inputs: ['config', 'iconPack', 'meeting', 'size', 'states', 't']
+  inputs: ['config', 'iconPack', 'meeting', 'overrides', 'size', 'states', 't']
 })
 @Component({
   selector: 'rtk-setup-screen',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: '<ng-content></ng-content>',
   // eslint-disable-next-line @angular-eslint/no-inputs-metadata-property
-  inputs: ['config', 'iconPack', 'meeting', 'size', 'states', 't'],
+  inputs: ['config', 'iconPack', 'meeting', 'overrides', 'size', 'states', 't'],
 })
 export class RtkSetupScreen {
   protected el: HTMLRtkSetupScreenElement;

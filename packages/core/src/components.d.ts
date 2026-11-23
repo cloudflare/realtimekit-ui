@@ -620,7 +620,7 @@ export namespace Components {
         "meeting": Meeting;
         /**
           * UI Overrides
-          * @default {   disableEmojiPicker: false,   disablePrivateChat: false, }
+          * @default {   disableEmojiPicker: false,   disablePrivateChat: false,   hideMediaSelectorsInSetupScreen: false, }
          */
         "overrides": Overrides;
         /**
@@ -942,7 +942,7 @@ export namespace Components {
         "meeting": Meeting;
         /**
           * UI Overrides
-          * @default {   disableEmojiPicker: false,   disablePrivateChat: false, }
+          * @default {   disableEmojiPicker: false,   disablePrivateChat: false,   hideMediaSelectorsInSetupScreen: false, }
          */
         "overrides": Overrides1;
         /**
@@ -2139,7 +2139,7 @@ export namespace Components {
         "mode": MeetingMode;
         /**
           * UI Kit Overrides
-          * @default {   disableEmojiPicker: false,   disablePrivateChat: false, }
+          * @default {   disableEmojiPicker: false,   disablePrivateChat: false,   hideMediaSelectorsInSetupScreen: false, }
          */
         "overrides": Overrides;
         /**
@@ -3758,6 +3758,11 @@ export namespace Components {
          */
         "meeting": Meeting;
         /**
+          * UI Kit Overrides
+          * @default {   disableEmojiPicker: false,   disablePrivateChat: false,   hideMediaSelectorsInSetupScreen: false, }
+         */
+        "overrides": Overrides;
+        /**
           * Size
          */
         "size": Size;
@@ -4372,7 +4377,7 @@ export namespace Components {
         "mode": MeetingMode1;
         /**
           * UI Kit Overrides
-          * @default {   disableEmojiPicker: false,   disablePrivateChat: false, }
+          * @default {   disableEmojiPicker: false,   disablePrivateChat: false,   hideMediaSelectorsInSetupScreen: false, }
          */
         "overrides": Overrides1;
         /**
@@ -7636,7 +7641,7 @@ declare namespace LocalJSX {
         "onRtkStateUpdate"?: (event: RtkChatCustomEvent<States1>) => void;
         /**
           * UI Overrides
-          * @default {   disableEmojiPicker: false,   disablePrivateChat: false, }
+          * @default {   disableEmojiPicker: false,   disablePrivateChat: false,   hideMediaSelectorsInSetupScreen: false, }
          */
         "overrides"?: Overrides;
         /**
@@ -8037,7 +8042,7 @@ declare namespace LocalJSX {
         "onRtkDropdownToggle"?: (event: RtkChatSelectorCustomEvent<{ open: boolean }>) => void;
         /**
           * UI Overrides
-          * @default {   disableEmojiPicker: false,   disablePrivateChat: false, }
+          * @default {   disableEmojiPicker: false,   disablePrivateChat: false,   hideMediaSelectorsInSetupScreen: false, }
          */
         "overrides"?: Overrides1;
         /**
@@ -9348,7 +9353,7 @@ declare namespace LocalJSX {
         "onRtkStatesUpdate"?: (event: RtkMeetingCustomEvent<States>) => void;
         /**
           * UI Kit Overrides
-          * @default {   disableEmojiPicker: false,   disablePrivateChat: false, }
+          * @default {   disableEmojiPicker: false,   disablePrivateChat: false,   hideMediaSelectorsInSetupScreen: false, }
          */
         "overrides"?: Overrides;
         /**
@@ -11082,6 +11087,11 @@ declare namespace LocalJSX {
          */
         "onRtkStateUpdate"?: (event: RtkSetupScreenCustomEvent<States>) => void;
         /**
+          * UI Kit Overrides
+          * @default {   disableEmojiPicker: false,   disablePrivateChat: false,   hideMediaSelectorsInSetupScreen: false, }
+         */
+        "overrides"?: Overrides;
+        /**
           * Size
          */
         "size"?: Size;
@@ -11739,7 +11749,7 @@ declare namespace LocalJSX {
         "onRtkStatesUpdate"?: (event: RtkUiProviderCustomEvent<States1>) => void;
         /**
           * UI Kit Overrides
-          * @default {   disableEmojiPicker: false,   disablePrivateChat: false, }
+          * @default {   disableEmojiPicker: false,   disablePrivateChat: false,   hideMediaSelectorsInSetupScreen: false, }
          */
         "overrides"?: Overrides1;
         /**

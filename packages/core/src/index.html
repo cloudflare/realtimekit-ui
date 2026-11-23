@@ -371,6 +371,7 @@
             authToken: '',
             env: 'staging',
             showSetupScreen: false,
+            showMediaSelectorsInSetupScreen: true,
             defaults: {
               audio: false,
               video: false,
@@ -602,8 +603,14 @@
 
             this.status = 'Getting meeting details...';
 
-            const { roomName, defaults, authToken, addEffectsAddon, disableEmojiPickerOverride } =
-              this.data;
+            const {
+              roomName,
+              defaults,
+              authToken,
+              addEffectsAddon,
+              disableEmojiPickerOverride,
+              showMediaSelectorsInSetupScreen,
+            } = this.data;
             const modules = {
               spotlight: true,
               devTools: {
@@ -650,6 +657,7 @@
               const config = addEffectsAddon ? await this.addAddonsInConfig(meeting) : null;
               this.overrides = {
                 disableEmojiPicker: disableEmojiPickerOverride,
+                hideMediaSelectorsInSetupScreen: !showMediaSelectorsInSetupScreen,
               };
               await this.attachMeetingObject(meeting, config);
               this.$refs.meeting.overrides = this.overrides;
@@ -741,6 +749,15 @@
                     id="showSetupScreen"
                     class="checkbox-styles"
                     x-model="data.showSetupScreen"
+                  />
+                </label>
+                <label for="showMediaSelectorsInSetupScreen" class="checkbox-label">
+                  <span>Show Setup Media Selectors</span>
+                  <input
+                    type="checkbox"
+                    id="showMediaSelectorsInSetupScreen"
+                    class="checkbox-styles"
+                    x-model="data.showMediaSelectorsInSetupScreen"
                   />
                 </label>
                 <label for="video" class="checkbox-label">

@@ -31,6 +31,7 @@ export class RtkCameraToggle {
 
   private videoUpdateListener = ({ videoEnabled }: Peer) => {
     this.videoEnabled = videoEnabled;
+    this.currentDevice = this.meeting.self.getCurrentDevices()?.video;
   };
 
   private stageStatusListener = () => {
@@ -296,7 +297,7 @@ export class RtkCameraToggle {
           </rtk-tooltip>
           {!this.hideDeviceSelectionMenu && (
             <rtk-menu
-              placement="top-end"
+              placement="top"
               offset={4}
               size={this.size}
               iconPack={this.iconPack}

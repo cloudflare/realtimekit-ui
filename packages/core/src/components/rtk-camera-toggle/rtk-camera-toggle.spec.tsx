@@ -101,6 +101,23 @@ describe('<rtk-camera-toggle> device menu', () => {
     page.root.remove();
   });
 
+  it('checks the active camera when videoUpdate reports a device selected after startup', async () => {
+    const camera = device('videoinput', 'camera', 'FaceTime camera');
+    const { page, self } = await createToggle({ devices: [camera] });
+    const root = page.root.shadowRoot;
+
+    expect(root.querySelector('rtk-menu-item[aria-checked=true]')).toBeNull();
+
+    self.getCurrentDevices.mockReturnValue({ video: camera });
+    self.emit('videoUpdate', { videoEnabled: true });
+    await page.waitForChanges();
+
+    const selected = root.querySelector('rtk-menu-item[aria-checked=true]');
+    expect(selected?.textContent).toContain('FaceTime camera');
+    expect(selected?.querySelector('rtk-icon[slot=end]')).not.toBeNull();
+    page.root.remove();
+  });
+
   it('shows the empty state and uses deviceListUpdate without refetching', async () => {
     const { page, self } = await createToggle();
     const root = page.root.shadowRoot;

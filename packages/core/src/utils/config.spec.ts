@@ -2,13 +2,13 @@ import { createDefaultConfig } from '../lib/default-ui-config';
 import { extendConfig, generateConfig } from './config';
 
 describe('setup media controls', () => {
-  it('hides both device menus in the default and preset-generated configs', () => {
+  it('shows both device menus in the default and preset-generated configs', () => {
     const configs = [createDefaultConfig(), generateConfig({ designTokens: {} }, {} as any).config];
 
     for (const config of configs) {
       expect(config.root['div#setupcontrols-media']).toEqual([
-        ['rtk-mic-toggle', { size: 'sm', hideDeviceSelectionMenu: true }],
-        ['rtk-camera-toggle', { size: 'sm', hideDeviceSelectionMenu: true }],
+        ['rtk-mic-toggle', { size: 'sm' }],
+        ['rtk-camera-toggle', { size: 'sm' }],
       ]);
     }
   });

@@ -76,6 +76,29 @@ describe('<rtk-mic-toggle> device menu', () => {
     page.root.remove();
   });
 
+  it('checks devices selected on audioUpdate when the SDK mutates its current device map', async () => {
+    const mic = device('audioinput', 'mic', 'Desk microphone');
+    const speaker = device('audiooutput', 'speaker', 'Headphones');
+    const { page, self } = await createToggle({ inputs: [mic], outputs: [speaker] });
+    const root = page.root.shadowRoot;
+
+    expect(root.querySelectorAll('rtk-menu-item[aria-checked=true]')).toHaveLength(0);
+
+    const currentDevices = self.getCurrentDevices();
+    currentDevices.audio = mic;
+    currentDevices.speaker = speaker;
+    self.emit('audioUpdate', { audioEnabled: true });
+    await page.waitForChanges();
+
+    const selected = Array.from(root.querySelectorAll('rtk-menu-item[aria-checked=true]'));
+    expect(selected.map((item) => item.textContent.trim())).toEqual([
+      'Desk microphone',
+      'Headphones',
+    ]);
+    expect(selected.every((item) => item.querySelector('rtk-icon[slot=end]') != null)).toBe(true);
+    page.root.remove();
+  });
+
   it('shows localized empty states and updates devices from the SDK event', async () => {
     const { page, self } = await createToggle();
     const root = page.root.shadowRoot;

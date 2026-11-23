@@ -34,6 +34,7 @@ export class RtkMicToggle {
 
   private audioUpdateListener = ({ audioEnabled }: Peer) => {
     this.audioEnabled = audioEnabled;
+    this.currentDevices = { ...this.meeting.self.getCurrentDevices() };
   };
 
   private stageStatusListener = () => {
@@ -293,7 +294,7 @@ export class RtkMicToggle {
           </rtk-tooltip>
           {!this.hideDeviceSelectionMenu && (
             <rtk-menu
-              placement="top-end"
+              placement="top"
               offset={4}
               size={this.size}
               iconPack={this.iconPack}
