@@ -20,8 +20,6 @@ Commands are from the repo root unless noted. Check the root and workspace `pack
 
 | Goal | Command |
 | --- | --- |
-| Goal | Command |
-| --- | --- |
 | Lint core TypeScript | `npm run lint -w @cloudflare/realtimekit-ui` |
 | Lint all workspaces with lint scripts | `npm run lint` |
 | Run one core spec once | `npm exec -w @cloudflare/realtimekit-ui -- stencil test --spec --runInBand --testPathPattern=rtk-meeting.spec.tsx` (replace the filename) |
