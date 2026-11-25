@@ -3560,9 +3560,8 @@ export namespace Components {
         "variant": ControlBarVariant;
     }
     /**
-     * A component which plays a participant's screenshared video.
-     * It also allows for placement of other components similar to `rtk-participant-tile`.
-     * This component will not render anything if the participant hasn't start screensharing.
+     * Displays a participant's shared screen.
+     * For a local share, shows which joined participants are not currently viewing it.
      */
     interface RtkScreenshareView {
         /**
@@ -3575,6 +3574,11 @@ export namespace Components {
           * @default defaultIconPack
          */
         "iconPack": IconPack;
+        /**
+          * Maximum number of pending viewer avatars shown before the overflow count
+          * @default 3
+         */
+        "maxVisibleViewerAvatars": number;
         /**
           * Meeting object
          */
@@ -6456,9 +6460,8 @@ declare global {
   };
     }
     /**
-     * A component which plays a participant's screenshared video.
-     * It also allows for placement of other components similar to `rtk-participant-tile`.
-     * This component will not render anything if the participant hasn't start screensharing.
+     * Displays a participant's shared screen.
+     * For a local share, shows which joined participants are not currently viewing it.
      */
     interface HTMLRtkScreenshareViewElement extends Components.RtkScreenshareView, HTMLStencilElement {
         addEventListener<K extends keyof HTMLRtkScreenshareViewElementEventMap>(type: K, listener: (this: HTMLRtkScreenshareViewElement, ev: RtkScreenshareViewCustomEvent<HTMLRtkScreenshareViewElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
@@ -10858,9 +10861,8 @@ declare namespace LocalJSX {
         "variant"?: ControlBarVariant;
     }
     /**
-     * A component which plays a participant's screenshared video.
-     * It also allows for placement of other components similar to `rtk-participant-tile`.
-     * This component will not render anything if the participant hasn't start screensharing.
+     * Displays a participant's shared screen.
+     * For a local share, shows which joined participants are not currently viewing it.
      */
     interface RtkScreenshareView {
         /**
@@ -10873,6 +10875,11 @@ declare namespace LocalJSX {
           * @default defaultIconPack
          */
         "iconPack"?: IconPack;
+        /**
+          * Maximum number of pending viewer avatars shown before the overflow count
+          * @default 3
+         */
+        "maxVisibleViewerAvatars"?: number;
         /**
           * Meeting object
          */
@@ -10892,7 +10899,7 @@ declare namespace LocalJSX {
          */
         "onRtkStateUpdate"?: (event: RtkScreenshareViewCustomEvent<States>) => void;
         /**
-          * Emits when video playback happens successfully
+          * Emits on the screen-share video's play event
          */
         "onScreensharePlay"?: (event: RtkScreenshareViewCustomEvent<{
     participant: Peer;
@@ -12257,6 +12264,7 @@ declare namespace LocalJSX {
     }
     interface RtkScreenshareViewAttributes {
         "hideFullScreenButton": boolean;
+        "maxVisibleViewerAvatars": number;
         "nameTagPosition": | 'bottom-left'
     | 'bottom-right'
     | 'bottom-center'
@@ -12928,9 +12936,8 @@ declare module "@stencil/core" {
              */
             "rtk-screen-share-toggle": LocalJSX.IntrinsicElements["rtk-screen-share-toggle"] & JSXBase.HTMLAttributes<HTMLRtkScreenShareToggleElement>;
             /**
-             * A component which plays a participant's screenshared video.
-             * It also allows for placement of other components similar to `rtk-participant-tile`.
-             * This component will not render anything if the participant hasn't start screensharing.
+             * Displays a participant's shared screen.
+             * For a local share, shows which joined participants are not currently viewing it.
              */
             "rtk-screenshare-view": LocalJSX.IntrinsicElements["rtk-screenshare-view"] & JSXBase.HTMLAttributes<HTMLRtkScreenshareViewElement>;
             /**
