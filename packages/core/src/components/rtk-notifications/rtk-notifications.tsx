@@ -220,14 +220,14 @@ export class RtkNotifications {
        * as they are not actually leaving the meeting,
        * but rather reconnecting to it.
        */
-      for (const joinedParticipant of this.meeting.participants.joined.values()) {
-        if (joinedParticipant.peerIdBeforeReconnect === participant.id) return;
+      if (participant.replacedByPeerId) {
+        return;
       }
 
       const {
         socketState: { state },
       } = this.meeting.meta;
-      if (notifications.participant_left && state !== 'connected') {
+      if (notifications.participant_left && state === 'connected') {
         this.add({
           id: `${participant.id}-left`,
           message: `${formatName(participant.name)} ${this.t('notifications.left')}`,
