@@ -1,3 +1,10 @@
+# [2.2.0-staging.4](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.2.0-staging.3...@cloudflare/realtimekit-ui-v2.2.0-staging.4) (2026-11-26)
+
+
+### Features
+
+* **screenshare:** answering the question that gets asked in every meeting - can you see my screen ([#217](https://github.com/cloudflare/realtimekit-ui/issues/217)) ([33a08b4](https://github.com/cloudflare/realtimekit-ui/commit/33a08b41b4eae07dcd771aa626e973d80e71cf9a))
+
 # [2.2.0-staging.3](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.2.0-staging.2...@cloudflare/realtimekit-ui-v2.2.0-staging.3) (2026-11-26)
 
 
