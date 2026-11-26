@@ -8,6 +8,8 @@ import { RtkButton } from '../rtk-button/rtk-button';
 import { RtkIcon } from '../rtk-icon/rtk-icon';
 import { RtkScreenshareView } from './rtk-screenshare-view';
 
+const SCREEN_SHARE_VISIBILITY_MESSAGE = '__rtk_screenshare_visibility__';
+
 async function createView({
   remote = false,
   iconPack = defaultIconPack,
@@ -107,6 +109,7 @@ async function createVisibilityView({
     keys: () => joinedParticipants.keys(),
     toArray: () => Array.from(joinedParticipants.values()),
   });
+  Object.defineProperty(joined, 'size', { get: () => joinedParticipants.size });
   const broadcastMessage = jest.fn().mockResolvedValue(undefined);
   const participants = Object.assign(new EventEmitter(), { joined, broadcastMessage });
   const meta = Object.assign(new EventEmitter(), {
@@ -147,13 +150,15 @@ async function createVisibilityView({
 
 function reportViewerVisibility(
   participants: EventEmitter,
-  viewerId: string,
+  peerId: string,
   visible: boolean,
   producerId = 'producer-1'
 ) {
   participants.emit('broadcastedMessage', {
-    type: 'realtimekit.screenshare.validation',
-    payload: { sharerId: 'self', viewerId, producerId, visible },
+    type: SCREEN_SHARE_VISIBILITY_MESSAGE,
+    peerId,
+    timestamp: 1234,
+    payload: { sharerId: 'self', producerId, visible },
   });
 }
 
@@ -460,10 +465,11 @@ describe('<rtk-screenshare-view> local screen-share visibility', () => {
     reportViewerVisibility(meeting.participants, 'alice', true, 'previous-producer');
     reportViewerVisibility(meeting.participants, 'stranger', true);
     meeting.participants.emit('broadcastedMessage', {
-      type: 'realtimekit.screenshare.validation',
+      type: SCREEN_SHARE_VISIBILITY_MESSAGE,
+      peerId: 'alice',
+      timestamp: 1234,
       payload: {
         sharerId: 'someone-else',
-        viewerId: 'alice',
         producerId: 'producer-1',
         visible: true,
       },
@@ -476,6 +482,29 @@ describe('<rtk-screenshare-view> local screen-share visibility', () => {
     expect(
       root.shadowRoot.querySelector('.validation-border').classList.contains('none-active')
     ).toBe(true);
+  });
+
+  it('attributes a visibility report to its SDK sender rather than a viewer ID in the payload', async () => {
+    const { page, root, meeting } = await createVisibilityView({
+      viewerNames: ['alice', 'bob'],
+    });
+
+    meeting.participants.emit('broadcastedMessage', {
+      type: SCREEN_SHARE_VISIBILITY_MESSAGE,
+      peerId: 'alice',
+      timestamp: 1234,
+      payload: { sharerId: 'self', viewerId: 'bob', producerId: 'producer-1', visible: true },
+    });
+    await page.waitForChanges();
+
+    const status = root.shadowRoot.querySelector('.validation-status');
+    expect(status.textContent).toContain('Not currently viewing:');
+    expect(status.querySelector('.avatar-trigger').getAttribute('aria-label')).toBe('bob');
+    expect(
+      root.shadowRoot
+        .querySelector<HTMLElement>('.validation-border')
+        .style.getPropertyValue('--validation-progress')
+    ).toBe('50%');
   });
 
   it('updates visibility when viewers join, leave, and reconnect with the same ID', async () => {
@@ -510,6 +539,31 @@ describe('<rtk-screenshare-view> local screen-share visibility', () => {
     joined.emit('participantJoined', bob);
     await page.waitForChanges();
     expect(root.shadowRoot.querySelector('.none-visible')).not.toBeNull();
+  });
+
+  it('uses the current joined count when a confirmed viewer leaves', async () => {
+    const { page, root, meeting, joined, joinedParticipants } = await createVisibilityView({
+      viewerNames: ['alice', 'bob'],
+    });
+    reportViewerVisibility(meeting.participants, 'alice', true);
+    await page.waitForChanges();
+    expect(root.shadowRoot.querySelector('.avatar-trigger').getAttribute('aria-label')).toBe('bob');
+
+    const departedViewer = joinedParticipants.get('alice');
+    joinedParticipants.delete('alice');
+    joined.emit('participantLeft', departedViewer);
+    await page.waitForChanges();
+
+    expect(root.shadowRoot.querySelector('.validation-status').textContent.trim()).toBe(
+      'No one is viewing your screen.'
+    );
+    expect(
+      root.shadowRoot.querySelector('.validation-border').classList.contains('none-active')
+    ).toBe(true);
+
+    reportViewerVisibility(meeting.participants, 'bob', true);
+    await page.waitForChanges();
+    expect(root.shadowRoot.querySelector('.all-visible')).not.toBeNull();
   });
 
   it('does not accept an acknowledgement from the previous screen after switching shares', async () => {
@@ -602,8 +656,8 @@ describe('<rtk-screenshare-view> remote screen-share visibility', () => {
     await page.waitForChanges();
     expect(broadcastMessage).toHaveBeenCalledTimes(1);
     expect(broadcastMessage).toHaveBeenLastCalledWith(
-      'realtimekit.screenshare.validation',
-      { sharerId: 'sharer', viewerId: 'self', producerId: 'producer-1', visible: true },
+      SCREEN_SHARE_VISIBILITY_MESSAGE,
+      { sharerId: 'sharer', producerId: 'producer-1', visible: true },
       { participantIds: ['sharer'] }
     );
 
@@ -622,8 +676,8 @@ describe('<rtk-screenshare-view> remote screen-share visibility', () => {
     meeting.meta.selfActiveTab = { type: 'screenshare', id: 'different-share' };
     meeting.meta.emit('selfTabUpdate');
     expect(broadcastMessage).toHaveBeenLastCalledWith(
-      'realtimekit.screenshare.validation',
-      { sharerId: 'sharer', viewerId: 'self', producerId: 'producer-1', visible: false },
+      SCREEN_SHARE_VISIBILITY_MESSAGE,
+      { sharerId: 'sharer', producerId: 'producer-1', visible: false },
       { participantIds: ['sharer'] }
     );
 
@@ -651,7 +705,6 @@ describe('<rtk-screenshare-view> remote screen-share visibility', () => {
     await page.waitForChanges();
     expect(broadcastMessage.mock.calls[1][1]).toEqual({
       sharerId: 'sharer',
-      viewerId: 'self',
       producerId: 'producer-1',
       visible: false,
     });
@@ -664,7 +717,6 @@ describe('<rtk-screenshare-view> remote screen-share visibility', () => {
     expect(broadcastMessage).toHaveBeenCalledTimes(3);
     expect(broadcastMessage.mock.calls[2][1]).toEqual({
       sharerId: 'sharer',
-      viewerId: 'self',
       producerId: 'producer-2',
       visible: true,
     });
@@ -688,7 +740,6 @@ describe('<rtk-screenshare-view> remote screen-share visibility', () => {
     expect(broadcastMessage).toHaveBeenCalledTimes(2);
     expect(broadcastMessage.mock.calls[1][1]).toEqual({
       sharerId: 'sharer',
-      viewerId: 'self',
       producerId: 'producer-1',
       visible: true,
     });
@@ -712,7 +763,6 @@ describe('<rtk-screenshare-view> remote screen-share visibility', () => {
     expect(broadcastMessage).toHaveBeenCalledTimes(2);
     expect(broadcastMessage.mock.calls[1][1]).toEqual({
       sharerId: 'sharer',
-      viewerId: 'self',
       producerId: 'producer-1',
       visible: true,
     });
@@ -735,7 +785,6 @@ describe('<rtk-screenshare-view> remote screen-share visibility', () => {
     expect(broadcastMessage).toHaveBeenCalledTimes(2);
     expect(broadcastMessage.mock.calls[1][1]).toEqual({
       sharerId: 'sharer',
-      viewerId: 'self',
       producerId: 'producer-1',
       visible: true,
     });

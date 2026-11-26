@@ -10,7 +10,7 @@ Stencil.js Web Components UI kit for Cloudflare RealtimeKit (RTK), published as 
 
 ## SKILLS
 
-During development work (code, tests, or docs), read the relevant skills in `.opencode/skills/` when needed.
+During development work (code, tests, or docs), read the relevant skills in `.agents/skills/` when needed.
 
 ## STRUCTURE
 

@@ -23,7 +23,7 @@ import {
 import { SyncWithStore } from '../../utils/sync-with-store';
 import { BroadcastMessagePayload, RTKSelf } from '@cloudflare/realtimekit';
 
-const SCREEN_SHARE_VISIBILITY_MESSAGE = 'realtimekit.screenshare.validation';
+const SCREEN_SHARE_VISIBILITY_MESSAGE = '__rtk_screenshare_visibility__';
 let isScreenShareProgressRegistered = false;
 
 /**
@@ -43,7 +43,10 @@ export class RtkScreenshareView {
 
   private lastNotifiedVisibility?: { producerId: string; visible: boolean };
 
-  @State() trackedViewerIds: string[] = [];
+  private pendingViewerIds = new Set<string>();
+
+  // Stencil batches state assignments, but does not observe Set mutations.
+  @State() viewerVisibilityRevision = 0;
 
   private handleScreenShareUpdate = ({
     screenShareEnabled,
@@ -106,15 +109,18 @@ export class RtkScreenshareView {
   private startTrackingScreenShareVisibility(producerId: string) {
     this.resetScreenShareVisibilityTracking();
     this.trackedScreenShareProducerId = producerId;
-    this.trackedViewerIds = Array.from(this.meeting.participants.joined.keys());
-    this.notActivelySeenBy = this.meeting.participants.joined.toArray();
+    // Each viewer must report seeing the current screen-share producer.
+    for (const viewerId of this.meeting.participants.joined.keys()) {
+      this.pendingViewerIds.add(viewerId);
+    }
+    this.viewerVisibilityRevision++;
   }
 
   private resetScreenShareVisibilityTracking() {
     this.trackedScreenShareProducerId = undefined;
     this.lastNotifiedVisibility = undefined;
-    this.trackedViewerIds = [];
-    this.notActivelySeenBy = [];
+    this.pendingViewerIds.clear();
+    this.viewerVisibilityRevision++;
     this.previewedViewerId = undefined;
     this.showRemainingViewers = false;
   }
@@ -135,35 +141,33 @@ export class RtkScreenshareView {
       return;
     }
 
-    this.trackedViewerIds = Array.from(meeting.participants.joined.keys());
     // A rejoined viewer needs to confirm the current share again.
-    this.notActivelySeenBy = [
-      ...this.notActivelySeenBy.filter((viewer) => viewer.id !== peer.id),
-      peer,
-    ];
+    this.pendingViewerIds.add(peer.id);
+    this.viewerVisibilityRevision++;
   }
 
-  private handleViewerLeft = () => {
+  private handleViewerLeft = (peer: Peer) => {
     if (this.participant?.id === this.meeting?.self?.id) {
-      this.refreshScreenshareVisibilityAfterViewerLeaves();
+      this.removeDepartedViewerVisibility(peer);
     }
   };
 
-  private refreshScreenshareVisibilityAfterViewerLeaves() {
+  private removeDepartedViewerVisibility(peer: Peer) {
     const meeting = this.meeting;
     if (!meeting || !this.trackedScreenShareProducerId) {
       return;
     }
 
-    this.trackedViewerIds = Array.from(meeting.participants.joined.keys());
-    this.notActivelySeenBy = this.notActivelySeenBy.filter((viewer) =>
-      meeting.participants.joined.has(viewer.id)
-    );
+    if (meeting.participants.joined.has(peer.id)) {
+      return;
+    }
+    this.pendingViewerIds.delete(peer.id);
+    this.viewerVisibilityRevision++;
     this.hidePendingViewerDetailsWhenEmpty();
   }
 
   private hidePendingViewerDetailsWhenEmpty() {
-    if (this.notActivelySeenBy.length > 0) {
+    if (this.pendingViewerIds.size > 0) {
       return;
     }
     this.previewedViewerId = undefined;
@@ -173,9 +177,12 @@ export class RtkScreenshareView {
   private handleScreenShareVisibilityNotification = ({
     type,
     payload,
+    peerId,
   }: {
     type: string;
     payload: BroadcastMessagePayload;
+    peerId: string;
+    timestamp: number;
   }) => {
     const meeting = this.meeting;
     if (
@@ -188,27 +195,28 @@ export class RtkScreenshareView {
       return;
     }
 
-    const { sharerId, viewerId, producerId, visible } = payload;
+    const { sharerId, producerId, visible } = payload;
     if (
       sharerId !== meeting.self.id ||
-      typeof viewerId !== 'string' ||
       typeof producerId !== 'string' ||
       typeof visible !== 'boolean' ||
       producerId !== this.trackedScreenShareProducerId ||
-      !this.trackedViewerIds.includes(viewerId)
+      !meeting.participants.joined.has(peerId)
     ) {
       return;
     }
 
-    const viewer = meeting.participants.joined.get(viewerId);
-    if (!viewer) {
-      return;
-    }
     if (visible) {
-      this.notActivelySeenBy = this.notActivelySeenBy.filter((peer) => peer.id !== viewerId);
-    } else if (!this.notActivelySeenBy.some((peer) => peer.id === viewerId)) {
-      this.notActivelySeenBy = [...this.notActivelySeenBy, viewer];
+      if (!this.pendingViewerIds.delete(peerId)) {
+        return;
+      }
+    } else {
+      if (this.pendingViewerIds.has(peerId)) {
+        return;
+      }
+      this.pendingViewerIds.add(peerId);
     }
+    this.viewerVisibilityRevision++;
     this.hidePendingViewerDetailsWhenEmpty();
   };
 
@@ -238,7 +246,7 @@ export class RtkScreenshareView {
     void meeting.participants
       .broadcastMessage(
         SCREEN_SHARE_VISIBILITY_MESSAGE,
-        { sharerId, viewerId: meeting.self.id, producerId, visible },
+        { sharerId, producerId, visible },
         { participantIds: [sharerId] }
       )
       .catch((error) => {
@@ -348,8 +356,6 @@ export class RtkScreenshareView {
   @State() isFullScreen: boolean = false;
 
   @State() remoteControlInfo: string;
-
-  @State() notActivelySeenBy: Peer[] = [];
 
   @State() previewedViewerId?: string;
 
@@ -527,17 +533,35 @@ export class RtkScreenshareView {
 
   render() {
     const isSelf = this.participant?.id === this.meeting?.self.id;
-    const trackedViewerCount = this.trackedViewerIds.length;
-    const noViewersActive =
-      trackedViewerCount > 0 && this.notActivelySeenBy.length === trackedViewerCount;
+    const trackedViewerCount =
+      this.trackedScreenShareProducerId && this.meeting ? this.meeting.participants.joined.size : 0;
+    const pendingViewerCount = this.pendingViewerIds.size;
+    const noViewersActive = trackedViewerCount > 0 && pendingViewerCount === trackedViewerCount;
     const confirmationProgress =
       trackedViewerCount > 0
-        ? ((trackedViewerCount - this.notActivelySeenBy.length) / trackedViewerCount) * 100
+        ? ((trackedViewerCount - pendingViewerCount) / trackedViewerCount) * 100
         : 0;
     const showVisibilityStatus = isSelf && trackedViewerCount > 0;
-    const allViewersConfirmed = this.notActivelySeenBy.length === 0;
-    const displayedPendingViewers = this.notActivelySeenBy.slice(0, this.maxVisibleViewerAvatars);
-    const additionalPendingViewers = this.notActivelySeenBy.slice(this.maxVisibleViewerAvatars);
+    const allViewersConfirmed = pendingViewerCount === 0;
+    const displayedPendingViewers: Peer[] = [];
+    const additionalPendingViewers: Peer[] = [];
+    if (showVisibilityStatus && !noViewersActive && !allViewersConfirmed) {
+      for (const viewerId of this.pendingViewerIds) {
+        const viewer = this.meeting.participants.joined.get(viewerId);
+        if (!viewer) {
+          continue;
+        }
+        if (displayedPendingViewers.length < this.maxVisibleViewerAvatars) {
+          displayedPendingViewers.push(viewer);
+        } else if (this.showRemainingViewers) {
+          additionalPendingViewers.push(viewer);
+        }
+      }
+    }
+    const additionalPendingViewerCount = Math.max(
+      0,
+      pendingViewerCount - displayedPendingViewers.length
+    );
 
     const text = this.isFullScreen ? this.t('full_screen.exit') : this.t('full_screen');
     const icon = this.isFullScreen
@@ -677,13 +701,13 @@ export class RtkScreenshareView {
                       )}
                     </button>
                   ))}
-                  {additionalPendingViewers.length > 0 && (
+                  {additionalPendingViewerCount > 0 && (
                     <button
                       class="more-avatar"
                       type="button"
-                      aria-label={`${this.t('screenshare.visibility.more')} ${
-                        additionalPendingViewers.length
-                      }`}
+                      aria-label={`${this.t(
+                        'screenshare.visibility.more'
+                      )} ${additionalPendingViewerCount}`}
                       aria-expanded={this.showRemainingViewers}
                       aria-controls={this.showRemainingViewers ? 'remaining-viewers' : undefined}
                       onClick={() => (this.showRemainingViewers = !this.showRemainingViewers)}
@@ -694,11 +718,11 @@ export class RtkScreenshareView {
                         }
                       }}
                     >
-                      +{additionalPendingViewers.length}
+                      +{additionalPendingViewerCount}
                     </button>
                   )}
                 </div>
-                {this.showRemainingViewers && additionalPendingViewers.length > 0 && (
+                {this.showRemainingViewers && additionalPendingViewerCount > 0 && (
                   <div id="remaining-viewers" class="remaining-viewers" role="list">
                     {additionalPendingViewers.map((peer) => (
                       <div class="remaining-viewer" role="listitem" key={peer.id}>
