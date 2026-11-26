@@ -212,13 +212,8 @@ export class RtkNotifications {
     this.participantLeftListener = (participant: Participant) => {
       /**
        * NOTE(ravindra-cloudflare):
-       * Participants that immediately reconnected,
-       * due to Websocket disconnects with error code 1006,
-       * will have a peerIdBeforeReconnect set.
-       *
-       * We don't want to show notifications for such participants
-       * as they are not actually leaving the meeting,
-       * but rather reconnecting to it.
+       * A departing participant replaced after reconnecting has replacedByPeerId
+       * set before its leave event. Suppress the leave notification and sound.
        */
       if (participant.replacedByPeerId) {
         return;
