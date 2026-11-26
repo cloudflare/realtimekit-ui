@@ -1,3 +1,10 @@
+# [2.2.0-staging.3](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.2.0-staging.2...@cloudflare/realtimekit-ui-v2.2.0-staging.3) (2026-11-26)
+
+
+### Bug Fixes
+
+* **notifications:** do not emit notifications for reconnecting participants ([#218](https://github.com/cloudflare/realtimekit-ui/issues/218)) ([c77533b](https://github.com/cloudflare/realtimekit-ui/commit/c77533ba0ba94136edbcbd98b160f58d1612d943))
+
 # [2.2.0-staging.2](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.2.0-staging.1...@cloudflare/realtimekit-ui-v2.2.0-staging.2) (2026-11-23)
 
 
