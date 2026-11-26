@@ -24,6 +24,42 @@ video {
   @apply h-full w-full object-contain;
 }
 
+.validation-border {
+  @apply pointer-events-none absolute inset-3 rounded-md;
+  border: 2px solid theme('colors.background.600');
+  --validation-color: theme('colors.brand.500');
+  --rtk-screenshare-view-progress: var(--validation-progress);
+  transition: --rtk-screenshare-view-progress 0.5s linear, border-color 0.5s linear;
+
+  &.none-active {
+    border-color: theme('colors.danger');
+    /* Keep the red outline full while resetting the next color's sweep. */
+    --rtk-screenshare-view-progress: 0%;
+    transition: none;
+  }
+
+  &.complete {
+    --validation-color: theme('colors.success');
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    padding: 3px;
+    border-radius: inherit;
+    background: conic-gradient(
+      from 0deg,
+      var(--validation-color) var(--rtk-screenshare-view-progress),
+      transparent 0
+    );
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    mask-composite: exclude;
+  }
+}
+
 :host([variant='gradient']) {
   ::slotted(rtk-audio-visualizer) {
     @apply absolute top-2 right-2;
@@ -72,6 +108,91 @@ h3 {
 
 #self-message {
   @apply px-4;
+}
+
+.validation-status {
+  @apply text-text-800 text-text-sm mt-5 max-w-full px-4 text-center;
+  position: relative;
+  z-index: 2;
+}
+
+.waiting-viewers {
+  @apply flex max-w-full flex-wrap items-center justify-center gap-2;
+  position: relative;
+}
+
+.pending-avatars {
+  @apply flex max-w-full flex-wrap items-center justify-center py-1;
+
+  button {
+    @apply text-text-xs h-8 w-8 flex-shrink-0 rounded-full;
+    @apply flex cursor-pointer items-center justify-center p-0;
+    border: 2px solid theme('colors.video-bg');
+    appearance: none;
+    position: relative;
+  }
+
+  button:focus-visible {
+    outline: 2px solid theme('colors.brand.500');
+    outline-offset: 2px;
+  }
+
+  .avatar-trigger {
+    @apply bg-transparent;
+  }
+
+  rtk-avatar {
+    @apply text-text-xs h-full w-full;
+    pointer-events: none;
+  }
+
+  button + button {
+    margin-left: -10px;
+  }
+
+  button:hover,
+  button:focus-visible {
+    z-index: 1;
+  }
+
+  .more-avatar {
+    @apply bg-brand-500 text-text-on-brand-1000 font-medium;
+  }
+}
+
+.viewer-name {
+  @apply bg-background-600 text-text-1000 text-text-sm max-w-48 absolute bottom-full left-1/2 truncate rounded-sm px-2 py-1;
+  pointer-events: none;
+  transform: translateX(-50%);
+  width: max-content;
+  margin-bottom: 4px;
+}
+
+.remaining-viewers {
+  @apply bg-background-900 border-background-600 border-sm max-h-40 w-64 max-w-full overflow-y-auto rounded-md border-solid p-2;
+  @apply box-border flex flex-col gap-1;
+  flex-basis: 100%;
+  margin: 0 auto;
+}
+
+.remaining-viewer {
+  @apply text-text-900 text-text-sm flex items-center gap-2 px-1 py-1;
+
+  rtk-avatar {
+    @apply text-text-xs h-6 w-6 flex-shrink-0;
+  }
+
+  span {
+    @apply truncate;
+  }
+}
+
+.none-visible {
+  @apply text-danger text-text-sm font-medium;
+}
+
+.all-visible {
+  @apply text-success text-text-sm font-medium;
 }
 
 :host(.isSelf) #self-view {

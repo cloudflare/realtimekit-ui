@@ -2960,14 +2960,14 @@ export declare interface RtkScreenShareToggle extends Components.RtkScreenShareT
 
 
 @ProxyCmp({
-  inputs: ['hideFullScreenButton', 'iconPack', 'meeting', 'nameTagPosition', 'participant', 'size', 't', 'variant']
+  inputs: ['hideFullScreenButton', 'iconPack', 'maxVisibleViewerAvatars', 'meeting', 'nameTagPosition', 'participant', 'size', 't', 'variant']
 })
 @Component({
   selector: 'rtk-screenshare-view',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: '<ng-content></ng-content>',
   // eslint-disable-next-line @angular-eslint/no-inputs-metadata-property
-  inputs: ['hideFullScreenButton', 'iconPack', 'meeting', 'nameTagPosition', 'participant', 'size', 't', 'variant'],
+  inputs: ['hideFullScreenButton', 'iconPack', 'maxVisibleViewerAvatars', 'meeting', 'nameTagPosition', 'participant', 'size', 't', 'variant'],
 })
 export class RtkScreenshareView {
   protected el: HTMLRtkScreenshareViewElement;
@@ -2988,7 +2988,7 @@ export declare interface RtkScreenshareView extends Components.RtkScreenshareVie
    */
   rtkStateUpdate: EventEmitter<CustomEvent<IRtkScreenshareViewStates>>;
   /**
-   * Emits when video playback happens successfully
+   * Emits on the screen-share video's play event
    */
   screensharePlay: EventEmitter<CustomEvent<{ participant: IRtkScreenshareViewPeer; screenshareParticipant: IRtkScreenshareViewPeer; }>>;
 }

@@ -8,6 +8,8 @@ import { RtkButton } from '../rtk-button/rtk-button';
 import { RtkIcon } from '../rtk-icon/rtk-icon';
 import { RtkScreenshareView } from './rtk-screenshare-view';
 
+const SCREEN_SHARE_VISIBILITY_MESSAGE = '__rtk_screenshare_visibility__';
+
 async function createView({
   remote = false,
   iconPack = defaultIconPack,
@@ -56,6 +58,121 @@ function createRemoteParticipant(id: string) {
     registerScreenshareVideoElement: jest.fn(),
     deregisterScreenshareVideoElement: jest.fn(),
   };
+}
+
+function createVisibilityParticipant(participantId: string, name: string) {
+  return {
+    id: participantId,
+    name,
+    screenShareEnabled: false,
+    screenShareTracks: { video: undefined as MediaStreamTrack | undefined },
+    producers: [] as { producerId: string; kind: 'video'; screenShare: boolean }[],
+    supportsRemoteControl: false,
+    registerScreenshareVideoElement: jest.fn(),
+    deregisterScreenshareVideoElement: jest.fn(),
+  };
+}
+
+async function createVisibilityView({
+  remote = false,
+  viewerNames = [],
+  maxVisibleViewerAvatars,
+  t = useLanguage(),
+}: {
+  remote?: boolean;
+  viewerNames?: string[];
+  maxVisibleViewerAvatars?: number;
+  t?: RtkI18n;
+} = {}) {
+  const screenShareTrack = { id: 'screen-track', kind: 'video' } as MediaStreamTrack;
+  const self = Object.assign(new EventEmitter(), {
+    id: 'self',
+    screenShareEnabled: !remote,
+    screenShareTracks: { video: remote ? undefined : screenShareTrack },
+    producers: remote ? [] : [{ id: 'producer-1', kind: 'video', appData: { screenShare: true } }],
+    supportsRemoteControl: false,
+    registerScreenshareVideoElement: jest.fn(),
+    deregisterScreenshareVideoElement: jest.fn(),
+  });
+  const sharer = createVisibilityParticipant('sharer', 'Sharer');
+  sharer.screenShareEnabled = true;
+  sharer.screenShareTracks.video = screenShareTrack;
+  sharer.producers = [{ producerId: 'producer-1', kind: 'video', screenShare: true }];
+  const joinedParticipants = new Map(
+    remote
+      ? [[sharer.id, sharer] as const]
+      : viewerNames.map((name) => [name, createVisibilityParticipant(name, name)] as const)
+  );
+  const joined = Object.assign(new EventEmitter(), {
+    get: (participantId: string) => joinedParticipants.get(participantId),
+    has: (participantId: string) => joinedParticipants.has(participantId),
+    keys: () => joinedParticipants.keys(),
+    toArray: () => Array.from(joinedParticipants.values()),
+  });
+  Object.defineProperty(joined, 'size', { get: () => joinedParticipants.size });
+  const broadcastMessage = jest.fn().mockResolvedValue(undefined);
+  const participants = Object.assign(new EventEmitter(), { joined, broadcastMessage });
+  const meta = Object.assign(new EventEmitter(), {
+    selfActiveTab: { type: 'screenshare', id: sharer.id },
+  });
+  const logger = { error: jest.fn() };
+  const meeting = { self, participants, meta, __internals__: { logger } };
+  const participant = remote ? sharer : self;
+  const page = await newSpecPage({
+    components: [RtkScreenshareView, RtkButton, RtkIcon],
+    template: () =>
+      h('rtk-screenshare-view', {
+        meeting: meeting as unknown as Meeting,
+        participant: participant as unknown as Peer,
+        t,
+        ...(maxVisibleViewerAvatars === undefined ? {} : { maxVisibleViewerAvatars }),
+      }),
+  });
+  const root = page.root;
+  if (root?.shadowRoot == null) throw new Error('Screen-share view did not render');
+  const video = root.shadowRoot.querySelector('video');
+  if (video == null) throw new Error('Screen-share video did not render');
+
+  return {
+    page,
+    root,
+    self,
+    sharer,
+    meeting,
+    joined,
+    joinedParticipants,
+    broadcastMessage,
+    logger,
+    screenShareTrack,
+    video,
+  };
+}
+
+function reportViewerVisibility(
+  participants: EventEmitter,
+  peerId: string,
+  visible: boolean,
+  producerId = 'producer-1'
+) {
+  participants.emit('broadcastedMessage', {
+    type: SCREEN_SHARE_VISIBILITY_MESSAGE,
+    peerId,
+    timestamp: 1234,
+    payload: { sharerId: 'self', producerId, visible },
+  });
+}
+
+function setPlayingVideoTrack(video: HTMLVideoElement, screenShareTrack: MediaStreamTrack) {
+  Object.defineProperties(video, {
+    HAVE_CURRENT_DATA: { configurable: true, value: 2 },
+    paused: { configurable: true, value: false },
+    readyState: { configurable: true, value: 2 },
+    srcObject: {
+      configurable: true,
+      writable: true,
+      value: { getVideoTracks: () => [screenShareTrack] },
+    },
+  });
 }
 
 describe('<rtk-screenshare-view> video element registration', () => {
@@ -289,5 +406,435 @@ describe('<rtk-screenshare-view> screen-sharing actions', () => {
     expect(switchButton().querySelector<HTMLRtkIconElement>('rtk-icon').icon).toBe(
       icons.share_screen_start
     );
+  });
+});
+
+describe('<rtk-screenshare-view> local screen-share visibility', () => {
+  it('hides visibility status when nobody else has joined', async () => {
+    const { root } = await createVisibilityView();
+
+    expect(root.shadowRoot.querySelector('.validation-status')).toBeNull();
+    expect(root.shadowRoot.querySelector('.validation-border')).toBeNull();
+  });
+
+  it('shows only a red message and a full red border before anyone starts viewing', async () => {
+    const { root } = await createVisibilityView({ viewerNames: ['alice', 'bob'] });
+    const status = root.shadowRoot.querySelector('.validation-status');
+    const border = root.shadowRoot.querySelector<HTMLElement>('.validation-border');
+
+    expect(status.textContent.trim()).toBe('No one is viewing your screen.');
+    expect(status.querySelector('.none-visible')).not.toBeNull();
+    expect(status.querySelector('.pending-avatars')).toBeNull();
+    expect(status.querySelector('.more-avatar')).toBeNull();
+    expect(border.classList.contains('none-active')).toBe(true);
+    expect(border.style.getPropertyValue('--validation-progress')).toBe('100%');
+  });
+
+  it('shows pending avatars for partial viewing, then the green message when all are viewing', async () => {
+    const { page, root, meeting } = await createVisibilityView({ viewerNames: ['alice', 'bob'] });
+
+    reportViewerVisibility(meeting.participants, 'alice', true);
+    await page.waitForChanges();
+    const status = root.shadowRoot.querySelector('.validation-status');
+    const border = root.shadowRoot.querySelector<HTMLElement>('.validation-border');
+    expect(status.textContent).toContain('Not currently viewing:');
+    expect(status.querySelectorAll('.avatar-trigger')).toHaveLength(1);
+    expect(status.querySelector('.avatar-trigger').getAttribute('aria-label')).toBe('bob');
+    expect(border.classList.contains('none-active')).toBe(false);
+    expect(border.style.getPropertyValue('--validation-progress')).toBe('50%');
+
+    reportViewerVisibility(meeting.participants, 'bob', true);
+    await page.waitForChanges();
+    expect(status.textContent.trim()).toBe('Everyone is viewing your screen.');
+    expect(status.querySelector('.all-visible')).not.toBeNull();
+    expect(status.querySelector('.pending-avatars')).toBeNull();
+    expect(border.classList.contains('complete')).toBe(true);
+    expect(border.style.getPropertyValue('--validation-progress')).toBe('100%');
+
+    reportViewerVisibility(meeting.participants, 'bob', false);
+    await page.waitForChanges();
+    expect(status.textContent).toContain('Not currently viewing:');
+    expect(status.querySelector('.avatar-trigger').getAttribute('aria-label')).toBe('bob');
+    expect(border.classList.contains('complete')).toBe(false);
+    expect(border.style.getPropertyValue('--validation-progress')).toBe('50%');
+  });
+
+  it('ignores notifications for another share or for a participant who is not joined', async () => {
+    const { page, root, meeting } = await createVisibilityView({ viewerNames: ['alice'] });
+
+    reportViewerVisibility(meeting.participants, 'alice', true, 'previous-producer');
+    reportViewerVisibility(meeting.participants, 'stranger', true);
+    meeting.participants.emit('broadcastedMessage', {
+      type: SCREEN_SHARE_VISIBILITY_MESSAGE,
+      peerId: 'alice',
+      timestamp: 1234,
+      payload: {
+        sharerId: 'someone-else',
+        producerId: 'producer-1',
+        visible: true,
+      },
+    });
+    await page.waitForChanges();
+
+    expect(root.shadowRoot.querySelector('.validation-status').textContent.trim()).toBe(
+      'No one is viewing your screen.'
+    );
+    expect(
+      root.shadowRoot.querySelector('.validation-border').classList.contains('none-active')
+    ).toBe(true);
+  });
+
+  it('attributes a visibility report to its SDK sender rather than a viewer ID in the payload', async () => {
+    const { page, root, meeting } = await createVisibilityView({
+      viewerNames: ['alice', 'bob'],
+    });
+
+    meeting.participants.emit('broadcastedMessage', {
+      type: SCREEN_SHARE_VISIBILITY_MESSAGE,
+      peerId: 'alice',
+      timestamp: 1234,
+      payload: { sharerId: 'self', viewerId: 'bob', producerId: 'producer-1', visible: true },
+    });
+    await page.waitForChanges();
+
+    const status = root.shadowRoot.querySelector('.validation-status');
+    expect(status.textContent).toContain('Not currently viewing:');
+    expect(status.querySelector('.avatar-trigger').getAttribute('aria-label')).toBe('bob');
+    expect(
+      root.shadowRoot
+        .querySelector<HTMLElement>('.validation-border')
+        .style.getPropertyValue('--validation-progress')
+    ).toBe('50%');
+  });
+
+  it('updates visibility when viewers join, leave, and reconnect with the same ID', async () => {
+    const { page, root, meeting, joined, joinedParticipants } = await createVisibilityView({
+      viewerNames: ['alice'],
+    });
+
+    reportViewerVisibility(meeting.participants, 'alice', true);
+    await page.waitForChanges();
+    expect(root.shadowRoot.querySelector('.all-visible')).not.toBeNull();
+
+    const rejoinedAlice = createVisibilityParticipant('alice', 'Alice rejoined');
+    joinedParticipants.set('alice', rejoinedAlice);
+    joined.emit('participantJoined', rejoinedAlice);
+    await page.waitForChanges();
+    expect(root.shadowRoot.querySelector('.none-visible').textContent).toBe(
+      'No one is viewing your screen.'
+    );
+
+    reportViewerVisibility(meeting.participants, 'alice', true);
+    await page.waitForChanges();
+    expect(root.shadowRoot.querySelector('.all-visible')).not.toBeNull();
+
+    joinedParticipants.delete('alice');
+    joined.emit('participantLeft', rejoinedAlice);
+    await page.waitForChanges();
+    expect(root.shadowRoot.querySelector('.validation-status')).toBeNull();
+    expect(root.shadowRoot.querySelector('.validation-border')).toBeNull();
+
+    const bob = createVisibilityParticipant('bob', 'Bob');
+    joinedParticipants.set('bob', bob);
+    joined.emit('participantJoined', bob);
+    await page.waitForChanges();
+    expect(root.shadowRoot.querySelector('.none-visible')).not.toBeNull();
+  });
+
+  it('uses the current joined count when a confirmed viewer leaves', async () => {
+    const { page, root, meeting, joined, joinedParticipants } = await createVisibilityView({
+      viewerNames: ['alice', 'bob'],
+    });
+    reportViewerVisibility(meeting.participants, 'alice', true);
+    await page.waitForChanges();
+    expect(root.shadowRoot.querySelector('.avatar-trigger').getAttribute('aria-label')).toBe('bob');
+
+    const departedViewer = joinedParticipants.get('alice');
+    joinedParticipants.delete('alice');
+    joined.emit('participantLeft', departedViewer);
+    await page.waitForChanges();
+
+    expect(root.shadowRoot.querySelector('.validation-status').textContent.trim()).toBe(
+      'No one is viewing your screen.'
+    );
+    expect(
+      root.shadowRoot.querySelector('.validation-border').classList.contains('none-active')
+    ).toBe(true);
+
+    reportViewerVisibility(meeting.participants, 'bob', true);
+    await page.waitForChanges();
+    expect(root.shadowRoot.querySelector('.all-visible')).not.toBeNull();
+  });
+
+  it('does not accept an acknowledgement from the previous screen after switching shares', async () => {
+    const { page, root, self, meeting, screenShareTrack } = await createVisibilityView({
+      viewerNames: ['alice'],
+    });
+    reportViewerVisibility(meeting.participants, 'alice', true);
+    await page.waitForChanges();
+    expect(root.shadowRoot.querySelector('.all-visible')).not.toBeNull();
+
+    self.producers = [{ id: 'producer-2', kind: 'video', appData: { screenShare: true } }];
+    self.emit('screenShareUpdate', {
+      screenShareEnabled: true,
+      screenShareTracks: { video: screenShareTrack },
+    });
+    reportViewerVisibility(meeting.participants, 'alice', true);
+    await page.waitForChanges();
+    expect(root.shadowRoot.querySelector('.none-visible')).not.toBeNull();
+
+    reportViewerVisibility(meeting.participants, 'alice', true, 'producer-2');
+    await page.waitForChanges();
+    expect(root.shadowRoot.querySelector('.all-visible')).not.toBeNull();
+  });
+
+  it('shows at most the configured avatar count and lets the sharer see participant names', async () => {
+    const { page, root, meeting } = await createVisibilityView({
+      viewerNames: ['alice', 'bob', 'charlie', 'dana', 'eve'],
+      maxVisibleViewerAvatars: 2,
+    });
+    reportViewerVisibility(meeting.participants, 'alice', true);
+    await page.waitForChanges();
+
+    const status = root.shadowRoot.querySelector('.validation-status');
+    expect(status.querySelectorAll('.avatar-trigger')).toHaveLength(2);
+    expect(status.querySelector('.more-avatar').textContent.trim()).toBe('+2');
+
+    status.querySelector<HTMLElement>('.avatar-trigger').click();
+    await page.waitForChanges();
+    expect(status.querySelector('.viewer-name').textContent).toBe('bob');
+
+    status.querySelector<HTMLElement>('.more-avatar').click();
+    await page.waitForChanges();
+    expect(status.querySelectorAll('.remaining-viewer')).toHaveLength(2);
+    expect(status.querySelector('.remaining-viewers').textContent).toContain('dana');
+    expect(status.querySelector('.remaining-viewers').textContent).toContain('eve');
+  });
+
+  it('uses customized visibility labels for the no-viewer, partial, and all-viewing states', async () => {
+    const { page, root, meeting } = await createVisibilityView({
+      viewerNames: ['alice', 'bob'],
+      t: useLanguage({
+        'screenshare.visibility.none': 'Nobody watching',
+        'screenshare.visibility.not_viewing': 'Still waiting:',
+        'screenshare.visibility.all': 'All watching',
+      }),
+    });
+    expect(root.shadowRoot.querySelector('.validation-status').textContent.trim()).toBe(
+      'Nobody watching'
+    );
+
+    reportViewerVisibility(meeting.participants, 'alice', true);
+    await page.waitForChanges();
+    expect(root.shadowRoot.querySelector('.validation-status').textContent).toContain(
+      'Still waiting:'
+    );
+
+    reportViewerVisibility(meeting.participants, 'bob', true);
+    await page.waitForChanges();
+    expect(root.shadowRoot.querySelector('.validation-status').textContent.trim()).toBe(
+      'All watching'
+    );
+  });
+});
+
+describe('<rtk-screenshare-view> remote screen-share visibility', () => {
+  it('notifies the sharer only after the current video track is mounted and playing', async () => {
+    const { page, root, video, screenShareTrack, broadcastMessage } = await createVisibilityView({
+      remote: true,
+    });
+    const oldVideoTrack = { id: 'previous-track', kind: 'video' } as MediaStreamTrack;
+    setPlayingVideoTrack(video, oldVideoTrack);
+
+    video.dispatchEvent(new Event('playing'));
+    await page.waitForChanges();
+    expect(broadcastMessage).not.toHaveBeenCalled();
+    expect(root.shadowRoot.querySelector('.validation-status')).toBeNull();
+
+    video.srcObject = { getVideoTracks: () => [screenShareTrack] } as unknown as MediaStream;
+    video.dispatchEvent(new Event('loadeddata'));
+    await page.waitForChanges();
+    expect(broadcastMessage).toHaveBeenCalledTimes(1);
+    expect(broadcastMessage).toHaveBeenLastCalledWith(
+      SCREEN_SHARE_VISIBILITY_MESSAGE,
+      { sharerId: 'sharer', producerId: 'producer-1', visible: true },
+      { participantIds: ['sharer'] }
+    );
+
+    video.dispatchEvent(new Event('playing'));
+    expect(broadcastMessage).toHaveBeenCalledTimes(1);
+  });
+
+  it('notifies the sharer when the selected tab changes and when video playback ends', async () => {
+    const { video, screenShareTrack, meeting, broadcastMessage } = await createVisibilityView({
+      remote: true,
+    });
+    setPlayingVideoTrack(video, screenShareTrack);
+    video.dispatchEvent(new Event('playing'));
+    expect(broadcastMessage).toHaveBeenCalledTimes(1);
+
+    meeting.meta.selfActiveTab = { type: 'screenshare', id: 'different-share' };
+    meeting.meta.emit('selfTabUpdate');
+    expect(broadcastMessage).toHaveBeenLastCalledWith(
+      SCREEN_SHARE_VISIBILITY_MESSAGE,
+      { sharerId: 'sharer', producerId: 'producer-1', visible: false },
+      { participantIds: ['sharer'] }
+    );
+
+    meeting.meta.selfActiveTab = { type: 'screenshare', id: 'sharer' };
+    meeting.meta.emit('activeTabUpdate');
+    expect(broadcastMessage).toHaveBeenCalledTimes(3);
+    expect(broadcastMessage.mock.calls[2][1].visible).toBe(true);
+
+    video.dispatchEvent(new Event('ended'));
+    expect(broadcastMessage).toHaveBeenCalledTimes(4);
+    expect(broadcastMessage.mock.calls[3][1].visible).toBe(false);
+  });
+
+  it('does not report the next share as visible until its video track replaces the old track', async () => {
+    const { page, video, sharer, joined, broadcastMessage, screenShareTrack } =
+      await createVisibilityView({ remote: true });
+    setPlayingVideoTrack(video, screenShareTrack);
+    video.dispatchEvent(new Event('playing'));
+    expect(broadcastMessage.mock.calls[0][1].visible).toBe(true);
+
+    const nextVideoTrack = { id: 'next-track', kind: 'video' } as MediaStreamTrack;
+    sharer.producers = [{ producerId: 'producer-2', kind: 'video', screenShare: true }];
+    sharer.screenShareTracks.video = nextVideoTrack;
+    joined.emit('screenShareUpdate', sharer);
+    await page.waitForChanges();
+    expect(broadcastMessage.mock.calls[1][1]).toEqual({
+      sharerId: 'sharer',
+      producerId: 'producer-1',
+      visible: false,
+    });
+
+    video.dispatchEvent(new Event('playing'));
+    expect(broadcastMessage).toHaveBeenCalledTimes(2);
+
+    video.srcObject = { getVideoTracks: () => [nextVideoTrack] } as unknown as MediaStream;
+    video.dispatchEvent(new Event('loadeddata'));
+    expect(broadcastMessage).toHaveBeenCalledTimes(3);
+    expect(broadcastMessage.mock.calls[2][1]).toEqual({
+      sharerId: 'sharer',
+      producerId: 'producer-2',
+      visible: true,
+    });
+  });
+
+  it('sends a fresh visibility report when the remote sharer rejoins with the same ID', async () => {
+    const { page, video, screenShareTrack, sharer, joined, joinedParticipants, broadcastMessage } =
+      await createVisibilityView({ remote: true });
+    setPlayingVideoTrack(video, screenShareTrack);
+    video.dispatchEvent(new Event('playing'));
+    expect(broadcastMessage).toHaveBeenCalledTimes(1);
+
+    const rejoinedSharer = createVisibilityParticipant('sharer', 'Sharer rejoined');
+    rejoinedSharer.screenShareEnabled = true;
+    rejoinedSharer.screenShareTracks.video = screenShareTrack;
+    rejoinedSharer.producers = sharer.producers;
+    joinedParticipants.set('sharer', rejoinedSharer);
+    joined.emit('participantJoined', rejoinedSharer);
+    await page.waitForChanges();
+
+    expect(broadcastMessage).toHaveBeenCalledTimes(2);
+    expect(broadcastMessage.mock.calls[1][1]).toEqual({
+      sharerId: 'sharer',
+      producerId: 'producer-1',
+      visible: true,
+    });
+  });
+
+  it('reports visibility again after the sharer participant object is replaced', async () => {
+    const { page, root, video, screenShareTrack, sharer, joinedParticipants, broadcastMessage } =
+      await createVisibilityView({ remote: true });
+    setPlayingVideoTrack(video, screenShareTrack);
+    video.dispatchEvent(new Event('playing'));
+    expect(broadcastMessage).toHaveBeenCalledTimes(1);
+
+    const replacementSharer = createVisibilityParticipant('sharer', 'Sharer rejoined');
+    replacementSharer.screenShareEnabled = true;
+    replacementSharer.screenShareTracks.video = screenShareTrack;
+    replacementSharer.producers = sharer.producers;
+    joinedParticipants.set('sharer', replacementSharer);
+    (root as HTMLRtkScreenshareViewElement).participant = replacementSharer as unknown as Peer;
+    await page.waitForChanges();
+
+    expect(broadcastMessage).toHaveBeenCalledTimes(2);
+    expect(broadcastMessage.mock.calls[1][1]).toEqual({
+      sharerId: 'sharer',
+      producerId: 'producer-1',
+      visible: true,
+    });
+  });
+
+  it('retries a visibility report after the SDK rejects the broadcast', async () => {
+    const { video, screenShareTrack, logger, broadcastMessage } = await createVisibilityView({
+      remote: true,
+    });
+    const broadcastError = new Error('Meeting disconnected');
+    broadcastMessage.mockRejectedValueOnce(broadcastError);
+    setPlayingVideoTrack(video, screenShareTrack);
+    video.dispatchEvent(new Event('playing'));
+    await Promise.resolve();
+
+    expect(logger.error).toHaveBeenCalledWith('rtkScreenshareView::validateScreenShare', {
+      error: broadcastError,
+    });
+    video.dispatchEvent(new Event('playing'));
+    expect(broadcastMessage).toHaveBeenCalledTimes(2);
+    expect(broadcastMessage.mock.calls[1][1]).toEqual({
+      sharerId: 'sharer',
+      producerId: 'producer-1',
+      visible: true,
+    });
+  });
+
+  it('notifies the sharer that viewing stopped and removes listeners when the view disconnects', async () => {
+    const { root, video, screenShareTrack, meeting, joined, broadcastMessage } =
+      await createVisibilityView({ remote: true });
+    setPlayingVideoTrack(video, screenShareTrack);
+    video.dispatchEvent(new Event('playing'));
+    root.remove();
+
+    expect(broadcastMessage).toHaveBeenCalledTimes(2);
+    expect(broadcastMessage.mock.calls[1][1].visible).toBe(false);
+    expect(meeting.participants.listenerCount('broadcastedMessage')).toBe(0);
+    expect(joined.listenerCount('participantJoined')).toBe(0);
+    expect(joined.listenerCount('participantLeft')).toBe(0);
+    expect(meeting.meta.listenerCount('selfTabUpdate')).toBe(0);
+    expect(meeting.meta.listenerCount('activeTabUpdate')).toBe(0);
+  });
+});
+
+describe('<rtk-screenshare-view> animated visibility border', () => {
+  it('registers the animatable progress property only once across screen-share views', async () => {
+    const originalCss = Object.getOwnPropertyDescriptor(globalThis, 'CSS');
+    const registerProperty = jest.fn();
+    Object.defineProperty(globalThis, 'CSS', {
+      configurable: true,
+      value: { registerProperty },
+    });
+
+    try {
+      const firstView = await createVisibilityView({ viewerNames: ['alice'] });
+      const secondView = await createVisibilityView({ viewerNames: ['bob'] });
+
+      expect(firstView.root.shadowRoot.querySelector('.validation-border')).not.toBeNull();
+      expect(secondView.root.shadowRoot.querySelector('.validation-border')).not.toBeNull();
+      expect(registerProperty).toHaveBeenCalledTimes(1);
+      expect(registerProperty).toHaveBeenCalledWith({
+        name: '--rtk-screenshare-view-progress',
+        syntax: '<percentage>',
+        inherits: true,
+        initialValue: '0%',
+      });
+    } finally {
+      if (originalCss) {
+        Object.defineProperty(globalThis, 'CSS', originalCss);
+      } else {
+        Reflect.deleteProperty(globalThis, 'CSS');
+      }
+    }
   });
 });
