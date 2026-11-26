@@ -182,6 +182,20 @@ export class RtkNotifications {
     this.audio = new RTKNotificationsAudio(meeting);
     const { notifications, notification_duration, notification_sounds } = this.permissions;
     this.participantJoinedListener = (participant: Participant) => {
+      /**
+       * NOTE(ravindra-cloudflare):
+       * Participants that immediately reconnected,
+       * due to Websocket disconnects with error code 1006,
+       * will have a peerIdBeforeReconnect set.
+       *
+       * We don't want to show notifications for such participants
+       * as they are not actually joining the meeting,
+       * but rather reconnecting to it.
+       */
+      const isReconnectedParticipant = !!participant.peerIdBeforeReconnect;
+      if (isReconnectedParticipant) {
+        return;
+      }
       if (notifications.participant_joined) {
         this.add({
           id: `${participant.id}-joined`,
@@ -196,10 +210,19 @@ export class RtkNotifications {
     };
 
     this.participantLeftListener = (participant: Participant) => {
+      /**
+       * NOTE(ravindra-cloudflare):
+       * A departing participant replaced after reconnecting has replacedByPeerId
+       * set before its leave event. Suppress the leave notification and sound.
+       */
+      if (participant.replacedByPeerId) {
+        return;
+      }
+
       const {
         socketState: { state },
       } = this.meeting.meta;
-      if (notifications.participant_left && state !== 'connected') {
+      if (notifications.participant_left && state === 'connected') {
         this.add({
           id: `${participant.id}-left`,
           message: `${formatName(participant.name)} ${this.t('notifications.left')}`,
