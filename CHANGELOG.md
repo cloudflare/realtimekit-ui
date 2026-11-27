@@ -1,3 +1,10 @@
+# [2.2.0-staging.5](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.2.0-staging.4...@cloudflare/realtimekit-ui-v2.2.0-staging.5) (2026-11-27)
+
+
+### Features
+
+* **notifications:** ability to customize notification sound, duration, and toggle ([#220](https://github.com/cloudflare/realtimekit-ui/issues/220)) ([5869c2d](https://github.com/cloudflare/realtimekit-ui/commit/5869c2dd7ff31e9ece8dfcd1f7db0af89e540cb5))
+
 # [2.2.0-staging.4](https://github.com/cloudflare/realtimekit-ui/compare/@cloudflare/realtimekit-ui-v2.2.0-staging.3...@cloudflare/realtimekit-ui-v2.2.0-staging.4) (2026-11-26)
 
 
