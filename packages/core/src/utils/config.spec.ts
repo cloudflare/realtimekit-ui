@@ -3,7 +3,10 @@ import { extendConfig, generateConfig } from './config';
 
 describe('setup media controls', () => {
   it('shows both device menus in the default and preset-generated configs', () => {
-    const configs = [createDefaultConfig(), generateConfig({ designTokens: {} as any }, {} as any).config];
+    const configs = [
+      createDefaultConfig(),
+      generateConfig({ designTokens: {} as any }, {} as any).config,
+    ];
 
     for (const config of configs) {
       expect(config.root['div#setupcontrols-media']).toEqual([
