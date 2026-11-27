@@ -1,12 +1,16 @@
 import { Component, Host, h, Prop, State, Element, Watch, writeTask, Listen } from '@stencil/core';
 import { Meeting, Participant, Peer, WaitlistedParticipant } from '../../types/rtk-client';
 import { Size, Notification, States, Poll } from '../../types/props';
-import RTKNotificationsAudio, { isAudioFileUrl, Sound } from '../../lib/notification';
+import RTKNotificationsAudio, { isAudioFileUrl, isBuiltInSoundName } from '../../lib/notification';
 import { formatName } from '../../utils/string';
 import { defaultIconPack, IconPack } from '../../lib/icons';
 import { RtkI18n, useLanguage } from '../../lib/lang';
 import { UIConfig } from '../../types/ui-config';
-import { DEFAULT_NOTIFICATION_CONFIG, Config, NotificationKey } from '../../types/ui-config/config';
+import {
+  DEFAULT_NOTIFICATION_CONFIG,
+  NotificationConfig,
+  NotificationKey,
+} from '../../types/ui-config/config';
 import type {
   ActiveTab,
   RecordingState,
@@ -15,6 +19,7 @@ import type {
 } from '@cloudflare/realtimekit';
 import { createDefaultConfig } from '../../exports';
 import { parseMessageForTarget } from '../../utils/chat';
+import deepMerge from 'lodash-es/merge';
 import { SyncWithStore } from '../../utils/sync-with-store';
 import { showLivestream } from '../../utils/livestream';
 
@@ -80,11 +85,14 @@ export class RtkNotifications {
 
   @State() notifications: Notification[] = [];
 
+  private notificationConfig: NotificationConfig = deepMerge({}, DEFAULT_NOTIFICATION_CONFIG);
+
   connectedCallback() {
     if (typeof document !== 'undefined') {
       document?.addEventListener('rtkNotification', this.onNotification);
     }
     this.meetingChanged(this.meeting);
+    this.configChanged(this.config);
   }
 
   private clearListeners(meeting: Meeting) {
@@ -397,7 +405,7 @@ export class RtkNotifications {
     };
 
     this.peerStageStatusListener = (participant: Peer) => {
-      if (participant.stageStatus === 'REQUESTED_TO_JOIN_STAGE') {
+      if (participant.stageStatus === 'REQUESTED_TO_JOIN_STAGE' && this.canAcceptStageRequests()) {
         this.showIfEnabled('stage_requested_to_join', {
           id: `stage-request-${participant.id}`,
           message: `${participant.name} ${this.t('notifications.requested_to_join_stage')}`,
@@ -486,7 +494,7 @@ export class RtkNotifications {
     meeting.recording?.addListener('recordingUpdate', this.onRecordingUpdate);
     meeting.stage?.addListener('stageRequestApproved', this.stageRequestAccepted);
     meeting.stage?.addListener('stageRequestRejected', this.stageRequestRejected);
-    if (meeting.self.permissions.stageEnabled && meeting.self.permissions.acceptStageRequests) {
+    if (this.canAcceptStageRequests()) {
       meeting.stage?.addListener('newStageRequest', this.newStageRequests);
     }
   }
@@ -501,12 +509,10 @@ export class RtkNotifications {
     meeting.participants.joined.removeListener('participantLeft', this.participantLeftListener);
   };
 
-  /**
-   * The notification settings of the `config` prop.
-   * A UI config without notification settings uses the defaults.
-   */
-  private get notificationConfig(): Config {
-    return this.config?.config ?? DEFAULT_NOTIFICATION_CONFIG;
+  @Watch('config')
+  configChanged(config: UIConfig) {
+    // a group, key or limit that the config does not set keeps its default value
+    this.notificationConfig = deepMerge({}, DEFAULT_NOTIFICATION_CONFIG, config?.config);
   }
 
   @Listen('rtkApiError', { target: 'window' })
@@ -536,9 +542,14 @@ export class RtkNotifications {
     this.playCustomSoundIfEnabled();
   }
 
-  private onNotification = (e: CustomEvent<Notification & { playSound: Sound | undefined }>) => {
-    if (this.isShown('custom')) this.add(e.detail);
-    this.playCustomSoundIfEnabled(e.detail.playSound);
+  private onNotification = (
+    e: CustomEvent<Notification & { playSound: string | undefined; meetingId: string | undefined }>
+  ) => {
+    const { playSound, meetingId, ...notification } = e.detail;
+    // a notification that names a meeting is only for the rtk-notifications of that meeting
+    if (!!meetingId && meetingId !== this.meeting?.meta?.meetingId) return;
+    if (this.isShown('custom')) this.add(notification);
+    this.playCustomSoundIfEnabled(playSound);
   };
 
   private onRecordingUpdate = (recordingState: RecordingState) => {
@@ -590,16 +601,20 @@ export class RtkNotifications {
   }
 
   /**
-   * A custom notification plays the URL from the config when one is set.
-   * Otherwise it plays the sound that its sender chose, if any.
+   * A custom notification plays the sound that its sender chose:
+   * the name of a built-in sound or the URL of an audio file.
+   * Without a usable sound from the sender, it plays the `custom` URL from the config, if one is set.
    */
-  private playCustomSoundIfEnabled(senderSound?: Sound) {
+  private playCustomSoundIfEnabled(senderSound?: string) {
     if (!this.isSoundOn('custom')) return;
-    const url = this.notificationConfig.notification_sound_urls.custom;
+    if (isBuiltInSoundName(senderSound)) {
+      this.audio?.play(senderSound);
+      return;
+    }
+    const configUrl = this.notificationConfig.notification_sound_urls.custom;
+    const url = isAudioFileUrl(senderSound) ? senderSound : configUrl;
     if (isAudioFileUrl(url)) {
       this.audio?.playUrl(url);
-    } else if (senderSound != undefined) {
-      this.audio?.play(senderSound);
     }
   }
 
@@ -651,6 +666,11 @@ export class RtkNotifications {
       this.meeting.participants.count <=
         this.notificationConfig.participant_chat_message_sound_notification_limit
     );
+  }
+
+  private canAcceptStageRequests(): boolean {
+    const { stageEnabled, acceptStageRequests } = this.meeting.self.permissions;
+    return !!(stageEnabled && acceptStageRequests);
   }
 
   private canAcceptWaitingRequests(): boolean {

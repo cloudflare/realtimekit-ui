@@ -9,13 +9,20 @@ export const SOUNDS = {
 
 export type Sound = keyof typeof SOUNDS;
 
+/**
+ * Checks that a value is the name of a built-in sound: `joined`, `left` or `message`.
+ */
+export function isBuiltInSoundName(value: unknown): value is Sound {
+  return typeof value === 'string' && Object.prototype.hasOwnProperty.call(SOUNDS, value);
+}
+
 const AUDIO_FILE_EXTENSIONS = ['.mp3', '.wav', '.ogg', '.m4a', '.aac', '.flac', '.opus', '.webm'];
 
 /**
  * Checks that a value is an `https:` or `http:` URL whose path ends with an audio file extension.
  */
 export function isAudioFileUrl(url: unknown): url is string {
-  if (typeof url !== 'string') return false;
+  if (!url || typeof url !== 'string') return false;
 
   let parsedUrl: URL;
   try {

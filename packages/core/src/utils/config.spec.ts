@@ -3,7 +3,7 @@ import { extendConfig, generateConfig } from './config';
 
 describe('setup media controls', () => {
   it('shows both device menus in the default and preset-generated configs', () => {
-    const configs = [createDefaultConfig(), generateConfig({ designTokens: {} }, {} as any).config];
+    const configs = [createDefaultConfig(), generateConfig({ designTokens: {} as any }, {} as any).config];
 
     for (const config of configs) {
       expect(config.root['div#setupcontrols-media']).toEqual([
@@ -11,6 +11,24 @@ describe('setup media controls', () => {
         ['rtk-camera-toggle', { size: 'sm' }],
       ]);
     }
+  });
+});
+
+describe('generateConfig() notification config', () => {
+  it('returns the default notification settings', () => {
+    const { config } = generateConfig({ designTokens: {} as any }, {} as any).config;
+
+    expect(config.notifications.participant_joined).toBe(true);
+    expect(config.notifications.chat_message_edited).toBe(false);
+    expect(config.notification_sounds.chat_new_message).toBe(true);
+    expect(config.notification_duration.participant_joined_waitlist).toBe(4000);
+    expect(config.notification_sound_urls.chat_new_message).toBe(
+      'https://rtk-assets.realtime.cloudflare.com/ui-kit/sounds/notification_message.mp3'
+    );
+    expect(config.participant_joined_sound_notification_limit).toBe(3);
+    expect(config.participant_chat_message_sound_notification_limit).toBe(10);
+    expect(config.visible_notifications_limit).toBe(5);
+    expect(config.videoFit).toBe('cover');
   });
 });
 

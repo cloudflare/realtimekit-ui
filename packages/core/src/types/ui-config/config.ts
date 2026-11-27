@@ -49,7 +49,8 @@ export interface NotificationConfig {
    * A URL must use `https:` or `http:` and its path must end with an audio file
    * extension: `.mp3`, `.wav`, `.ogg`, `.m4a`, `.aac`, `.flac`, `.opus` or `.webm`.
    * Any other value is ignored and the default sound of that notification is played.
-   * `custom` is empty by default: it plays the sound that the sender of the notification chose.
+   * `custom` is empty by default. A custom notification plays the sound that its sender
+   * chose. The `custom` URL plays only when the sender chose no sound.
    */
   notification_sound_urls: Partial<NotificationSoundUrls>;
 
@@ -211,7 +212,7 @@ export const DEFAULT_NOTIFICATION_CONFIG: Readonly<NotificationConfig> = Object.
     network_disconnected: SOUNDS.message,
     network_failed: SOUNDS.message,
     api_error: SOUNDS.message,
-    custom: '',
+    custom: undefined,
   },
   participant_joined_sound_notification_limit: 3,
   participant_chat_message_sound_notification_limit: 10,

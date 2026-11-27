@@ -32,12 +32,16 @@ async function createNotifications({
   states = undefined as States,
   canAcceptStageRequests = false,
   canAcceptWaitingRequests = false,
+  viewType = 'GROUP_CALL',
+  currentSpeaker = undefined as { deviceId: string },
 }: {
   config?: UIConfig;
   participantCount?: number;
   states?: States;
   canAcceptStageRequests?: boolean;
   canAcceptWaitingRequests?: boolean;
+  viewType?: 'GROUP_CALL' | 'LIVESTREAM' | 'CHAT';
+  currentSpeaker?: { deviceId: string };
 } = {}) {
   const joined = Object.assign(new EventEmitter(), {
     toArray: () => [{ id: 'sharing-peer', name: 'Ada', screenShareEnabled: true }],
@@ -46,27 +50,36 @@ async function createNotifications({
   const waitlisted = new EventEmitter();
   const acceptWaitingRoomRequest = jest.fn(async () => {});
   const polls = new EventEmitter();
+  const recording = new EventEmitter();
+  const leave = jest.fn();
   const selfEvents = new EventEmitter();
-  const stage = Object.assign(new EventEmitter(), { grantAccess: jest.fn(async () => {}) });
+  const stage = Object.assign(new EventEmitter(), {
+    status: 'OFF_STAGE',
+    grantAccess: jest.fn(async () => {}),
+  });
   const meta = Object.assign(new EventEmitter(), {
-    viewType: 'GROUP_CALL',
+    viewType,
+    meetingId: 'meeting-1',
     socketState: { state: 'connected' },
   });
   const meeting = {
     self: Object.assign(selfEvents, {
       userId: 'self-user',
       videoEnabled: true,
-      config: { viewType: 'GROUP_CALL' },
+      audioEnabled: true,
+      config: { viewType },
       permissions: {
         acceptWaitingRequests: canAcceptWaitingRequests,
         stageEnabled: canAcceptStageRequests,
         acceptStageRequests: canAcceptStageRequests,
       },
-      getCurrentDevices: jest.fn(() => ({})),
+      getCurrentDevices: jest.fn(() => ({ speaker: currentSpeaker })),
     }),
     meta,
     chat,
     polls,
+    recording,
+    leave,
     stage,
     plugins: { active: { toArray: () => [{ id: 'whiteboard-plugin', name: 'Whiteboard' }] } },
     participants: { joined, waitlisted, acceptWaitingRoomRequest, count: participantCount },
@@ -74,6 +87,9 @@ async function createNotifications({
   const playSound = jest
     .spyOn(RTKNotificationsAudio.prototype, 'playUrl')
     .mockImplementation(() => {});
+  const setSpeaker = jest
+    .spyOn(RTKNotificationsAudio.prototype, 'setDevice')
+    .mockImplementation(async () => {});
   const playSenderSound = jest
     .spyOn(RTKNotificationsAudio.prototype, 'play')
     .mockImplementation(() => {});
@@ -85,6 +101,7 @@ async function createNotifications({
 
   return {
     page,
+    meeting,
     joined,
     waitlisted,
     acceptWaitingRoomRequest,
@@ -93,6 +110,9 @@ async function createNotifications({
     stage,
     meta,
     selfEvents,
+    recording,
+    leave,
+    setSpeaker,
     playSound,
     playSenderSound,
   };
@@ -649,6 +669,70 @@ describe('<rtk-notifications> config handling', () => {
     page.root.remove();
   });
 
+  it('uses the default values for groups and keys that a partial config does not set', async () => {
+    const { page, joined, chat, playSound } = await createNotifications({
+      config: { config: { notifications: { chat_new_message: false } } },
+    });
+
+    chat.emit('chatUpdate', { action: 'add', message: chatMessage });
+    joined.emit('participantJoined', { id: 'new-peer', name: 'Ada' });
+    await page.waitForChanges();
+
+    expect(page.rootInstance.notifications).toEqual([
+      expect.objectContaining({ id: 'new-peer-joined', duration: 2100 }),
+    ]);
+    expect(playSound).toHaveBeenCalledWith(MESSAGE_SOUND_URL);
+    page.root.remove();
+  });
+
+  it('uses the default limits when the config does not set them', async () => {
+    const { page, joined, playSound } = await createNotifications({
+      config: { config: { notification_sounds: { participant_joined: true } } },
+      participantCount: 4,
+    });
+
+    ['peer-1', 'peer-2', 'peer-3', 'peer-4', 'peer-5', 'peer-6'].forEach((id) =>
+      joined.emit('participantJoined', { id, name: 'Ada' })
+    );
+    await page.waitForChanges();
+
+    expect(page.rootInstance.notifications).toHaveLength(5);
+    expect(playSound).not.toHaveBeenCalled();
+    page.root.remove();
+  });
+
+  it('keeps a limit of 0 from the config as no limit', async () => {
+    const { page, joined, playSound } = await createNotifications({
+      config: {
+        config: { participant_joined_sound_notification_limit: 0, visible_notifications_limit: 0 },
+      },
+      participantCount: 50,
+    });
+
+    ['peer-1', 'peer-2', 'peer-3', 'peer-4', 'peer-5', 'peer-6'].forEach((id) =>
+      joined.emit('participantJoined', { id, name: 'Ada' })
+    );
+    await page.waitForChanges();
+
+    expect(page.rootInstance.notifications).toHaveLength(6);
+    expect(playSound).toHaveBeenCalledWith(JOIN_SOUND_URL);
+    page.root.remove();
+  });
+
+  it('uses the default value for a key that the config sets to undefined', async () => {
+    const { page, joined } = await createNotifications({
+      config: { config: { notifications: { participant_joined: undefined } } },
+    });
+
+    joined.emit('participantJoined', { id: 'new-peer', name: 'Ada' });
+    await page.waitForChanges();
+
+    expect(page.rootInstance.notifications).toEqual([
+      expect.objectContaining({ id: 'new-peer-joined', duration: 2100 }),
+    ]);
+    page.root.remove();
+  });
+
   it('does not change the config object when notification sounds are muted', async () => {
     const config = createConfigWithAllOn();
     const { page } = await createNotifications({
@@ -667,7 +751,9 @@ describe('<rtk-notifications> stage messages', () => {
   });
 
   it('shows the requested to join stage message and plays a sound', async () => {
-    const { page, joined, playSound } = await createNotifications();
+    const { page, joined, playSound } = await createNotifications({
+      canAcceptStageRequests: true,
+    });
 
     joined.emit('stageStatusUpdate', {
       id: 'requesting-peer',
@@ -684,8 +770,24 @@ describe('<rtk-notifications> stage messages', () => {
     page.root.remove();
   });
 
+  it('does not show the stage request to a user who cannot accept stage requests', async () => {
+    const { page, joined, playSound } = await createNotifications();
+
+    joined.emit('stageStatusUpdate', {
+      id: 'requesting-peer',
+      userId: 'requesting-user',
+      name: 'Ada',
+      stageStatus: 'REQUESTED_TO_JOIN_STAGE',
+    });
+    await page.waitForChanges();
+
+    expect(page.rootInstance.notifications).toEqual([]);
+    expect(playSound).not.toHaveBeenCalled();
+    page.root.remove();
+  });
+
   it('grants stage access and removes the message when Accept is clicked', async () => {
-    const { page, joined, stage } = await createNotifications();
+    const { page, joined, stage } = await createNotifications({ canAcceptStageRequests: true });
     joined.emit('stageStatusUpdate', {
       id: 'requesting-peer',
       userId: 'requesting-user',
@@ -705,7 +807,7 @@ describe('<rtk-notifications> stage messages', () => {
   it('hides the requested to join stage message when stage_requested_to_join is false', async () => {
     const config = createConfigWithAllOn();
     config.config.notifications.stage_requested_to_join = false;
-    const { page, joined } = await createNotifications({ config });
+    const { page, joined } = await createNotifications({ config, canAcceptStageRequests: true });
 
     joined.emit('stageStatusUpdate', {
       id: 'requesting-peer',
@@ -779,7 +881,10 @@ describe('<rtk-notifications> stage messages', () => {
   it('plays the requested to join stage sound when only the stage_joined sound is off', async () => {
     const config = createConfigWithAllOn();
     config.config.notification_sounds.stage_joined = false;
-    const { page, joined, playSound } = await createNotifications({ config });
+    const { page, joined, playSound } = await createNotifications({
+      config,
+      canAcceptStageRequests: true,
+    });
 
     joined.emit('stageStatusUpdate', {
       id: 'requesting-peer',
@@ -1168,7 +1273,18 @@ describe('<rtk-notifications> custom notifications', () => {
     page.root.remove();
   });
 
-  it('plays the configured URL instead of the sound of the sender', async () => {
+  it('plays the audio file URL that the sender passes', async () => {
+    const { page, playSound, playSenderSound } = await createNotifications();
+
+    sendNotification(customNotification, 'https://example.com/sounds/hand.mp3');
+    await page.waitForChanges();
+
+    expect(playSound).toHaveBeenCalledWith('https://example.com/sounds/hand.mp3');
+    expect(playSenderSound).not.toHaveBeenCalled();
+    page.root.remove();
+  });
+
+  it('plays the sound of the sender when the config also sets a custom URL', async () => {
     const config = createConfigWithAllOn();
     config.config.notification_sound_urls.custom = 'https://example.com/sounds/custom.ogg';
     const { page, playSound, playSenderSound } = await createNotifications({ config });
@@ -1176,7 +1292,72 @@ describe('<rtk-notifications> custom notifications', () => {
     sendNotification(customNotification, 'joined');
     await page.waitForChanges();
 
+    expect(playSenderSound).toHaveBeenCalledWith('joined');
+    expect(playSound).not.toHaveBeenCalled();
+    page.root.remove();
+  });
+
+  it('plays the custom URL of the config when the sender passes no sound', async () => {
+    const config = createConfigWithAllOn();
+    config.config.notification_sound_urls.custom = 'https://example.com/sounds/custom.ogg';
+    const { page, playSound } = await createNotifications({ config });
+
+    sendNotification(customNotification);
+    await page.waitForChanges();
+
     expect(playSound).toHaveBeenCalledWith('https://example.com/sounds/custom.ogg');
+    page.root.remove();
+  });
+
+  it('plays the custom URL of the config when the sender passes a script URL', async () => {
+    const config = createConfigWithAllOn();
+    config.config.notification_sound_urls.custom = 'https://example.com/sounds/custom.ogg';
+    const { page, playSound } = await createNotifications({ config });
+
+    sendNotification(customNotification, 'javascript:alert(1)');
+    await page.waitForChanges();
+
+    expect(playSound).toHaveBeenCalledTimes(1);
+    expect(playSound).toHaveBeenCalledWith('https://example.com/sounds/custom.ogg');
+    page.root.remove();
+  });
+
+  it('plays no sound when the sender passes a script URL and the config has no custom URL', async () => {
+    const { page, playSound, playSenderSound } = await createNotifications();
+
+    sendNotification(customNotification, 'javascript:alert(1)');
+    await page.waitForChanges();
+
+    expect(page.rootInstance.notifications).toEqual([
+      expect.objectContaining({ id: 'hand-raised' }),
+    ]);
+    expect(playSound).not.toHaveBeenCalled();
+    expect(playSenderSound).not.toHaveBeenCalled();
+    page.root.remove();
+  });
+
+  it('shows a notification that is sent for the meeting of this component', async () => {
+    const { page, meeting, playSenderSound } = await createNotifications();
+
+    sendNotification(customNotification, 'joined', meeting as any);
+    await page.waitForChanges();
+
+    expect(page.rootInstance.notifications).toEqual([
+      { id: 'hand-raised', message: 'Ada raised a hand', duration: 4000 },
+    ]);
+    expect(playSenderSound).toHaveBeenCalledWith('joined');
+    page.root.remove();
+  });
+
+  it('does not show or play a notification that is sent for another meeting', async () => {
+    const { page, playSound, playSenderSound } = await createNotifications();
+    const otherMeeting = { meta: { meetingId: 'meeting-2' } };
+
+    sendNotification(customNotification, 'joined', otherMeeting as any);
+    await page.waitForChanges();
+
+    expect(page.rootInstance.notifications).toEqual([]);
+    expect(playSound).not.toHaveBeenCalled();
     expect(playSenderSound).not.toHaveBeenCalled();
     page.root.remove();
   });
@@ -1274,6 +1455,7 @@ describe('<rtk-notifications> with the default config', () => {
   it('hides the stage request and stage joined messages and plays no sound', async () => {
     const { page, joined, playSound } = await createNotifications({
       config: createDefaultConfig(),
+      canAcceptStageRequests: true,
     });
 
     joined.emit('stageStatusUpdate', {
@@ -1531,6 +1713,353 @@ describe('<rtk-notifications> listeners and replaced notifications', () => {
     expect(page.rootInstance.notifications).toEqual([
       expect.objectContaining({ id: 'hand-raised' }),
     ]);
+    page.root.remove();
+  });
+});
+
+describe('<rtk-notifications> speaker, microphone, recording and network keys', () => {
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it('shows the speaker switched message with a sound and uses the speaker for sounds', async () => {
+    const { page, selfEvents, setSpeaker, playSound } = await createNotifications();
+
+    selfEvents.emit('deviceUpdate', {
+      device: { kind: 'audiooutput', deviceId: 'speaker-1', label: 'Desk speaker' },
+      preview: false,
+    });
+    await page.waitForChanges();
+
+    expect(page.rootInstance.notifications).toEqual([
+      expect.objectContaining({
+        id: 'speaker-switched',
+        message: 'Connected to Desk speaker',
+        duration: 5000,
+      }),
+    ]);
+    expect(setSpeaker).toHaveBeenCalledWith('speaker-1');
+    expect(playSound).toHaveBeenCalledWith(MESSAGE_SOUND_URL);
+    page.root.remove();
+  });
+
+  it('hides the speaker switched message when speaker_switched is false', async () => {
+    const config = createConfigWithAllOn();
+    config.config.notifications.speaker_switched = false;
+    const { page, selfEvents } = await createNotifications({ config });
+
+    selfEvents.emit('deviceUpdate', {
+      device: { kind: 'audiooutput', deviceId: 'speaker-1', label: 'Desk speaker' },
+      preview: false,
+    });
+    await page.waitForChanges();
+
+    expect(page.rootInstance.notifications).toEqual([]);
+    page.root.remove();
+  });
+
+  it('shows the microphone switched message with a sound', async () => {
+    const { page, selfEvents, playSound } = await createNotifications();
+
+    selfEvents.emit('deviceUpdate', {
+      device: { kind: 'audioinput', deviceId: 'microphone-1', label: 'Headset microphone' },
+      preview: false,
+    });
+    await page.waitForChanges();
+
+    expect(page.rootInstance.notifications).toEqual([
+      expect.objectContaining({
+        id: 'mic-switched',
+        message: 'Connected to Headset microphone',
+        duration: 5000,
+      }),
+    ]);
+    expect(playSound).toHaveBeenCalledWith(MESSAGE_SOUND_URL);
+    page.root.remove();
+  });
+
+  it('hides the microphone switched message when microphone_switched is false', async () => {
+    const config = createConfigWithAllOn();
+    config.config.notifications.microphone_switched = false;
+    const { page, selfEvents } = await createNotifications({ config });
+
+    selfEvents.emit('deviceUpdate', {
+      device: { kind: 'audioinput', deviceId: 'microphone-1', label: 'Headset microphone' },
+      preview: false,
+    });
+    await page.waitForChanges();
+
+    expect(page.rootInstance.notifications).toEqual([]);
+    page.root.remove();
+  });
+
+  it('does not notify for a device change in the preview', async () => {
+    const { page, selfEvents, playSound } = await createNotifications();
+
+    selfEvents.emit('deviceUpdate', {
+      device: { kind: 'audioinput', deviceId: 'microphone-1', label: 'Headset microphone' },
+      preview: true,
+    });
+    await page.waitForChanges();
+
+    expect(page.rootInstance.notifications).toEqual([]);
+    expect(playSound).not.toHaveBeenCalled();
+    page.root.remove();
+  });
+
+  it('shows the recording started message for 2 seconds with a sound', async () => {
+    const { page, recording, playSound } = await createNotifications();
+
+    recording.emit('recordingUpdate', 'RECORDING');
+    await page.waitForChanges();
+
+    expect(page.rootInstance.notifications).toEqual([
+      expect.objectContaining({ id: 'recording-started', duration: 2000 }),
+    ]);
+    expect(playSound).toHaveBeenCalledWith(MESSAGE_SOUND_URL);
+    page.root.remove();
+  });
+
+  it('hides the recording started message when recording_started is false', async () => {
+    const config = createConfigWithAllOn();
+    config.config.notifications.recording_started = false;
+    const { page, recording } = await createNotifications({ config });
+
+    recording.emit('recordingUpdate', 'RECORDING');
+    await page.waitForChanges();
+
+    expect(page.rootInstance.notifications).toEqual([]);
+    page.root.remove();
+  });
+
+  it('shows the recording stopped message for its own duration with a sound', async () => {
+    const config = createConfigWithAllOn();
+    config.config.notification_duration.recording_stopped = 3000;
+    const { page, recording, playSound } = await createNotifications({ config });
+
+    recording.emit('recordingUpdate', 'STOPPING');
+    await page.waitForChanges();
+
+    expect(page.rootInstance.notifications).toEqual([
+      expect.objectContaining({ id: 'recording-stopped', duration: 3000 }),
+    ]);
+    expect(playSound).toHaveBeenCalledWith(MESSAGE_SOUND_URL);
+    page.root.remove();
+  });
+
+  it('does not play the recording stopped sound when its sound is off', async () => {
+    const config = createConfigWithAllOn();
+    config.config.notification_sounds.recording_stopped = false;
+    const { page, recording, playSound } = await createNotifications({ config });
+
+    recording.emit('recordingUpdate', 'STOPPING');
+    await page.waitForChanges();
+
+    expect(playSound).not.toHaveBeenCalled();
+    page.root.remove();
+  });
+
+  it('keeps the reconnect delay message on screen and plays a sound', async () => {
+    const { page, meta, playSound } = await createNotifications();
+
+    meta.emit('socketConnectionUpdate', { state: 'reconnecting', reconnectionAttempt: 4 });
+    await page.waitForChanges();
+
+    expect(page.rootInstance.notifications).toEqual([
+      expect.objectContaining({
+        id: 'socket',
+        message: 'Taking too long to reconnect. Please check your network connection.',
+        duration: undefined,
+      }),
+    ]);
+    expect(playSound).toHaveBeenCalledWith(MESSAGE_SOUND_URL);
+    page.root.remove();
+  });
+
+  it('hides the reconnect delay message when network_delayed is false', async () => {
+    const config = createConfigWithAllOn();
+    config.config.notifications.network_delayed = false;
+    const { page, meta } = await createNotifications({ config });
+
+    meta.emit('socketConnectionUpdate', { state: 'reconnecting', reconnectionAttempt: 4 });
+    await page.waitForChanges();
+
+    expect(page.rootInstance.notifications).toEqual([]);
+    page.root.remove();
+  });
+
+  it('does not notify for the first reconnect attempts', async () => {
+    const { page, meta, playSound } = await createNotifications();
+
+    meta.emit('socketConnectionUpdate', { state: 'reconnecting', reconnectionAttempt: 2 });
+    await page.waitForChanges();
+
+    expect(page.rootInstance.notifications).toEqual([]);
+    expect(playSound).not.toHaveBeenCalled();
+    page.root.remove();
+  });
+
+  it('leaves the meeting from the End Meeting button of the could not reconnect message', async () => {
+    const { page, meta, leave } = await createNotifications();
+
+    meta.emit('socketConnectionUpdate', { state: 'reconnecting', reconnectionAttempt: 6 });
+    await page.waitForChanges();
+    page.rootInstance.notifications[0].button.onClick();
+
+    expect(leave).toHaveBeenCalledTimes(1);
+    page.root.remove();
+  });
+
+  it('leaves the meeting from the End Meeting button of the network failed message', async () => {
+    const { page, meta, leave } = await createNotifications();
+
+    meta.emit('socketConnectionUpdate', { state: 'failed' });
+    await page.waitForChanges();
+    page.rootInstance.notifications[0].button.onClick();
+
+    expect(leave).toHaveBeenCalledTimes(1);
+    page.root.remove();
+  });
+
+  it('hides the network failed message when network_failed is false', async () => {
+    const config = createConfigWithAllOn();
+    config.config.notifications.network_failed = false;
+    const { page, meta } = await createNotifications({ config });
+
+    meta.emit('socketConnectionUpdate', { state: 'failed' });
+    await page.waitForChanges();
+
+    expect(page.rootInstance.notifications).toEqual([]);
+    page.root.remove();
+  });
+
+  it('removes the waiting room request when the participant leaves the waiting room', async () => {
+    const { page, waitlisted } = await createNotifications({ canAcceptWaitingRequests: true });
+
+    waitlisted.emit('participantJoined', { id: 'waiting-peer', name: 'Ada' });
+    await page.waitForChanges();
+    waitlisted.emit('participantLeft', { id: 'waiting-peer', name: 'Ada' });
+    await page.waitForChanges();
+
+    expect(page.rootInstance.notifications).toEqual([]);
+    page.root.remove();
+  });
+});
+
+describe('<rtk-notifications> view types and the current speaker', () => {
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it('notifies about joining participants in a livestream only while the user is on stage', async () => {
+    const { page, joined, stage } = await createNotifications({ viewType: 'LIVESTREAM' });
+
+    joined.emit('participantJoined', { id: 'peer-1', name: 'Ada' });
+    await page.waitForChanges();
+    expect(page.rootInstance.notifications).toEqual([]);
+
+    stage.emit('stageStatusUpdate', 'ON_STAGE');
+    joined.emit('participantJoined', { id: 'peer-2', name: 'Grace' });
+    await page.waitForChanges();
+    expect(page.rootInstance.notifications).toEqual([
+      expect.objectContaining({ id: 'peer-2-joined' }),
+    ]);
+
+    stage.emit('stageStatusUpdate', 'OFF_STAGE');
+    joined.emit('participantJoined', { id: 'peer-3', name: 'Edsger' });
+    await page.waitForChanges();
+    expect(page.rootInstance.notifications).toEqual([
+      expect.objectContaining({ id: 'peer-2-joined' }),
+    ]);
+    page.root.remove();
+  });
+
+  it('notifies only about chat messages in the chat view type', async () => {
+    const { page, joined, chat, meta } = await createNotifications({ viewType: 'CHAT' });
+
+    joined.emit('participantJoined', { id: 'peer-1', name: 'Ada' });
+    meta.emit('socketConnectionUpdate', { state: 'disconnected' });
+    chat.emit('chatUpdate', { action: 'add', message: chatMessage });
+    await page.waitForChanges();
+
+    expect(page.rootInstance.notifications).toEqual([
+      expect.objectContaining({ message: 'Ada: Hello' }),
+    ]);
+    page.root.remove();
+  });
+
+  it('uses the current speaker for sounds when the meeting is set', async () => {
+    const { page, setSpeaker } = await createNotifications({
+      currentSpeaker: { deviceId: 'speaker-1' },
+    });
+
+    expect(setSpeaker).toHaveBeenCalledWith('speaker-1');
+    page.root.remove();
+  });
+});
+
+describe('<rtk-notifications> dismiss and pause', () => {
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  function wait(milliseconds: number) {
+    return new Promise((resolve) => setTimeout(resolve, milliseconds));
+  }
+
+  async function createWithOneNotification() {
+    const created = await createNotifications();
+    created.joined.emit('participantJoined', { id: 'new-peer', name: 'Ada' });
+    await created.page.waitForChanges();
+    const notificationElement = created.page.root.shadowRoot.querySelector(
+      '[data-id="new-peer-joined"]'
+    ) as HTMLRtkNotificationElement;
+    return { ...created, notificationElement };
+  }
+
+  it('plays the exit animation and then removes a notification that asks to be dismissed', async () => {
+    const { page, notificationElement } = await createWithOneNotification();
+
+    notificationElement.dispatchEvent(
+      new CustomEvent('rtkNotificationDismiss', { detail: 'new-peer-joined' })
+    );
+
+    expect(notificationElement.classList.contains('exit')).toBe(true);
+    expect(page.rootInstance.notifications).toHaveLength(1);
+
+    await wait(450);
+    await page.waitForChanges();
+
+    expect(page.rootInstance.notifications).toEqual([]);
+    expect(page.root.shadowRoot.querySelector('[data-id="new-peer-joined"]')).toBeNull();
+    page.root.remove();
+  });
+
+  it('pauses the notifications while the pointer is over them', async () => {
+    const { page } = await createWithOneNotification();
+    const container = page.root.shadowRoot.querySelector('div');
+
+    container.dispatchEvent(new Event('mouseenter'));
+    await page.waitForChanges();
+    expect(page.rootInstance.paused).toBe(true);
+
+    container.dispatchEvent(new Event('mouseleave'));
+    await page.waitForChanges();
+    expect(page.rootInstance.paused).toBe(false);
+    page.root.remove();
+  });
+
+  it('pauses the notifications while the focus is inside them', async () => {
+    const { page } = await createWithOneNotification();
+    const container = page.root.shadowRoot.querySelector('div');
+
+    container.dispatchEvent(new Event('focusin'));
+    await page.waitForChanges();
+    expect(page.rootInstance.paused).toBe(true);
+
+    container.dispatchEvent(new Event('focusout'));
+    await page.waitForChanges();
+    expect(page.rootInstance.paused).toBe(false);
     page.root.remove();
   });
 });

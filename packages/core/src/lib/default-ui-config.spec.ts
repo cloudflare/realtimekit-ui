@@ -122,7 +122,7 @@ describe('createDefaultConfig', () => {
         network_disconnected: MESSAGE_SOUND_URL,
         network_failed: MESSAGE_SOUND_URL,
         api_error: MESSAGE_SOUND_URL,
-        custom: '',
+        custom: undefined,
       },
       participant_joined_sound_notification_limit: 3,
       participant_chat_message_sound_notification_limit: 10,

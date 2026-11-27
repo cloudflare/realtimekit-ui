@@ -15,7 +15,7 @@ To change a notification setting, call `createDefaultConfig()`, change the setti
 | `notification_duration`   | How long the notification stays on screen.   | Milliseconds. With `0`, it stays until the user dismisses it or another notification replaces it. |
 | `notification_sound_urls` | The audio file of the sound.                 | A URL. See "Sound files".                                                                         |
 
-Always start from `createDefaultConfig()`. Do not write these groups by hand. `rtk-notifications` needs all four groups with every key. If a group is missing, the component throws an error.
+Start from `createDefaultConfig()`, so that you can see and change every key. If a group or a key is missing from the config, `rtk-notifications` uses its default value.
 
 The groups work on their own. If you hide a notification, its sound still plays unless you also set its key in `notification_sounds` to `false`.
 
@@ -74,7 +74,7 @@ To see every default value, read the object that `createDefaultConfig()` returns
 | `tab_sync_screen_share_switched` | The meeting switches to the screen share of a participant.                                                                  |
 | `recording_started`              | The recording starts.                                                                                                       |
 | `recording_stopped`              | The recording stops.                                                                                                        |
-| `stage_requested_to_join`        | A participant asks to join the stage. It has an Accept button.                                                              |
+| `stage_requested_to_join`        | A participant asks to join the stage. Only users who can accept these requests see it. It has an Accept button.             |
 | `stage_joined`                   | A participant joins the stage.                                                                                              |
 | `stage_request_accepted`         | Your request to join the stage is accepted.                                                                                 |
 | `stage_request_rejected`         | Your request to join the stage is rejected.                                                                                 |
@@ -143,9 +143,40 @@ uiConfig.config.notification_sound_urls.participant_joined =
 - The URL starts with `https:` or `http:`.
 - The path of the URL ends with `.mp3`, `.wav`, `.ogg`, `.m4a`, `.aac`, `.flac`, `.opus` or `.webm`.
 
-If a URL does not pass this check, `rtk-notifications` plays the default sound of that notification.
+If a URL does not pass this check, `rtk-notifications` plays the default sound of that notification. The `custom` key is the exception, because it has no default sound.
 
-The `custom` key is empty by default. A notification from `sendNotification()` then plays the sound that your app chooses. If you set a URL for `custom`, every notification from `sendNotification()` plays that file.
+## Sounds of your own notifications
+
+`sendNotification()` takes the sound as its second argument. Pass the name of a built-in sound (`joined`, `left` or `message`) or the URL of your own audio file. The URL follows the same check as above.
+
+```js
+sendNotification(
+  { id: 'hand-raised', message: 'Ada raised a hand' },
+  'https://example.com/sounds/hand.mp3'
+);
+sendNotification(
+  { id: 'vote-closed', message: 'The vote is closed' },
+  'message'
+);
+```
+
+The `custom` key in `notification_sound_urls` is the sound for a notification that your app sends without a sound. It is empty by default, so such a notification plays no sound. A URL that does not pass the check counts as no sound.
+
+## More than one meeting on a page
+
+If a page has more than one meeting, every `rtk-notifications` on the page shows a notification from `sendNotification()`. To send a notification to one meeting only, pass that meeting as the third argument.
+
+```js
+sendNotification(
+  { id: 'hand-raised', message: 'Ada raised a hand' },
+  'message',
+  meeting
+);
+```
+
+`rtk-notifications` then compares `meeting.meta.meetingId` with the ID of its own meeting. If the IDs are different, it does not show the notification and does not play its sound.
+
+If you do not pass a meeting, every `rtk-notifications` on the page shows the notification, as before.
 
 ## Sound limits by participant count
 
