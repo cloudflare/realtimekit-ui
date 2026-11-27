@@ -58,6 +58,8 @@ export class RtkNotification {
 
   @Watch('notification')
   notificationChanged(notification: Notification) {
+    // a notification that replaces another one must not close on the timer of the earlier one
+    clearTimeout(this.timeout);
     if (notification != null && typeof notification.duration === 'number' && !this.paused) {
       this.timeout = window.setTimeout(() => {
         this.dismiss.emit(notification.id);

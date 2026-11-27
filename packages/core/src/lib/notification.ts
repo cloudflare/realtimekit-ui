@@ -1,13 +1,34 @@
 import { Meeting } from '../types/rtk-client';
 import { isFirefox } from '../utils/browser';
 
-const SOUNDS = {
+export const SOUNDS = {
   joined: 'https://rtk-assets.realtime.cloudflare.com/ui-kit/sounds/notification_join.mp3',
   left: 'https://rtk-assets.realtime.cloudflare.com/ui-kit/sounds/notification_join.mp3',
   message: 'https://rtk-assets.realtime.cloudflare.com/ui-kit/sounds/notification_message.mp3',
 };
 
 export type Sound = keyof typeof SOUNDS;
+
+const AUDIO_FILE_EXTENSIONS = ['.mp3', '.wav', '.ogg', '.m4a', '.aac', '.flac', '.opus', '.webm'];
+
+/**
+ * Checks that a value is an `https:` or `http:` URL whose path ends with an audio file extension.
+ */
+export function isAudioFileUrl(url: unknown): url is string {
+  if (typeof url !== 'string') return false;
+
+  let parsedUrl: URL;
+  try {
+    parsedUrl = new URL(url, typeof document !== 'undefined' ? document.baseURI : undefined);
+  } catch (error) {
+    return false;
+  }
+
+  if (parsedUrl.protocol !== 'https:' && parsedUrl.protocol !== 'http:') return false;
+
+  const path = parsedUrl.pathname.toLowerCase();
+  return AUDIO_FILE_EXTENSIONS.some((extension) => path.endsWith(extension));
+}
 
 /**
  * Handles notification sounds in a meeting
@@ -23,12 +44,35 @@ export default class RTKNotificationsAudio {
     this.audio.volume = 0.3;
   }
 
+  /**
+   * Plays one of the built-in notification sounds: `joined`, `left` or `message`.
+   * After a sound starts, no other sound can start for `duration` milliseconds.
+   * A call during that time does nothing.
+   * @param sound The name of the built-in sound
+   * @param duration How long this sound plays before other sounds can start, in milliseconds
+   */
   play(sound: Sound, duration: number = 3000) {
+    this.playUrlSound(SOUNDS[sound], duration);
+  }
+
+  /**
+   * Plays an audio file from a URL.
+   * The URL must use `https:` or `http:` and its path must end with an audio file extension.
+   * Any other URL is ignored.
+   * @param url The URL of the audio file to play
+   * @param duration How long this sound plays before other sounds can start, in milliseconds
+   */
+  playUrl(url: string, duration: number = 3000) {
+    if (!isAudioFileUrl(url)) return;
+    this.playUrlSound(url, duration);
+  }
+
+  private playUrlSound(source: string, duration: number) {
     if (this.playing) return;
 
     this.playing = true;
 
-    this.audio.src = SOUNDS[sound];
+    this.audio.src = source;
     this.audio.volume = 0.3;
     this.audio.play()?.catch((_) => {});
 

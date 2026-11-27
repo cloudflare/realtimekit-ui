@@ -1,4 +1,5 @@
 import { UIConfig } from '../types/ui-config';
+import { DEFAULT_NOTIFICATION_CONFIG } from '../types/ui-config/config';
 import clone from '../utils/clone';
 
 /**
@@ -328,11 +329,7 @@ export const defaultConfig: UIConfig = {
     ],
   },
   config: {
-    notification_sounds: {
-      participant_left: false,
-    },
-    participant_joined_sound_notification_limit: 10,
-    participant_chat_message_sound_notification_limit: 10,
+    ...clone(DEFAULT_NOTIFICATION_CONFIG),
     videoFit: 'cover',
   },
 };
