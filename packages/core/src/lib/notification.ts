@@ -19,14 +19,19 @@ export function isBuiltInSoundName(value: unknown): value is Sound {
 const AUDIO_FILE_EXTENSIONS = ['.mp3', '.wav', '.ogg', '.m4a', '.aac', '.flac', '.opus', '.webm'];
 
 /**
- * Checks that a value is an `https:` or `http:` URL whose path ends with an audio file extension.
+ * Checks that a value is a valid sound URL.
+ * It must be an absolute URL that starts with `https://` or `http://` and ends with a
+ * supported audio file extension: `.mp3`, `.wav`, `.ogg`, `.m4a`, `.aac`, `.flac`, `.opus`
+ * or `.webm`.
+ * A query string after the extension is allowed.
  */
 export function isAudioFileUrl(url: unknown): url is string {
   if (!url || typeof url !== 'string') return false;
 
   let parsedUrl: URL;
   try {
-    parsedUrl = new URL(url, typeof document !== 'undefined' ? document.baseURI : undefined);
+    // no base URL: a relative path is not a valid URL here
+    parsedUrl = new URL(url);
   } catch (error) {
     return false;
   }
@@ -64,7 +69,9 @@ export default class RTKNotificationsAudio {
 
   /**
    * Plays an audio file from a URL.
-   * The URL must use `https:` or `http:` and its path must end with an audio file extension.
+   * It must be an absolute URL that starts with `https://` or `http://` and ends with a
+   * supported audio file extension: `.mp3`, `.wav`, `.ogg`, `.m4a`, `.aac`, `.flac`, `.opus`
+   * or `.webm`.
    * Any other URL is ignored.
    * @param url The URL of the audio file to play
    * @param duration How long this sound plays before other sounds can start, in milliseconds

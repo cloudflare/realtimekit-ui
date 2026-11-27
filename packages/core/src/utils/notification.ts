@@ -6,8 +6,11 @@ import { Sound } from '../lib/notification';
  * Send notification which will be displayed in the `<rtk-notifications />` component.
  * @param notification Notification object
  * @param playSound The sound to play with the notification. Pass the name of a built-in sound
- * (`joined`, `left` or `message`) or the URL of an audio file. The URL must use `https:` or
- * `http:` and its path must end with an audio file extension. Any other URL is ignored.
+ * (`joined`, `left` or `message`) or the URL of an audio file.
+ * It must be an absolute URL that starts with `https://` or `http://` and ends with a
+ * supported audio file extension: `.mp3`, `.wav`, `.ogg`, `.m4a`, `.aac`, `.flac`, `.opus`
+ * or `.webm`.
+ * Any other URL is ignored.
  * @param meeting The meeting that the notification is for. Pass it when the page has more than
  * one meeting: only the `<rtk-notifications />` of this meeting shows the notification.
  * Without it, every `<rtk-notifications />` on the page shows the notification.

@@ -46,8 +46,9 @@ export interface NotificationConfig {
   notification_duration: Partial<NotificationDuration>;
   /**
    * The audio file that each notification plays.
-   * A URL must use `https:` or `http:` and its path must end with an audio file
-   * extension: `.mp3`, `.wav`, `.ogg`, `.m4a`, `.aac`, `.flac`, `.opus` or `.webm`.
+   * It must be an absolute URL that starts with `https://` or `http://` and ends with a
+   * supported audio file extension: `.mp3`, `.wav`, `.ogg`, `.m4a`, `.aac`, `.flac`, `.opus`
+   * or `.webm`.
    * Any other value is ignored and the default sound of that notification is played.
    * `custom` is empty by default. A custom notification plays the sound that its sender
    * chose. The `custom` URL plays only when the sender chose no sound.

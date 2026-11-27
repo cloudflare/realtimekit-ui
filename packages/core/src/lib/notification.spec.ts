@@ -10,6 +10,13 @@ describe('isAudioFileUrl', () => {
     expect(isAudioFileUrl(url)).toBe(true);
   });
 
+  it.each(['/sounds/join.mp3', 'sounds/join.mp3', '../sounds/join.mp3', '//example.com/join.mp3'])(
+    'rejects the relative path %s',
+    (path) => {
+      expect(isAudioFileUrl(path)).toBe(false);
+    }
+  );
+
   it.each([
     'javascript:alert(1)',
     'javascript:alert(1)//join.mp3',

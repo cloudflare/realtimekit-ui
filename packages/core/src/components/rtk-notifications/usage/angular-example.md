@@ -148,7 +148,7 @@ uiConfig.config.notification_sound_urls.participant_joined =
 
 `rtk-notifications` plays a URL only if both of these are true:
 
-- The URL starts with `https:` or `http:`.
+- The URL is absolute and starts with `https:` or `http:`. A relative path, such as `/sounds/join.mp3`, does not pass.
 - The path of the URL ends with `.mp3`, `.wav`, `.ogg`, `.m4a`, `.aac`, `.flac`, `.opus` or `.webm`.
 
 If a URL does not pass this check, `rtk-notifications` plays the default sound of that notification. The `custom` key is the exception, because it has no default sound.
