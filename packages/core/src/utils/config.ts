@@ -1,11 +1,13 @@
 import type { RTKThemePreset, RTKPermissionsPreset } from '@cloudflare/realtimekit';
 import { createDefaultConfig } from '../lib/default-ui-config';
 import { UIConfig } from '../types/ui-config';
+import { DEFAULT_NOTIFICATION_CONFIG } from '../types/ui-config/config';
 import { DesignTokens } from '../types/ui-config/design-tokens';
 import { isValidHexColor } from './color';
 import deepMerge from 'lodash-es/merge';
 import { Meeting } from '../types/rtk-client';
 import { isLiveStreamHost } from './livestream';
+import clone from './clone';
 
 /**
  * Extend the default UI Config with your own
@@ -459,11 +461,7 @@ export const generateConfig = (
       'rtk-name-tag': [['rtk-audio-visualizer', { slot: 'start' }]],
     },
     config: {
-      notification_sounds: {
-        participant_left: false,
-      },
-      participant_joined_sound_notification_limit: 3,
-      participant_chat_message_sound_notification_limit: 10,
+      ...clone(DEFAULT_NOTIFICATION_CONFIG),
       videoFit: 'cover',
     },
   };

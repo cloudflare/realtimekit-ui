@@ -90,7 +90,7 @@ sendNotification(
     icon: 'warning', // optional icon name from iconPack
     button: { text: 'Undo', onClick: () => {} }, // optional CTA
   },
-  /* playSound = */ true
+  /* playSound = */ 'message'
 );
 ```
 

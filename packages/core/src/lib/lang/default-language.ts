@@ -421,6 +421,8 @@ export const defaultLanguage = {
   'notifications.request_to_join_rejected': 'Request to join rejected',
   'notifications.accept': 'Accept',
   'notifications.new_poll_created_by': 'New poll created by',
+  'notifications.chat_message_edited': 'edited a message',
+  'notifications.chat_message_deleted': 'deleted a message',
   'notifications.connected_to': 'Connected to',
   'notifications.plugin_switched_to': 'Plugin switched to',
   'notifications.remote_control_requested': 'has requested for remote control',

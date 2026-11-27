@@ -1,17 +1,15 @@
 import { Component, Host, h, Prop, State, Element, Watch, writeTask, Listen } from '@stencil/core';
 import { Meeting, Participant, Peer, WaitlistedParticipant } from '../../types/rtk-client';
 import { Size, Notification, States, Poll } from '../../types/props';
-import RTKNotificationsAudio, { Sound } from '../../lib/notification';
+import RTKNotificationsAudio, { isAudioFileUrl, isBuiltInSoundName } from '../../lib/notification';
 import { formatName } from '../../utils/string';
 import { defaultIconPack, IconPack } from '../../lib/icons';
 import { RtkI18n, useLanguage } from '../../lib/lang';
 import { UIConfig } from '../../types/ui-config';
 import {
-  Config,
   DEFAULT_NOTIFICATION_CONFIG,
-  DEFAULT_NOTIFICATION_DURATION,
   NotificationConfig,
-  NotificationSoundsType,
+  NotificationKey,
 } from '../../types/ui-config/config';
 import type {
   ActiveTab,
@@ -21,30 +19,9 @@ import type {
 } from '@cloudflare/realtimekit';
 import { createDefaultConfig } from '../../exports';
 import { parseMessageForTarget } from '../../utils/chat';
+import deepMerge from 'lodash-es/merge';
 import { SyncWithStore } from '../../utils/sync-with-store';
 import { showLivestream } from '../../utils/livestream';
-
-function parseConfig(config: Config) {
-  const permissions: NotificationConfig = Object.assign({}, DEFAULT_NOTIFICATION_CONFIG);
-
-  if (config == null) return permissions;
-
-  Object.assign(permissions.notification_sounds, config.notification_sounds);
-  Object.assign(permissions.notifications, config.notifications);
-  Object.assign(permissions.notification_duration, config.notification_duration);
-
-  permissions.participant_chat_message_sound_notification_limit =
-    config.participant_chat_message_sound_notification_limit;
-
-  permissions.participant_joined_sound_notification_limit =
-    config.participant_joined_sound_notification_limit;
-
-  return permissions;
-}
-
-function getEnabledSounds(sounds: Partial<NotificationSoundsType>) {
-  return Object.keys(sounds).filter((key) => sounds[key]);
-}
 
 /**
  * A component which handles notifications.
@@ -59,11 +36,6 @@ function getEnabledSounds(sounds: Partial<NotificationSoundsType>) {
 })
 export class RtkNotifications {
   private audio: RTKNotificationsAudio;
-
-  private permissions: NotificationConfig = DEFAULT_NOTIFICATION_CONFIG;
-  private enabledSounds: string[] = getEnabledSounds(
-    DEFAULT_NOTIFICATION_CONFIG.notification_sounds
-  );
 
   private participantJoinedListener: (participant: Peer) => void;
   private participantLeftListener: (participant: Peer) => void;
@@ -113,13 +85,14 @@ export class RtkNotifications {
 
   @State() notifications: Notification[] = [];
 
+  private notificationConfig: NotificationConfig = deepMerge({}, DEFAULT_NOTIFICATION_CONFIG);
+
   connectedCallback() {
     if (typeof document !== 'undefined') {
       document?.addEventListener('rtkNotification', this.onNotification);
     }
     this.meetingChanged(this.meeting);
     this.configChanged(this.config);
-    this.statesChanged(this.states);
   }
 
   private clearListeners(meeting: Meeting) {
@@ -141,6 +114,20 @@ export class RtkNotifications {
     this.stageStatusUpdateListener &&
       meeting.stage?.removeListener('stageStatusUpdate', this.stageStatusUpdateListener);
     meeting.recording?.removeListener('recordingUpdate', this.onRecordingUpdate);
+    this.peerStageStatusListener &&
+      meeting.participants.joined.removeListener('stageStatusUpdate', this.peerStageStatusListener);
+    this.waitlistedParticipantJoinedListener &&
+      meeting.participants.waitlisted.removeListener(
+        'participantJoined',
+        this.waitlistedParticipantJoinedListener
+      );
+    this.waitlistedParticipantLeftListener &&
+      meeting.participants.waitlisted.removeListener(
+        'participantLeft',
+        this.waitlistedParticipantLeftListener
+      );
+    this.activeTabUpdateListener &&
+      meeting.meta?.removeListener('activeTabUpdate', this.activeTabUpdateListener);
     clearTimeout(this.disconnectTimeout);
     meeting.self.removeListener('deviceUpdate', this.deviceUpdateListener);
   }
@@ -152,25 +139,6 @@ export class RtkNotifications {
 
     if (!this.meeting) return;
     this.clearListeners(this.meeting);
-    this.waitlistedParticipantJoinedListener &&
-      this.meeting.participants.waitlisted.removeListener(
-        'participantJoined',
-        this.waitlistedParticipantJoinedListener
-      );
-
-    this.waitlistedParticipantLeftListener &&
-      this.meeting.participants.waitlisted.removeListener(
-        'participantLeft',
-        this.waitlistedParticipantLeftListener
-      );
-
-    this.activeTabUpdateListener &&
-      this.meeting.meta?.removeListener('activeTabUpdate', this.activeTabUpdateListener);
-    this.peerStageStatusListener &&
-      this.meeting.participants.joined.removeListener(
-        'stageStatusUpdate',
-        this.peerStageStatusListener
-      );
   }
 
   @Watch('meeting')
@@ -180,7 +148,6 @@ export class RtkNotifications {
     if (!meeting) return;
     const isLivestream = meeting.meta.viewType === 'LIVESTREAM';
     this.audio = new RTKNotificationsAudio(meeting);
-    const { notifications, notification_duration, notification_sounds } = this.permissions;
     this.participantJoinedListener = (participant: Participant) => {
       /**
        * NOTE(ravindra-cloudflare):
@@ -196,16 +163,13 @@ export class RtkNotifications {
       if (isReconnectedParticipant) {
         return;
       }
-      if (notifications.participant_joined) {
-        this.add({
-          id: `${participant.id}-joined`,
-          message: `${formatName(participant.name)} ${this.t('notifications.joined')}`,
-          image: participant.picture,
-          duration: notification_duration.participant_joined,
-        });
-      }
-      if (notification_sounds.participant_joined && this.canPlayParticipantJoinedSound()) {
-        this.audio.play('joined');
+      this.showIfEnabled('participant_joined', {
+        id: `${participant.id}-joined`,
+        message: `${formatName(participant.name)} ${this.t('notifications.joined')}`,
+        image: participant.picture,
+      });
+      if (this.canPlayParticipantJoinedSound()) {
+        this.playSoundIfEnabled('participant_joined');
       }
     };
 
@@ -222,29 +186,27 @@ export class RtkNotifications {
       const {
         socketState: { state },
       } = this.meeting.meta;
-      if (notifications.participant_left && state === 'connected') {
-        this.add({
+      if (state === 'connected') {
+        this.showIfEnabled('participant_left', {
           id: `${participant.id}-left`,
           message: `${formatName(participant.name)} ${this.t('notifications.left')}`,
           image: participant.picture,
-          duration: notification_duration.participant_left,
         });
-      }
-      if (notification_sounds.participant_left && this.canPlayParticipantJoinedSound()) {
-        this.audio.play('left');
+        if (this.canPlayParticipantJoinedSound()) {
+          this.playSoundIfEnabled('participant_left');
+        }
       }
     };
 
     this.waitlistedParticipantJoinedListener = (participant: WaitlistedParticipant) => {
       if (!this.canAcceptWaitingRequests()) return;
       const id = `${participant.id}-joined-waitlist`;
-      this.add({
+      this.showIfEnabled('participant_joined_waitlist', {
         id,
         message: `${formatName(participant.name)} ${this.t(
           'notifications.requesting_to_join_meeting'
         )}`,
         image: participant.picture,
-        duration: notification_duration.participant_joined_waitlist,
         button: {
           text: this.t('notifications.accept'),
           variant: 'primary',
@@ -254,8 +216,8 @@ export class RtkNotifications {
           },
         },
       });
-      if (notification_sounds.participant_joined_waitlist && this.canPlayParticipantJoinedSound()) {
-        this.audio.play('message');
+      if (this.canPlayParticipantJoinedSound()) {
+        this.playSoundIfEnabled('participant_joined_waitlist');
       }
     };
 
@@ -264,24 +226,32 @@ export class RtkNotifications {
     };
 
     this.chatUpdateListener = ({ message, action }) => {
-      // NOTE(ikabra): we only want notifications for new messages
-      if (action !== 'add') return;
       const parsedMessage = parseMessageForTarget(message);
       if (parsedMessage != null) {
         if (parsedMessage.userId === meeting.self.userId) {
           return;
         }
-        if (parsedMessage.type === 'text') {
-          if (notifications.chat) {
-            this.add({
-              id: `message-${Math.random().toString(36)}`,
-              icon: this.iconPack.chat,
-              message: `${parsedMessage.displayName}: ${parsedMessage.message}`,
-              duration: notification_duration.chat,
-            });
+        if (action === 'edit' || action === 'delete') {
+          const notificationKey =
+            action === 'edit' ? 'chat_message_edited' : 'chat_message_deleted';
+          this.showIfEnabled(notificationKey, {
+            id: `message-${Math.random().toString(36)}`,
+            icon: this.iconPack.chat,
+            message: `${parsedMessage.displayName} ${this.t(`notifications.${notificationKey}`)}`,
+          });
+          if (this.canPlayChatSound()) {
+            this.playSoundIfEnabled(notificationKey);
           }
-          if (notification_sounds.chat && this.canPlayChatSound()) {
-            this.audio.play('message');
+          return;
+        }
+        if (parsedMessage.type === 'text') {
+          this.showIfEnabled('chat_new_message', {
+            id: `message-${Math.random().toString(36)}`,
+            icon: this.iconPack.chat,
+            message: `${parsedMessage.displayName}: ${parsedMessage.message}`,
+          });
+          if (this.canPlayChatSound()) {
+            this.playSoundIfEnabled('chat_new_message');
           }
         }
       }
@@ -289,25 +259,16 @@ export class RtkNotifications {
 
     this.pollUpdateListener = ({ polls, newPoll }) => {
       if (newPoll === false) return;
-      if (
-        notifications.polls &&
-        this.meeting.self.userId !== polls[polls.length - 1].createdByUserId
-      ) {
-        this.add({
-          id: `poll-${Math.random().toString(36)}`,
-          icon: this.iconPack.poll,
-          message: `${this.t('notifications.new_poll_created_by')} ${
-            polls[polls.length - 1].createdBy
-          }`,
-          duration: notification_duration.polls,
-        });
-      }
-      if (
-        notification_sounds.polls &&
-        this.meeting.self.userId !== polls[polls.length - 1].createdByUserId &&
-        this.canPlayChatSound()
-      ) {
-        this.audio.play('message');
+      if (this.meeting.self.userId === polls[polls.length - 1].createdByUserId) return;
+      this.showIfEnabled('polls_new_poll', {
+        id: `poll-${Math.random().toString(36)}`,
+        icon: this.iconPack.poll,
+        message: `${this.t('notifications.new_poll_created_by')} ${
+          polls[polls.length - 1].createdBy
+        }`,
+      });
+      if (this.canPlayChatSound()) {
+        this.playSoundIfEnabled('polls_new_poll');
       }
     };
 
@@ -316,32 +277,32 @@ export class RtkNotifications {
       if (device.kind === 'audiooutput') {
         this.audio.setDevice(device.deviceId);
         this.remove(`speaker-switched`);
-        this.add({
+        this.showIfEnabled('speaker_switched', {
           id: `speaker-switched`,
           message: `${this.t('notifications.connected_to')} ${device.label}`,
           icon: this.iconPack.speaker,
-          duration: 5000,
         });
+        this.playSoundIfEnabled('speaker_switched');
       }
       if (device.kind === 'videoinput') {
         this.remove(`camera-switched`);
-        this.add({
+        this.showIfEnabled('camera_switched', {
           id: `camera-switched`,
           message: `${this.t('notifications.connected_to')} ${device.label}`,
           icon: this.meeting.self.videoEnabled ? this.iconPack.video_on : this.iconPack.video_off,
           iconVariant: this.meeting.self.videoEnabled ? 'primary' : 'danger',
-          duration: 5000,
         });
+        this.playSoundIfEnabled('camera_switched');
       }
       if (device.kind === 'audioinput') {
         this.remove(`mic-switched`);
-        this.add({
+        this.showIfEnabled('microphone_switched', {
           id: `mic-switched`,
           message: `${this.t('notifications.connected_to')} ${device.label}`,
           icon: this.meeting.self.audioEnabled ? this.iconPack.mic_on : this.iconPack.mic_off,
           iconVariant: this.meeting.self.audioEnabled ? 'primary' : 'danger',
-          duration: 5000,
         });
+        this.playSoundIfEnabled('microphone_switched');
       }
     };
 
@@ -349,26 +310,28 @@ export class RtkNotifications {
       switch (state) {
         case 'connected':
           this.remove('socket');
-          if (reconnected)
-            this.add({
+          if (reconnected) {
+            this.showIfEnabled('network_restored', {
               id: `socket`,
               icon: this.iconPack.wifi,
               message: this.t('network.restored'),
-              duration: 3000,
             });
+            this.playSoundIfEnabled('network_restored');
+          }
           break;
         case 'disconnected':
           this.remove('socket');
-          this.add({
+          this.showIfEnabled('network_reconnecting', {
             id: 'socket',
             icon: this.iconPack.disconnected,
             message: this.t('network.reconnecting'),
           });
+          this.playSoundIfEnabled('network_reconnecting');
           break;
         case 'reconnecting':
           if (reconnectionAttempt >= 6) {
             this.remove('socket');
-            this.add({
+            this.showIfEnabled('network_disconnected', {
               id: 'socket',
               icon: this.iconPack.disconnected,
               message: this.t('network.disconnected'),
@@ -378,19 +341,21 @@ export class RtkNotifications {
                 onClick: () => this.meeting?.leave(),
               },
             });
+            this.playSoundIfEnabled('network_disconnected');
           } else if (reconnectionAttempt >= 4) {
             this.remove('socket');
-            this.add({
+            this.showIfEnabled('network_delayed', {
               id: 'socket',
               icon: this.iconPack.disconnected,
               message: this.t('network.delay_extended'),
             });
+            this.playSoundIfEnabled('network_delayed');
           }
 
           break;
         case 'failed':
           this.remove('socket');
-          this.add({
+          this.showIfEnabled('network_failed', {
             id: 'socket',
             icon: this.iconPack.disconnected,
             message: this.t('network.leaving'),
@@ -400,6 +365,7 @@ export class RtkNotifications {
               onClick: () => this.meeting?.leave(),
             },
           });
+          this.playSoundIfEnabled('network_failed');
           break;
         default:
           break;
@@ -407,7 +373,6 @@ export class RtkNotifications {
     };
 
     this.activeTabUpdateListener = (activeTab) => {
-      if (!notifications.tab_sync) return;
       switch (activeTab.type) {
         case 'plugin':
           const activePlugin = meeting.plugins.active
@@ -415,11 +380,11 @@ export class RtkNotifications {
             .find((plugin) => plugin.id == activeTab.id);
 
           if (activePlugin != undefined) {
-            this.add({
+            this.showIfEnabled('tab_sync_plugin_switched', {
               id: 'activeTab',
               message: `${this.t('notifications.plugin_switched_to')} ${activePlugin.name}`,
-              duration: notification_duration.participant_joined,
             });
+            this.playSoundIfEnabled('tab_sync_plugin_switched');
           }
           break;
         case 'screenshare':
@@ -429,22 +394,21 @@ export class RtkNotifications {
             .find((participant) => participant.id == activeTab.id);
 
           if (screenShareParticipant != undefined) {
-            this.add({
+            this.showIfEnabled('tab_sync_screen_share_switched', {
               id: 'spotlight',
               message: `Now watching ${screenShareParticipant.name}'s screen`,
-              duration: notification_duration.webinar,
             });
+            this.playSoundIfEnabled('tab_sync_screen_share_switched');
           }
           break;
       }
     };
 
     this.peerStageStatusListener = (participant: Peer) => {
-      if (participant.stageStatus === 'REQUESTED_TO_JOIN_STAGE') {
-        this.add({
+      if (participant.stageStatus === 'REQUESTED_TO_JOIN_STAGE' && this.canAcceptStageRequests()) {
+        this.showIfEnabled('stage_requested_to_join', {
           id: `stage-request-${participant.id}`,
           message: `${participant.name} ${this.t('notifications.requested_to_join_stage')}`,
-          duration: notification_duration.webinar,
           button: {
             text: this.t('notifications.accept'),
             variant: 'primary',
@@ -454,46 +418,41 @@ export class RtkNotifications {
             },
           },
         });
-        if (notification_sounds.webinar) {
-          this.audio.play('joined');
-        }
+        this.playSoundIfEnabled('stage_requested_to_join');
       }
       if (participant.stageStatus === 'ON_STAGE') {
-        this.add({
+        this.showIfEnabled('stage_joined', {
           id: `stage-joined-${participant.id}`,
           message: `${participant.name} ${this.t('notifications.joined_stage')}`,
-          duration: notification_duration.webinar,
         });
-        if (notification_sounds.webinar) {
-          this.audio.play('joined');
-        }
+        this.playSoundIfEnabled('stage_joined');
       }
     };
 
     this.stageRequestAccepted = () => {
-      this.add({
+      this.showIfEnabled('stage_request_accepted', {
         id: 'stage-request-accepted',
         message: this.t('notifications.request_to_join_accepted'),
-        duration: 3000,
       });
+      this.playSoundIfEnabled('stage_request_accepted');
     };
 
     this.stageRequestRejected = () => {
-      this.add({
+      this.showIfEnabled('stage_request_rejected', {
         id: 'stage-request-rejected',
         message: this.t('notifications.request_to_join_rejected'),
-        duration: 3000,
       });
+      this.playSoundIfEnabled('stage_request_rejected');
     };
 
     this.newStageRequests = ({ count }) => {
-      this.add({
+      this.showIfEnabled('stage_new_request_received', {
         id: 'new-stage-request',
         message: `You have ${count < 0 ? 'new stage' : `${count} pending`} request${
           count === 1 ? '' : 's'
         }`,
-        duration: 3000,
       });
+      this.playSoundIfEnabled('stage_new_request_received');
     };
 
     this.stageStatusUpdateListener = (status) => {
@@ -531,10 +490,11 @@ export class RtkNotifications {
     meeting.self.addListener('deviceUpdate', this.deviceUpdateListener);
     meeting.meta.addListener('socketConnectionUpdate', this.socketConnectionUpdateListener);
     meeting.meta?.addListener('activeTabUpdate', this.activeTabUpdateListener);
+    meeting.participants.joined.addListener('stageStatusUpdate', this.peerStageStatusListener);
     meeting.recording?.addListener('recordingUpdate', this.onRecordingUpdate);
     meeting.stage?.addListener('stageRequestApproved', this.stageRequestAccepted);
     meeting.stage?.addListener('stageRequestRejected', this.stageRequestRejected);
-    if (meeting.self.permissions.stageEnabled && meeting.self.permissions.acceptStageRequests) {
+    if (this.canAcceptStageRequests()) {
       meeting.stage?.addListener('newStageRequest', this.newStageRequests);
     }
   }
@@ -551,86 +511,123 @@ export class RtkNotifications {
 
   @Watch('config')
   configChanged(config: UIConfig) {
-    if (config != null) {
-      if (config?.config != null) {
-        this.permissions = parseConfig(config.config);
-        this.enabledSounds = getEnabledSounds(this.permissions.notification_sounds);
-      }
-    }
-  }
-
-  @Watch('states')
-  statesChanged(states: States) {
-    if (states != null) {
-      const notificationSoundsEnabled = !states?.prefs?.muteNotificationSounds;
-
-      // toggle only the notification sounds values which were enabled in the first place
-      for (const permission of this.enabledSounds) {
-        if (permission in this.permissions.notification_sounds) {
-          this.permissions.notification_sounds[permission] = notificationSoundsEnabled;
-        }
-      }
-    }
+    // a group, key or limit that the config does not set keeps its default value
+    this.notificationConfig = deepMerge({}, DEFAULT_NOTIFICATION_CONFIG, config?.config);
   }
 
   @Listen('rtkApiError', { target: 'window' })
   apiErrorListener({ detail }) {
     const { trace, message } = detail;
-    this.add({
+    this.showIfEnabled('api_error', {
       id: trace,
       message,
-      duration: DEFAULT_NOTIFICATION_DURATION,
       icon: this.iconPack.warning,
     });
+    this.playSoundIfEnabled('api_error');
   }
 
   @Listen('rtkSendNotification', { target: 'window' })
   sendNotificationListener({ detail }) {
     const { trace, message } = detail;
-    this.add({
+    // rtk-participant sends the stage invite message with a trace that starts with `join-stage-`
+    if (trace?.startsWith('join-stage-')) {
+      this.showIfEnabled('stage_invite_sent', { id: trace, message });
+      this.playSoundIfEnabled('stage_invite_sent');
+      return;
+    }
+    this.showIfEnabled('custom', {
       id: trace,
       message,
-      duration: DEFAULT_NOTIFICATION_DURATION,
     });
+    this.playCustomSoundIfEnabled();
   }
 
-  private onNotification = (e: CustomEvent<Notification & { playSound: Sound | undefined }>) => {
-    this.add(e.detail);
-    const playSound = e.detail.playSound;
-    if (playSound != undefined) this.audio.play(playSound);
+  private onNotification = (
+    e: CustomEvent<Notification & { playSound: string | undefined; meetingId: string | undefined }>
+  ) => {
+    const { playSound, meetingId, ...notification } = e.detail;
+    // a notification that names a meeting is only for the rtk-notifications of that meeting
+    if (!!meetingId && meetingId !== this.meeting?.meta?.meetingId) return;
+    if (this.isShown('custom')) this.add(notification);
+    this.playCustomSoundIfEnabled(playSound);
   };
 
   private onRecordingUpdate = (recordingState: RecordingState) => {
-    if (
-      recordingState === 'RECORDING' &&
-      this.permissions.notifications.recording_started !== false
-    ) {
-      this.add({
+    if (recordingState === 'RECORDING') {
+      this.showIfEnabled('recording_started', {
         id: 'recording-started',
         icon: this.iconPack.recording,
         message: this.t('recording.started'),
-        duration:
-          this.permissions.notification_duration.recording_started ?? DEFAULT_NOTIFICATION_DURATION,
       });
-    } else if (
-      recordingState === 'STOPPING' &&
-      this.permissions.notifications.recording_stopped !== false
-    ) {
-      this.add({
+      this.playSoundIfEnabled('recording_started');
+    } else if (recordingState === 'STOPPING') {
+      this.showIfEnabled('recording_stopped', {
         id: 'recording-stopped',
         icon: this.iconPack.stop_recording,
         message: this.t('recording.stopped'),
-        duration:
-          this.permissions.notification_duration.recording_stopped ?? DEFAULT_NOTIFICATION_DURATION,
       });
+      this.playSoundIfEnabled('recording_stopped');
     }
   };
 
-  private add(notification: Notification) {
-    // show notifications only if tab is in focus and a maximum of 5 at a time
-    if (document.visibilityState === 'visible' && this.notifications.length < 5) {
+  private isShown(key: NotificationKey): boolean {
+    return !!this.notificationConfig.notifications[key];
+  }
+
+  private isSoundOn(key: NotificationKey): boolean {
+    if (this.states?.prefs?.muteNotificationSounds) return false;
+    return !!this.notificationConfig.notification_sounds[key];
+  }
+
+  private showIfEnabled(key: NotificationKey, notification: Omit<Notification, 'duration'>) {
+    if (!this.isShown(key)) return;
+    const duration = this.notificationConfig.notification_duration[key];
+    // a duration of 0 keeps the notification until it is dismissed or replaced
+    // these two carry the End Meeting button, so the visible limit does not apply to them
+    const ignoreVisibleLimit = key === 'network_disconnected' || key === 'network_failed';
+    this.add(
+      { ...notification, duration: duration > 0 ? duration : undefined },
+      ignoreVisibleLimit
+    );
+  }
+
+  private playSoundIfEnabled(key: NotificationKey) {
+    if (!this.isSoundOn(key)) return;
+    const url = this.notificationConfig.notification_sound_urls[key];
+    // the audio player exists only after the meeting is set
+    this.audio?.playUrl(
+      isAudioFileUrl(url) ? url : DEFAULT_NOTIFICATION_CONFIG.notification_sound_urls[key]
+    );
+  }
+
+  /**
+   * A custom notification plays the sound that its sender chose:
+   * the name of a built-in sound or the URL of an audio file.
+   * Without a usable sound from the sender, it plays the `custom` URL from the config, if one is set.
+   */
+  private playCustomSoundIfEnabled(senderSound?: string) {
+    if (!this.isSoundOn('custom')) return;
+    if (isBuiltInSoundName(senderSound)) {
+      this.audio?.play(senderSound);
+      return;
+    }
+    const configUrl = this.notificationConfig.notification_sound_urls.custom;
+    const url = isAudioFileUrl(senderSound) ? senderSound : configUrl;
+    if (isAudioFileUrl(url)) {
+      this.audio?.playUrl(url);
+    }
+  }
+
+  private add(notification: Notification, ignoreVisibleLimit = false) {
+    // a new notification replaces an earlier one that has the same id
+    const otherNotifications = this.notifications.filter(({ id }) => id !== notification.id);
+    // show notifications only if tab is in focus and the visible limit is not reached
+    const visibleLimit = this.notificationConfig.visible_notifications_limit;
+    const hasRoom =
+      ignoreVisibleLimit || !(visibleLimit > 0) || otherNotifications.length < visibleLimit;
+    if (document.visibilityState === 'visible' && hasRoom) {
       // adds new notification to start of array so they appear at the bottom
-      this.notifications = [...this.notifications, notification];
+      this.notifications = [...otherNotifications, notification];
     }
   }
 
@@ -655,27 +652,29 @@ export class RtkNotifications {
 
   private canPlayParticipantJoinedSound(): boolean {
     return (
-      this.permissions.participant_joined_sound_notification_limit == undefined ||
-      this.permissions.participant_joined_sound_notification_limit <= 0 ||
+      this.notificationConfig.participant_joined_sound_notification_limit == undefined ||
+      this.notificationConfig.participant_joined_sound_notification_limit <= 0 ||
       this.meeting.participants.count <=
-        this.permissions.participant_joined_sound_notification_limit
+        this.notificationConfig.participant_joined_sound_notification_limit
     );
   }
 
   private canPlayChatSound(): boolean {
     return (
-      this.permissions.participant_chat_message_sound_notification_limit == undefined ||
-      this.permissions.participant_chat_message_sound_notification_limit <= 0 ||
+      this.notificationConfig.participant_chat_message_sound_notification_limit == undefined ||
+      this.notificationConfig.participant_chat_message_sound_notification_limit <= 0 ||
       this.meeting.participants.count <=
-        this.permissions.participant_chat_message_sound_notification_limit
+        this.notificationConfig.participant_chat_message_sound_notification_limit
     );
   }
 
+  private canAcceptStageRequests(): boolean {
+    const { stageEnabled, acceptStageRequests } = this.meeting.self.permissions;
+    return !!(stageEnabled && acceptStageRequests);
+  }
+
   private canAcceptWaitingRequests(): boolean {
-    return (
-      this.permissions.notifications.participant_joined_waitlist &&
-      this.meeting.self.permissions.acceptWaitingRequests
-    );
+    return !!this.meeting.self.permissions.acceptWaitingRequests;
   }
 
   @State()
